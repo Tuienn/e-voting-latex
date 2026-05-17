@@ -1,0 +1,101 @@
+\subsection{Mật mã đường cong elliptic}
+
+Mật mã đường cong elliptic (Elliptic Curve Cryptography -- ECC) được giới thiệu một cách độc lập bởi Neal Koblitz và Victor Miller vào năm 1985, mở ra một hướng đi mới trong việc xây dựng các hệ mật khóa công khai. Khác với các hệ mật cổ điển dựa trên bài toán phân tích thừa số nguyên tố (IFP) hay bài toán logarit rời rạc (DLP) trên trường hữu hạn, mật mã đường cong elliptic dựa trên độ khó của bài toán logarit rời rạc trên nhóm các điểm của đường cong elliptic (ECDLP) -- một bài toán cho đến nay vẫn chưa có giải thuật hiệu quả thời gian đa thức. Ưu điểm nổi bật của ECC là cung cấp mức độ an toàn tương đương các hệ mật truyền thống nhưng với độ dài khóa ngắn hơn nhiều lần, do đó tiết kiệm tài nguyên tính toán, băng thông truyền dẫn và năng lượng tiêu thụ. Chính vì lý do đó, ECC đã trở thành nền tảng toán học của hàng loạt chuẩn chữ ký số quốc tế hiện đại như ECDSA, EC-Schnorr và GOST R34.10-2012, đồng thời là cơ sở cho các lược đồ chữ ký mù tập thể được trình bày trong các chương sau của đồ án.
+
+\subsubsection{Khái niệm đường cong elliptic}
+
+Cho $K$ là một trường hữu hạn có đặc số khác $2$ và $3$. Một \textit{đường cong elliptic} (Elliptic Curve -- EC) trên trường $K$ được định nghĩa là tập hợp tất cả các nghiệm $(x, y) \in K \times K$ của phương trình Weierstrass rút gọn:
+\begin{equation}
+E: y^2 = x^3 + ax + b
+\label{eq:ec-weierstrass}
+\end{equation}
+cùng với một điểm đặc biệt $\mathcal{O}$ được gọi là \textit{điểm vô cùng} (point at infinity), trong đó các hệ số $a, b \in K$ thỏa mãn điều kiện không suy biến:
+\begin{equation}
+\Delta = -16(4a^3 + 27b^2) \neq 0
+\label{eq:ec-discriminant}
+\end{equation}
+Điều kiện trên đảm bảo đường cong không có nghiệm bội, tức là đồ thị của nó là một đường cong trơn không có điểm tự cắt hoặc điểm kỳ dị. Đại lượng $\Delta$ trong \eqref{eq:ec-discriminant} được gọi là \textit{biệt thức} (discriminant) của đường cong.
+
+Trong các ứng dụng mật mã, đường cong elliptic được xét trên trường hữu hạn nguyên tố $\mathbb{F}_p$ với $p$ là một số nguyên tố lớn. Khi đó phương trình đường cong được viết dưới dạng đồng dư modulo $p$:
+\begin{equation}
+E(\mathbb{F}_p): y^2 \equiv x^3 + ax + b \pmod{p}
+\label{eq:ec-fp}
+\end{equation}
+với điều kiện $4a^3 + 27b^2 \not\equiv 0 \pmod{p}$. Một thuộc tính quan trọng đặc trưng cho lớp các đường cong elliptic tương đương về mặt đẳng cấu là \textit{bất biến $j$} (j-invariant) được xác định bởi:
+\begin{equation}
+J(E) = 1728 \cdot \frac{4a^3}{4a^3 + 27b^2} \bmod p
+\label{eq:ec-jinvariant}
+\end{equation}
+Ngược lại, từ giá trị $J(E)$ với $J(E) \neq 0$ và $J(E) \neq 1728$, có thể khôi phục các hệ số của đường cong theo công thức $a = 2k \bmod p$, $b = 3k \bmod p$, trong đó $k = \frac{J(E)}{1728 - J(E)} \bmod p$.
+
+\subsubsection{Nhóm điểm trên đường cong elliptic}
+
+Tập hợp tất cả các điểm $(x, y) \in \mathbb{F}_p \times \mathbb{F}_p$ thỏa mãn phương trình \eqref{eq:ec-fp} cùng với điểm vô cùng $\mathcal{O}$ tạo thành một nhóm Abel, ký hiệu là $E(\mathbb{F}_p)$, với phép toán cộng điểm được định nghĩa hình học và đại số sẽ được trình bày trong mục tiếp theo. Số lượng phần tử của nhóm này được gọi là \textit{cấp} (order) của đường cong, ký hiệu $\#E(\mathbb{F}_p) = m$. Theo định lý nổi tiếng của Hasse, cấp $m$ thỏa mãn bất đẳng thức:
+\begin{equation}
+p + 1 - 2\sqrt{p} \leq m \leq p + 1 + 2\sqrt{p}
+\label{eq:hasse}
+\end{equation}
+Bất đẳng thức Hasse cho biết số điểm của đường cong xấp xỉ bằng kích thước của trường nền và là cơ sở cho việc đếm số điểm của đường cong khi lựa chọn tham số mật mã.
+
+Trong các ứng dụng mật mã, người ta thường chọn một điểm gốc $G \in E(\mathbb{F}_p)$, $G \neq \mathcal{O}$ có cấp là một số nguyên tố lớn $q$ -- tức là $q$ là số nguyên dương nhỏ nhất thỏa mãn $q \times G \equiv \mathcal{O}$. Khi đó, $G$ sinh ra một \textit{nhóm con cyclic} của $E(\mathbb{F}_p)$:
+\begin{equation}
+\langle G \rangle = \{\mathcal{O}, G, 2G, 3G, \ldots, (q-1)G\}
+\label{eq:cyclic-subgroup}
+\end{equation}
+Cấp $q$ của nhóm con này là ước của cấp $m$ của đường cong, tức là $m = n \cdot q$ với $n$ là số nguyên dương được gọi là \textit{đối cấp} (cofactor). Để đảm bảo tính an toàn của hệ mật, đối cấp $n$ thường được chọn rất nhỏ (thường $n = 1$, $n = 2$ hoặc $n = 4$), và $q$ phải là số nguyên tố đủ lớn (thường $q \geq 2^{160}$ hoặc $q \geq 2^{256}$ cho mức an toàn cao).
+
+\subsubsection{Phép toán trên đường cong elliptic}
+
+Trên nhóm điểm $E(\mathbb{F}_p)$, phép toán \textit{cộng hai điểm} được định nghĩa theo nguyên tắc \textit{tiếp tuyến và dây cung} (chord-and-tangent rule) như sau. Cho hai điểm $P_1 = (x_1, y_1)$ và $P_2 = (x_2, y_2)$ thuộc $E(\mathbb{F}_p)$, điểm tổng $P_3 = P_1 + P_2 = (x_3, y_3)$ được xác định bởi các công thức:
+
+\textit{Trường hợp 1 -- Cộng hai điểm phân biệt} ($P_1 \neq \pm P_2$, tức là $x_1 \neq x_2$): hệ số góc $\lambda$ và toạ độ của điểm tổng được tính bằng:
+\begin{equation}
+\lambda = \frac{y_2 - y_1}{x_2 - x_1} \bmod p, \quad x_3 = \lambda^2 - x_1 - x_2 \bmod p, \quad y_3 = \lambda(x_1 - x_3) - y_1 \bmod p
+\label{eq:point-add}
+\end{equation}
+
+\textit{Trường hợp 2 -- Nhân đôi điểm} ($P_1 = P_2$, $y_1 \neq 0$): sử dụng tiếp tuyến của đường cong tại điểm $P_1$ với hệ số góc:
+\begin{equation}
+\lambda = \frac{3x_1^2 + a}{2y_1} \bmod p, \quad x_3 = \lambda^2 - 2x_1 \bmod p, \quad y_3 = \lambda(x_1 - x_3) - y_1 \bmod p
+\label{eq:point-double}
+\end{equation}
+
+\textit{Trường hợp 3 -- Phần tử trung hòa và phần tử đối}: với mọi điểm $P \in E(\mathbb{F}_p)$, ta có $P + \mathcal{O} = \mathcal{O} + P = P$. Đối của điểm $P = (x, y)$ là điểm $-P = (x, -y \bmod p)$, và $P + (-P) = \mathcal{O}$.
+
+Trên cơ sở phép cộng điểm, \textit{phép nhân điểm với một số nguyên} (scalar multiplication) -- phép toán cốt lõi của mọi hệ mật trên đường cong elliptic -- được định nghĩa như phép cộng lặp:
+\begin{equation}
+k \times P = \underbrace{P + P + \cdots + P}_{k \text{ lần}}
+\label{eq:scalar-mult}
+\end{equation}
+trong đó $k$ là số nguyên dương và $P \in E(\mathbb{F}_p)$. Trong thực tế, phép nhân điểm không được thực hiện bằng cách cộng lặp $k$ lần (quá tốn kém khi $k$ lớn) mà được tính toán hiệu quả bằng thuật toán \textit{double-and-add} (nhân đôi và cộng) dựa trên biểu diễn nhị phân của $k$, với độ phức tạp $O(\log_2 k)$ phép cộng điểm. Đây cũng là cơ sở cho tính an toàn của bài toán logarit rời rạc trên đường cong elliptic được trình bày trong mục tiếp theo: việc tính $Q = k \times P$ là dễ dàng, nhưng việc tìm ngược lại $k$ khi biết $P$ và $Q$ là một bài toán khó.
+
+\subsubsection{Bài toán logarit rời rạc trên đường cong elliptic}
+
+\textit{Định nghĩa bài toán ECDLP:} Cho đường cong elliptic $E$ trên trường hữu hạn $\mathbb{F}_p$, một điểm $G \in E(\mathbb{F}_p)$ có cấp là số nguyên tố $q$ và một điểm $P \in \langle G \rangle$ thuộc nhóm con cyclic sinh bởi $G$. Bài toán logarit rời rạc trên đường cong elliptic (Elliptic Curve Discrete Logarithm Problem -- ECDLP) yêu cầu tìm số nguyên duy nhất $k$, $0 \leq k \leq q - 1$, sao cho:
+\begin{equation}
+P = k \times G
+\label{eq:ecdlp}
+\end{equation}
+Số nguyên $k$ được gọi là \textit{logarit rời rạc} của $P$ theo cơ sở $G$, ký hiệu $k = \log_G P$.
+
+Bài toán ECDLP được xem là khó về mặt tính toán theo nghĩa không tồn tại thuật toán hiệu quả trong thời gian đa thức để giải nó với các tham số được lựa chọn hợp lý. Đây chính là nền tảng cho tính an toàn của toàn bộ các hệ mật và lược đồ chữ ký số xây dựng trên đường cong elliptic.
+
+Các \textit{thuật toán tấn công ECDLP} đã được biết đến cho đến nay có thể chia thành hai nhóm chính. Nhóm thứ nhất gồm các thuật toán đa dụng áp dụng cho mọi nhóm cyclic, tiêu biểu là thuật toán \textit{Baby-step Giant-step} của Shanks và thuật toán \textit{Pollard's rho}, với độ phức tạp $O(\sqrt{q})$ phép toán nhóm. Nhóm thứ hai gồm các thuật toán chuyên dụng khai thác cấu trúc đặc biệt của nhóm, tiêu biểu là thuật toán \textit{Pohlig-Hellman} cho phép quy bài toán ECDLP về việc giải các bài toán con tương ứng với các ước nguyên tố của $q$. Sự kết hợp của hai thuật toán Pohlig-Hellman và Pollard's rho hiện được xem là phương pháp tấn công tốt nhất, có độ phức tạp $O(\sqrt{p'})$, trong đó $p'$ là ước nguyên tố lớn nhất của cấp $q$. Đáng chú ý, khác với các bài toán IFP và DLP trên trường hữu hạn, đối với ECDLP trên đường cong được lựa chọn cẩn thận, hiện không tồn tại thuật toán \textit{index-calculus} dưới mũ -- thuật toán này từng là công cụ phá vỡ hiệu quả các hệ mật dựa trên IFP và DLP.
+
+Để chống lại các tấn công nói trên, các tham số của đường cong elliptic dùng cho mật mã phải được lựa chọn sao cho cấp $q$ của nhóm con cyclic là một số nguyên tố đủ lớn, thông thường $q \geq 2^{160}$ cho mức an toàn $80$ bit và $q \geq 2^{256}$ cho mức an toàn $128$ bit -- mức được khuyến nghị hiện nay theo các tiêu chuẩn NIST và Brainpool. Ngoài ra, đường cong cũng cần tránh các lớp đặc biệt như đường cong dị thường (anomalous), đường cong siêu kỳ dị (supersingular) với nhúng nhỏ và đường cong có cấp chứa thừa số nhỏ -- những lớp đường cong có thể bị phá vỡ bằng các thuật toán chuyên dụng hiệu quả.
+
+\subsubsection{Ưu điểm của mật mã đường cong elliptic}
+
+So với các hệ mật khóa công khai cổ điển như RSA hay ElGamal trên trường hữu hạn, mật mã đường cong elliptic sở hữu nhiều ưu điểm vượt trội khiến nó trở thành lựa chọn được ưu tiên trong các hệ thống mật mã hiện đại, đặc biệt là các hệ thống có hạ tầng tài nguyên hạn chế:
+
+\begin{itemize}
+    \item \textbf{Độ dài khóa ngắn hơn nhiều với cùng mức an toàn:} Do không tồn tại thuật toán index-calculus dưới mũ cho ECDLP nên độ dài khóa cần thiết để đạt cùng mức an toàn của ECC nhỏ hơn nhiều lần so với RSA. Cụ thể, theo khuyến nghị của NIST, khóa ECC $256$ bit cung cấp mức an toàn tương đương khóa RSA $3072$ bit, và khóa ECC $384$ bit tương đương với khóa RSA $7680$ bit. Tỷ lệ này càng lớn khi tăng mức an toàn yêu cầu.
+
+    \item \textbf{Tốc độ tính toán nhanh và chi phí tài nguyên thấp:} Do độ dài khóa và độ dài chữ ký ngắn hơn nên các phép toán mật mã trên đường cong elliptic được thực hiện nhanh hơn, tiêu thụ ít bộ nhớ, ít băng thông truyền dẫn và ít năng lượng tiêu thụ hơn so với các hệ mật khác. Điều này đặc biệt có ý nghĩa với các thiết bị di động, thẻ thông minh, cảm biến IoT và các thiết bị nhúng có tài nguyên hạn chế.
+
+    \item \textbf{Tính linh hoạt cao trong thiết kế:} Trên cùng một trường hữu hạn $\mathbb{F}_p$, có thể xây dựng được vô số đường cong elliptic khác nhau bằng cách thay đổi các tham số $a, b$. Điều này cho phép thiết kế các đường cong tùy chỉnh phù hợp với từng ứng dụng cụ thể và mức độ an toàn yêu cầu, đồng thời tạo ra sự đa dạng cần thiết để chống lại các cuộc tấn công nhằm vào một đường cong cố định.
+
+    \item \textbf{Nền tảng cho các giao thức mật mã hiện đại:} ECC là cơ sở toán học của hàng loạt giao thức và chuẩn mật mã quan trọng đang được sử dụng rộng rãi trên toàn cầu, bao gồm thuật toán chữ ký số ECDSA (FIPS 186-4 của Hoa Kỳ), lược đồ EC-Schnorr, chuẩn chữ ký số GOST R34.10-2012 của Liên bang Nga, giao thức trao đổi khóa ECDH và ECDHE trong TLS, cũng như các lược đồ chữ ký số mù và chữ ký số tập thể mù -- chủ đề trọng tâm của các chương tiếp theo.
+\end{itemize}
+
+Với những ưu điểm nói trên, mật mã đường cong elliptic là lựa chọn phù hợp nhất cho việc triển khai các lược đồ chữ ký số trong hệ thống bỏ phiếu điện tử dựa trên công nghệ chuỗi khối được đề xuất trong đồ án này, nơi yêu cầu đồng thời về mức độ an toàn cao, hiệu năng xử lý nhanh và chi phí giao dịch thấp trên môi trường blockchain.

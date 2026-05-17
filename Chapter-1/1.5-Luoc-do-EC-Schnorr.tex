@@ -1,0 +1,129 @@
+\subsection{Lược đồ chữ ký số EC-Schnorr}
+
+Trên nền tảng toán học của mật mã đường cong elliptic được trình bày trong mục trên, mục này giới thiệu lược đồ chữ ký số EC-Schnorr -- một biến thể của lược đồ chữ ký Schnorr cổ điển được chuyển đổi sang nhóm điểm của đường cong elliptic. EC-Schnorr là một trong những lược đồ chữ ký số tiêu biểu nhất hiện nay nhờ cấu trúc đơn giản, hiệu năng tính toán cao, kích thước chữ ký gọn nhẹ và tính an toàn đã được chứng minh chặt chẽ trong mô hình tiên tri ngẫu nhiên (Random Oracle Model -- ROM). Lược đồ này không chỉ là cơ sở cho nhiều chuẩn chữ ký số đang được sử dụng rộng rãi trên thế giới (BIP340 của Bitcoin, EdDSA, GOST R34.10-2012) mà còn là nền móng để xây dựng các lược đồ chữ ký mù và chữ ký mù tập thể được trình bày trong các mục tiếp theo của đồ án.
+
+\subsubsection{Giới thiệu lược đồ Schnorr}
+
+Lược đồ chữ ký số Schnorr được Claus-Peter Schnorr đề xuất vào năm 1989 và công bố chính thức trong công trình ``\textit{Efficient Signature Generation by Smart Cards}'' năm 1991. Lược đồ này được xây dựng dựa trên độ khó của \textit{bài toán logarit rời rạc} (Discrete Logarithm Problem -- DLP) trên nhóm con cyclic của nhóm nhân $\mathbb{Z}_p^*$ và được thiết kế từ một giao thức nhận dạng tương tác (Schnorr identification protocol) bằng cách áp dụng \textit{phép biến đổi Fiat-Shamir} để chuyển thành lược đồ chữ ký số phi tương tác. So với các lược đồ chữ ký số ra đời cùng thời như ElGamal hay DSA, lược đồ Schnorr nổi bật ở cấu trúc tinh gọn, độ dài chữ ký ngắn và đặc biệt là tính an toàn đã được chứng minh chặt chẽ trong mô hình ROM dưới giả thiết bài toán DLP là khó.
+
+Lược đồ Schnorr cổ điển sử dụng bộ tham số miền $(p, q, g)$, trong đó $p$ là số nguyên tố lớn thỏa mãn $(p-1)$ chia hết cho $q$, $q$ là số nguyên tố lớn ngẫu nhiên và $g$ là phần tử sinh của nhóm con cấp $q$ trong $\mathbb{Z}_p^*$, được tính bằng $g = h^{(p-1)/q} \bmod p$ với $h \in (1, p-1)$ bất kỳ và yêu cầu $g \neq 1$. Người ký chọn khóa bí mật $d \in \mathbb{Z}_q^*$ và công bố khóa công khai $\rho = g^d \bmod p$. Quá trình ký một thông điệp $M$ bao gồm: chọn ngẫu nhiên giá trị $k$ với $1 < k < q$, tính $c = g^k \bmod p$, sau đó tính các thành phần chữ ký $r = H(M, c) \bmod q$ và $s = (k - r d) \bmod q$. Chữ ký số trên thông điệp $M$ là cặp $(r, s)$. Quá trình xác thực được thực hiện bằng cách tính $c' = g^s \cdot \rho^r \bmod p$, $r' = H(M, c')$ và kiểm tra điều kiện $r' = r$.
+
+Tuy nhiên, do được xây dựng trên nhóm $\mathbb{Z}_p^*$, lược đồ Schnorr cổ điển kế thừa hạn chế chung của các hệ mật khóa công khai dựa trên DLP truyền thống: tồn tại thuật toán tấn công \textit{index-calculus} với độ phức tạp dưới mũ, do đó để đạt mức an toàn $128$ bit cần phải sử dụng số nguyên tố $p$ có độ dài tối thiểu $3072$ bit. Điều này khiến cho kích thước khóa, kích thước phép tính trung gian và chi phí tính toán đều lớn, không phù hợp với các thiết bị tài nguyên hạn chế cũng như các môi trường yêu cầu hiệu năng cao như blockchain. Hạn chế này là động lực trực tiếp dẫn đến việc chuyển lược đồ Schnorr sang nhóm điểm của đường cong elliptic.
+
+\subsubsection{Lược đồ Schnorr trên đường cong elliptic}
+
+Lược đồ chữ ký số EC-Schnorr được phát triển dựa trên độ khó của bài toán logarit rời rạc trên đường cong elliptic (ECDLP) đã được trình bày trong mục \textit{Bài toán logarit rời rạc trên đường cong elliptic}. Về bản chất, EC-Schnorr giữ nguyên cấu trúc đại số của lược đồ Schnorr cổ điển, nhưng thay nhóm nhân $\mathbb{Z}_p^*$ bằng nhóm điểm $E(\mathbb{F}_p)$, thay phép mũ $g^k$ bằng phép nhân điểm $k \times G$ và thay khóa công khai dạng $\rho = g^d \bmod p$ bằng khóa công khai dạng điểm $P = d \times G$. Phép thay thế này không làm thay đổi cấu trúc logic của lược đồ nhưng đem lại lợi ích đáng kể về hiệu năng và kích thước nhờ các ưu điểm vốn có của ECC.
+
+Cụ thể, \textit{bộ tham số miền} của lược đồ EC-Schnorr được mô tả như sau:
+
+\begin{itemize}
+    \item $E$ là đường cong elliptic xác định trên trường hữu hạn $\mathbb{F}_p$, trong đó $p$ là số nguyên tố lớn tạo trường nền của đường cong;
+    \item $q$ là số nguyên tố lớn, là cấp của nhóm con cyclic được lựa chọn trên đường cong $E$;
+    \item $G \in E(\mathbb{F}_p)$ là điểm gốc có cấp $q$, $G \neq \mathcal{O}$, với toạ độ $(x_G, y_G)$ thoả mãn $q \times G \equiv \mathcal{O} \pmod{p}$;
+    \item $H: \{0,1\}^* \rightarrow \mathbb{Z}_q$ là một hàm băm mật mã, được mô hình hoá là một tiên tri ngẫu nhiên trong quá trình chứng minh an toàn;
+    \item $M$ là thông điệp cần ký, có thể là chuỗi bit có độ dài tùy ý.
+\end{itemize}
+
+Lược đồ EC-Schnorr bao gồm ba thuật toán cơ bản: thuật toán sinh khóa $\textsf{Gen}$, thuật toán sinh chữ ký $\textsf{Sig}$ và thuật toán xác minh chữ ký $\textsf{Ver}$, được trình bày chi tiết trong các mục tiếp theo.
+
+\subsubsection{Thuật toán sinh khóa}
+
+Thuật toán sinh khóa $\textsf{Gen}$ tạo ra cặp khóa bí mật và khóa công khai cho người ký với các bước thực hiện như sau:
+
+\begin{enumerate}
+    \item Chọn ngẫu nhiên số nguyên $d$ thoả mãn $1 < d < q$. Số nguyên $d$ chính là \textit{khóa bí mật} của người sử dụng;
+    \item Tính điểm khóa công khai $P$ bằng phép nhân điểm với khóa bí mật:
+    \begin{equation}
+        P = d \times G \bmod p
+        \label{eq:ec-schnorr-keygen}
+    \end{equation}
+    \item Người dùng giữ bí mật khóa $d$ và công bố khóa công khai $P$ cùng với bộ tham số miền $(E, p, q, G, H)$.
+\end{enumerate}
+
+Theo độ khó của bài toán ECDLP, biết khóa công khai $P$ và điểm gốc $G$ là không đủ để tìm ra khóa bí mật $d$ trong thời gian đa thức khi các tham số được lựa chọn hợp lý, do đó cặp khóa được sinh ra là an toàn về mặt mật mã.
+
+\subsubsection{Thuật toán ký}
+
+Để tạo chữ ký số trên thông điệp $M$ bằng khóa bí mật $d$, người ký thực hiện thuật toán $\textsf{Sig}$ qua các bước sau:
+
+\begin{enumerate}
+    \item Chọn ngẫu nhiên số nguyên $k$ thoả mãn $1 < k < q$. Giá trị $k$ phải hoàn toàn ngẫu nhiên, được giữ bí mật và \textit{không được tái sử dụng} cho hai lần ký khác nhau;
+    \item Tính điểm cam kết $C$ trên đường cong:
+    \begin{equation}
+        C = k \times G \bmod p
+        \label{eq:ec-schnorr-sign-c}
+    \end{equation}
+    \item Tính thành phần thứ nhất của chữ ký:
+    \begin{equation}
+        r = H(M, x_C) \bmod q
+        \label{eq:ec-schnorr-sign-r}
+    \end{equation}
+    trong đó $x_C$ là hoành độ của điểm $C$. Nếu $r = 0$ thì quay lại bước 1 và chọn lại giá trị $k$;
+    \item Tính thành phần thứ hai của chữ ký:
+    \begin{equation}
+        s = (k - r d) \bmod q
+        \label{eq:ec-schnorr-sign-s}
+    \end{equation}
+    Nếu $s = 0$ thì quay lại bước 1 và chọn lại giá trị $k$;
+    \item Đầu ra của thuật toán là cặp $(r, s) \in \mathbb{Z}_q \times \mathbb{Z}_q$ -- chính là chữ ký số EC-Schnorr trên thông điệp $M$.
+\end{enumerate}
+
+Do kích thước của cả hai thành phần $r$ và $s$ đều giới hạn trong $\mathbb{Z}_q$, kích thước tổng cộng của chữ ký EC-Schnorr là $2 \lceil \log_2 q \rceil$ bit, ngắn hơn đáng kể so với chữ ký Schnorr cổ điển trên $\mathbb{Z}_p^*$ ở cùng mức an toàn.
+
+\subsubsection{Thuật toán xác minh chữ ký}
+
+Để xác minh tính hợp lệ của chữ ký $(r, s)$ trên thông điệp $M$ với khóa công khai $P$, người xác minh thực hiện thuật toán $\textsf{Ver}$ như sau:
+
+\begin{enumerate}
+    \item Kiểm tra điều kiện cú pháp: $r, s \in \mathbb{Z}_q$ và $r, s \neq 0$. Nếu một trong các điều kiện này không thoả mãn, kết luận chữ ký không hợp lệ;
+    \item Tính điểm cam kết khôi phục $C'$ trên đường cong:
+    \begin{equation}
+        C' = s \times G + r \times P \bmod p
+        \label{eq:ec-schnorr-verify-c}
+    \end{equation}
+    \item Tính giá trị $r'$ từ điểm $C'$ và thông điệp $M$:
+    \begin{equation}
+        r' = H(M, x_{C'}) \bmod q
+        \label{eq:ec-schnorr-verify-r}
+    \end{equation}
+    trong đó $x_{C'}$ là hoành độ của điểm $C'$;
+    \item So sánh hai giá trị: nếu $r' = r$ thì chữ ký được chấp nhận, kết luận $\textsf{Ver}(M, (r,s), P) = \textsf{TRUE}$; ngược lại chữ ký bị từ chối.
+\end{enumerate}
+
+Quá trình xác minh chỉ sử dụng các tham số công khai $(E, p, q, G, H, P)$ và chữ ký $(r,s)$, không yêu cầu bất kỳ thông tin bí mật nào từ người ký, do đó bất kỳ thực thể nào trong hệ thống cũng có thể độc lập xác minh chữ ký.
+
+\subsubsection{Tính đúng đắn của lược đồ}
+
+\textit{Định lý:} Lược đồ chữ ký số EC-Schnorr là đúng đắn, tức là với mọi cặp khóa $(d, P)$ sinh ra bởi thuật toán $\textsf{Gen}$ và mọi thông điệp $M$, chữ ký $(r, s)$ tạo bởi thuật toán $\textsf{Sig}(M, d)$ luôn được chấp nhận bởi thuật toán $\textsf{Ver}(M, (r,s), P)$.
+
+\textit{Chứng minh:} Để chứng minh tính đúng đắn của lược đồ, cần chỉ ra rằng điểm $C'$ tính trong quá trình xác minh theo công thức \eqref{eq:ec-schnorr-verify-c} chính là điểm cam kết $C$ tính trong quá trình ký theo công thức \eqref{eq:ec-schnorr-sign-c}. Thay thế các giá trị tương ứng vào vế phải của \eqref{eq:ec-schnorr-verify-c} và sử dụng tính chất phân phối của phép nhân điểm trên đường cong elliptic, ta có:
+\begin{align}
+    C' &= s \times G + r \times P \pmod{p} \notag \\
+       &= (k - r d) \times G + r \times (d \times G) \pmod{p} \notag \\
+       &= k \times G - r d \times G + r d \times G \pmod{p} \notag \\
+       &= k \times G \pmod{p} \notag \\
+       &= C
+       \label{eq:ec-schnorr-correctness}
+\end{align}
+Như vậy điểm $C' = C$, suy ra $x_{C'} = x_C$, và do đó:
+\begin{equation}
+    r' = H(M, x_{C'}) \bmod q = H(M, x_C) \bmod q = r
+    \label{eq:ec-schnorr-r-equal}
+\end{equation}
+Điều kiện $r' = r$ luôn thoả mãn nên chữ ký hợp lệ luôn được thuật toán xác minh chấp nhận. Tính đúng đắn của lược đồ EC-Schnorr đã được chứng minh. $\hfill \blacksquare$
+
+\subsubsection{Tính an toàn của lược đồ}
+
+Tính an toàn của lược đồ chữ ký số EC-Schnorr đã được phân tích và chứng minh chặt chẽ trong nhiều công trình nghiên cứu, dựa trên độ khó của bài toán ECDLP và giả thiết về hàm băm trong mô hình tiên tri ngẫu nhiên ROM. Cụ thể, tính an toàn của EC-Schnorr được thể hiện qua các khía cạnh sau:
+
+\begin{itemize}
+    \item \textbf{An toàn của khóa bí mật:} Việc khôi phục khóa bí mật $d$ từ khóa công khai $P = d \times G$ tương đương trực tiếp với việc giải bài toán logarit rời rạc trên đường cong elliptic. Với các tham số được khuyến nghị (chẳng hạn đường cong secp256k1 hoặc các đường cong NIST P-256, Brainpool P-256), bài toán này hiện không có thuật toán hiệu quả trong thời gian đa thức, do đó khóa bí mật được bảo vệ an toàn ở mức $128$ bit.
+
+    \item \textbf{Tính không thể giả mạo dưới tấn công thông điệp được lựa chọn thích ứng} (Existential Unforgeability under Adaptive Chosen Message Attack -- EUF-CMA): Theo công trình kinh điển của Pointcheval và Stern (1996, 2000), lược đồ chữ ký Schnorr nói chung và EC-Schnorr nói riêng được chứng minh là an toàn EUF-CMA trong mô hình ROM với một quy giảm chặt chẽ về bài toán ECDLP thông qua kỹ thuật \textit{Forking Lemma}. Cụ thể, nếu tồn tại một đối thủ có thể giả mạo chữ ký EC-Schnorr với xác suất không bỏ qua được, thì cũng tồn tại một thuật toán giải được bài toán ECDLP với xác suất không bỏ qua được, mâu thuẫn với giả thiết ECDLP là khó.
+
+    \item \textbf{Vai trò sống còn của số ngẫu nhiên $k$:} Giá trị $k$ trong thuật toán ký bắt buộc phải được sinh hoàn toàn ngẫu nhiên, giữ bí mật và không được tái sử dụng. Nếu kẻ tấn công thu thập được hai chữ ký $(r_1, s_1)$ và $(r_2, s_2)$ trên hai thông điệp $M_1 \neq M_2$ nhưng sử dụng cùng một giá trị $k$, thì có thể khôi phục khóa bí mật một cách trực tiếp bằng cách giải hệ phương trình $s_1 - s_2 = -(r_1 - r_2) d \bmod q$, từ đó $d = -(s_1 - s_2)(r_1 - r_2)^{-1} \bmod q$. Đây cũng là nguyên nhân của nhiều sự cố lộ khóa nghiêm trọng trong thực tế, do đó các triển khai hiện đại đều yêu cầu hoặc sử dụng nguồn ngẫu nhiên chất lượng cao, hoặc áp dụng cơ chế \textit{sinh tất định} $k = H(d, M)$ theo chuẩn RFC 6979.
+
+    \item \textbf{Độ an toàn của hàm băm $H$:} Lược đồ giả định hàm băm $H$ thỏa mãn các tính chất kháng tiền ảnh, kháng tiền ảnh thứ hai và kháng va chạm. Trong thực tế, các hàm băm được khuyến nghị sử dụng kết hợp với EC-Schnorr là SHA-256, SHA-3 hoặc các biến thể có độ dài đầu ra phù hợp với cấp $q$ của nhóm con. Việc phá vỡ tính kháng va chạm của hàm băm sẽ phá vỡ tính không thể giả mạo của lược đồ chữ ký.
+\end{itemize}
+
+Tóm lại, lược đồ chữ ký số EC-Schnorr cung cấp một mức an toàn cao với hiệu năng tính toán vượt trội nhờ tận dụng được ưu điểm của mật mã đường cong elliptic, đồng thời kế thừa tính an toàn đã được chứng minh chặt chẽ của họ lược đồ Schnorr trong mô hình tiên tri ngẫu nhiên. Chính những đặc tính này là cơ sở để lựa chọn EC-Schnorr làm nền tảng xây dựng lược đồ chữ ký mù và chữ ký mù tập thể được trình bày trong các mục tiếp theo, đáp ứng đồng thời yêu cầu về tính riêng tư, độ an toàn và hiệu năng trong hệ thống bỏ phiếu điện tử dựa trên công nghệ chuỗi khối được đề xuất trong đồ án.

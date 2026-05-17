@@ -1,0 +1,87 @@
+\subsection{Cơ sở mật mã học}
+
+Mật mã học hiện đại là nền tảng lý thuyết cho hầu hết các hệ thống bảo mật trên môi trường mạng nói chung và các hệ thống bỏ phiếu điện tử nói riêng. Trong khuôn khổ của đồ án, các nguyên thủy mật mã được sử dụng bao gồm hàm băm mật mã, hệ mật khóa công khai, chữ ký số cùng với mô hình lý thuyết để đánh giá tính an toàn -- mô hình tiên tri ngẫu nhiên (Random Oracle Model -- ROM). Mục này trình bày một cách hệ thống các khái niệm nền tảng nói trên làm cơ sở cho các nội dung được phát triển ở các mục và các chương tiếp theo.
+
+\subsubsection{Hàm băm mật mã}
+
+Hàm băm mật mã (cryptographic hash function) là một hàm toán học $H: \{0,1\}^{*} \rightarrow \{0,1\}^{k}$ nhận đầu vào là một chuỗi bit có độ dài bất kỳ và sinh ra đầu ra có độ dài cố định $k$ (thường là 256 hoặc 512 bit). Giá trị đầu ra $H(M)$ được gọi là \textit{giá trị băm} hay \textit{bản tóm lược} (digest) của thông điệp $M$. Vai trò của hàm băm trong mật mã hiện đại là cung cấp một \textit{vân tay số} (fingerprint) duy nhất, gọn nhẹ và đại diện cho thông điệp gốc, nhờ đó có thể phát hiện mọi thay đổi dù là nhỏ nhất xảy ra với thông điệp ban đầu.
+
+Để được coi là an toàn về mặt mật mã, một hàm băm $H$ phải đồng thời thỏa mãn ba thuộc tính cơ bản sau:
+
+\begin{itemize}
+    \item \textbf{Tính kháng tiền ảnh (Preimage Resistance):} Với một giá trị băm $h$ cho trước, không tồn tại thuật toán hiệu quả trong thời gian đa thức tìm được thông điệp $M$ sao cho $H(M) = h$. Thuộc tính này còn được gọi là tính \textit{một chiều} (one-way) của hàm băm.
+
+    \item \textbf{Tính kháng tiền ảnh thứ hai (Second Preimage Resistance):} Cho trước một thông điệp $M_1$, không tồn tại thuật toán hiệu quả tìm được thông điệp $M_2 \neq M_1$ sao cho $H(M_1) = H(M_2)$.
+
+    \item \textbf{Tính kháng xung đột (Collision Resistance):} Không tồn tại thuật toán hiệu quả tìm được hai thông điệp khác nhau $M_1 \neq M_2$ bất kỳ thỏa mãn $H(M_1) = H(M_2)$.
+\end{itemize}
+
+Ngoài ra, một hàm băm mật mã tốt còn phải có \textit{tính khuếch tán} (avalanche effect) -- nghĩa là mọi thay đổi nhỏ trong đầu vào, dù chỉ một bit, đều dẫn đến sự thay đổi đáng kể và không thể dự đoán ở đầu ra. Trong thực tế, các thuật toán băm phổ biến hiện nay bao gồm dòng SHA-2 (SHA-256, SHA-512), SHA-3 (Keccak), cùng với các thuật toán đặc thù theo tiêu chuẩn quốc gia như GOST R34.11. Trong các lược đồ chữ ký số, hàm băm được sử dụng để rút gọn thông điệp về kích thước cố định trước khi ký nhằm đảm bảo hiệu năng và tránh các tấn công liên quan đến cấu trúc thông điệp dài.
+
+\subsubsection{Mã hóa khóa công khai}
+
+Hệ mật khóa công khai (Public-Key Cryptosystem) -- hay còn gọi là hệ mật bất đối xứng -- được Whitfield Diffie và Martin Hellman đề xuất lần đầu tiên vào năm 1976 trong bài báo \textit{``New Directions in Cryptography''}, mở ra một hướng đi hoàn toàn mới trong lĩnh vực mật mã hiện đại. Khác với hệ mật đối xứng truyền thống, trong đó cùng một khóa được sử dụng cho cả hai quá trình mã hóa và giải mã, hệ mật khóa công khai sử dụng một \textit{cặp khóa} gồm khóa công khai $pk$ (public key) và khóa bí mật $sk$ (secret key) có quan hệ toán học chặt chẽ nhưng không thể tính khóa bí mật từ khóa công khai trong thời gian hợp lý.
+
+Cơ chế hoạt động cơ bản của hệ mật khóa công khai có thể tóm tắt như sau: khóa công khai được phổ biến rộng rãi và bất kỳ ai cũng có thể sử dụng để mã hóa một thông điệp gửi tới chủ sở hữu của cặp khóa; trong khi đó khóa bí mật được người chủ giữ kín và chỉ người này mới có thể giải mã ngược thông điệp đã được mã hóa bằng khóa công khai tương ứng. Tính an toàn của hệ mật khóa công khai phụ thuộc vào độ khó của một bài toán toán học cụ thể -- gọi là \textit{bài toán cửa sập một chiều} (one-way trapdoor function) -- mà kẻ tấn công nếu không có khóa bí mật thì không thể giải được trong thời gian đa thức.
+
+Năm 1978, R. Rivest, A. Shamir và L. Adleman đã công bố hệ mật RSA -- hệ mật khóa công khai thực tế đầu tiên dựa trên độ khó của bài toán phân tích thừa số nguyên lớn (Integer Factorization Problem -- IFP). Sau đó, hàng loạt hệ mật khóa công khai khác đã được đề xuất dựa trên các bài toán khó khác nhau, tiêu biểu là hệ ElGamal và Schnorr dựa trên bài toán logarit rời rạc (Discrete Logarithm Problem -- DLP), cũng như các hệ mật trên đường cong elliptic (Elliptic Curve Cryptography -- ECC) dựa trên bài toán logarit rời rạc trên đường cong elliptic (Elliptic Curve Discrete Logarithm Problem -- ECDLP). Hệ mật khóa công khai không chỉ giải quyết bài toán bảo mật thông tin mà còn là nền tảng cho các giao thức xác thực, trao đổi khóa và đặc biệt là chữ ký số -- chủ đề trọng tâm của các phần tiếp theo.
+
+\subsubsection{Chữ ký số}
+
+Chữ ký số (Digital Signature -- DS) là một dạng dữ liệu được tạo ra bằng hệ mật khóa công khai nhằm xác thực nguồn gốc và tính toàn vẹn của một thông điệp điện tử. Theo Nghị định số 130/2018/NĐ-CP ngày 27/9/2018 của Chính phủ Việt Nam, chữ ký số được định nghĩa là \textit{``một loại chữ ký điện tử, được tạo bằng sự chuyển đổi thông điệp dữ liệu sử dụng một hệ thống mật mã không đối xứng, theo đó người có được thông điệp dữ liệu ban đầu và khóa công khai của người ký có thể xác định được chính xác việc biến đổi nêu trên được tạo ra bằng đúng khóa bí mật tương ứng với khóa công khai trong cùng một cặp khóa, và sự toàn vẹn nội dung của thông điệp dữ liệu kể từ khi thực hiện việc biến đổi nêu trên''}.
+
+Một lược đồ chữ ký số được xác định bởi bộ ba thuật toán $(Gen, Sig, Ver)$, trong đó:
+
+\begin{itemize}
+    \item \textbf{Thuật toán sinh khóa (Gen):} Nhận đầu vào là tham số an toàn $1^k$ và sinh ra cặp khóa công khai -- bí mật $(pk, sk)$. Đây thường là thuật toán xác suất.
+
+    \item \textbf{Thuật toán ký (Sig):} Sử dụng khóa bí mật $sk$ để tạo ra chữ ký $s \leftarrow Sig(sk, M)$ tương ứng với thông điệp $M$. Để tăng hiệu năng và tránh các bất lợi liên quan đến độ dài thông điệp lớn, trong thực tế người ký không ký trực tiếp lên thông điệp $M$ mà ký lên giá trị băm $H(M)$.
+
+    \item \textbf{Thuật toán xác thực (Ver):} Sử dụng khóa công khai $pk$ để kiểm tra tính hợp lệ của cặp $(M, s)$ và trả về kết quả thuộc tập $\{0, 1\}$. Đây là thuật toán khẳng định, cho phép bất kỳ ai có khóa công khai đều có thể kiểm tra chữ ký mà không cần biết khóa bí mật.
+\end{itemize}
+
+Quy trình tạo và xác thực chữ ký số được mô tả khái quát như sau: phía người ký áp dụng hàm băm $H$ lên thông điệp $M$ để tạo ra giá trị tóm lược $H(M)$, sau đó sử dụng khóa bí mật của mình để biến đổi $H(M)$ thành chữ ký số $s$. Cặp $(M, s)$ được gửi tới người nhận. Phía người nhận tiến hành tính lại giá trị $H(M)$ từ thông điệp nhận được, đồng thời sử dụng khóa công khai của người gửi để khôi phục hoặc tính giá trị đối chiếu từ chữ ký $s$. Nếu hai giá trị này khớp nhau, chữ ký được kết luận là hợp lệ -- điều này đồng thời chứng tỏ thông điệp xuất phát từ đúng người gửi và không bị thay đổi trong quá trình truyền.
+
+Nhờ cơ chế trên, chữ ký số đảm nhiệm ba chức năng cốt lõi sau: (i) \textit{xác thực nguồn gốc} thông điệp -- chỉ chủ sở hữu khóa bí mật mới có thể tạo ra chữ ký hợp lệ tương ứng với khóa công khai đã được công bố; (ii) \textit{đảm bảo tính toàn vẹn} -- mọi thay đổi dù nhỏ trên thông điệp sẽ làm thay đổi giá trị băm và khiến chữ ký không còn hợp lệ; (iii) \textit{chống chối bỏ} -- người ký không thể phủ nhận hành động ký của mình bởi chỉ có khóa bí mật của họ mới sinh ra được chữ ký đó. Hiện nay, chữ ký số đã được chuẩn hóa và triển khai tại hơn 40 quốc gia trên thế giới thông qua các tiêu chuẩn như FIPS của Hoa Kỳ và GOST của Liên bang Nga. Dựa trên các tiêu chí phân loại khác nhau, các lược đồ chữ ký số đã được phát triển thành nhiều biến thể như chữ ký số nhóm, chữ ký số tập thể, chữ ký số đại diện, chữ ký số ngưỡng và chữ ký số mù -- mỗi biến thể nhằm đáp ứng một yêu cầu nghiệp vụ cụ thể.
+
+\subsubsection{Các yêu cầu an toàn của chữ ký số}
+
+Để được sử dụng trong thực tế, một lược đồ chữ ký số phải chống lại được các dạng tấn công đã biết trên cả hai khía cạnh: khả năng truy cập thông tin của kẻ tấn công và mức độ thành công mà kẻ tấn công có thể đạt được. Goldwasser \textit{et al.} đã hệ thống hóa các loại tấn công và các dạng phá vỡ lược đồ chữ ký số như sau.
+
+\textit{Các loại tấn công} được phân loại theo lượng thông tin mà kẻ tấn công có thể thu thập được:
+
+\begin{itemize}
+    \item \textbf{Tấn công vào khóa (Key Only Attacks -- KOA):} Kẻ tấn công chỉ biết khóa công khai của người ký. Đây là dạng tấn công cơ bản nhất.
+
+    \item \textbf{Tấn công văn bản được biết (Known Message Attack -- KMA):} Kẻ tấn công có thể truy cập tới các chữ ký của một số văn bản $M_1, M_2, \dots, M_n$ nhưng không tự ý lựa chọn được các văn bản này.
+
+    \item \textbf{Tấn công văn bản được lựa chọn tổng quát (Generic Chosen Message Attack -- GCMA):} Kẻ tấn công có thể lựa chọn trước một danh sách các văn bản và yêu cầu chữ ký hợp lệ tương ứng. Danh sách này không phụ thuộc vào khóa công khai của người ký.
+
+    \item \textbf{Tấn công văn bản được lựa chọn trực tiếp (Directed Chosen Message Attack -- DCMA):} Tương tự GCMA nhưng danh sách văn bản được tạo ra \textit{sau khi} biết khóa công khai của người ký, tuy nhiên vẫn được tạo trước khi quan sát được bất kỳ chữ ký nào.
+
+    \item \textbf{Tấn công văn bản được lựa chọn thích ứng (Adaptive Chosen Message Attack -- ACMA):} Đây là dạng tấn công nghiêm trọng nhất, trong đó kẻ tấn công có thể sử dụng người ký hợp lệ như một \textit{nguồn Oracle}, lựa chọn văn bản để ký sau khi đã biết khóa công khai và quan sát được các chữ ký trước đó. Một lược đồ chữ ký số khi đưa vào sử dụng phải chứng minh được khả năng chịu được dạng tấn công này.
+\end{itemize}
+
+\textit{Các dạng phá vỡ} được phân loại theo mức độ thành công của kẻ tấn công, sắp xếp theo thứ tự giảm dần của mức độ nghiêm trọng:
+
+\begin{itemize}
+    \item \textbf{Phá vỡ hoàn toàn (Total Break -- TB):} Kẻ tấn công khôi phục được khóa bí mật của người ký, từ đó có thể giả mạo chữ ký trên bất kỳ thông điệp nào.
+
+    \item \textbf{Giả mạo tổng quát (Universal Forgery -- UF):} Kẻ tấn công xây dựng được một thuật toán có chức năng tương đương với thuật toán ký, dù không nhất thiết phải khôi phục được chính xác khóa bí mật.
+
+    \item \textbf{Giả mạo có lựa chọn (Selective Forgery -- SF):} Kẻ tấn công có thể tạo ra chữ ký hợp lệ cho một thông điệp cụ thể được lựa chọn trước theo ý của họ.
+
+    \item \textbf{Giả mạo có tồn tại (Existential Forgery -- EF):} Kẻ tấn công có thể tạo ra ít nhất một cặp $(M, s)$ hợp lệ, dù thông điệp $M$ có thể không có ý nghĩa thực tế và không được lựa chọn trước.
+\end{itemize}
+
+Một lược đồ chữ ký số được coi là \textit{an toàn} (theo nghĩa mạnh nhất hiện nay) nếu nó không bị giả mạo có tồn tại dưới tấn công văn bản lựa chọn thích ứng (existentially unforgeable under adaptive chosen message attack -- EUF-CMA). Đây là tiêu chuẩn an toàn được áp dụng cho hầu hết các lược đồ chữ ký số hiện đại và là mục tiêu cần đạt khi đề xuất các biến thể chữ ký mới như chữ ký mù tập thể được trình bày trong các chương sau của đồ án.
+
+\subsubsection{Mô hình Random Oracle Model}
+
+Việc chứng minh chặt chẽ tính an toàn của một lược đồ chữ ký số là một bài toán phức tạp. Một lược đồ được coi là an toàn nếu khả năng phá vỡ nó \textit{tương đương} (về mặt tính toán) với độ khó của một bài toán toán học đã được chấp nhận là khó -- chẳng hạn như IFP, DLP hay ECDLP. Tuy nhiên, trong nhiều trường hợp, việc thực hiện chứng minh chặt chẽ này trong mô hình tính toán chuẩn (standard model) là rất khó khăn hoặc không khả thi, đặc biệt với các lược đồ sử dụng hàm băm.
+
+Để giải quyết khó khăn nói trên, năm 1993, Mihir Bellare và Phillip Rogaway đã đề xuất \textit{mô hình tiên tri ngẫu nhiên} (Random Oracle Model -- ROM) -- một mô hình lý tưởng hóa cho phép chứng minh tính an toàn một cách nghiêm ngặt cho các giao thức mật mã dựa trên hàm băm. Trong mô hình ROM, hàm băm $H$ không còn được xem là một hàm xác định cụ thể mà được coi là một \textit{tiên tri ngẫu nhiên} (random oracle) -- một hộp đen lý tưởng có hành vi được mô tả như sau: khi nhận một thông điệp $M$ chưa từng được truy vấn, oracle sẽ chọn một giá trị ngẫu nhiên đều trên toàn miền giá trị làm đầu ra; khi $M$ được truy vấn lần thứ hai trở đi, oracle phải \textit{ghi nhớ} và trả về cùng một giá trị đã sinh ra trước đó để đảm bảo tính nhất quán.
+
+Trong khuôn khổ ROM, kẻ tấn công có thể tự do truy vấn oracle để lấy giá trị băm hoặc chữ ký của bất kỳ thông điệp nào mà họ quan tâm (mô phỏng kịch bản tấn công ACMA). Một lược đồ chữ ký số được xem là \textit{không an toàn trong ROM} nếu kẻ tấn công có thể giả mạo được chữ ký cho một thông điệp mà chính họ chưa từng truy vấn tới oracle. Ngược lại, nếu mọi thuật toán hiệu quả trong thời gian đa thức của kẻ tấn công đều có xác suất giả mạo thành công là một hàm vô cùng nhỏ $\varepsilon(k)$ theo tham số an toàn $k$, lược đồ được coi là an toàn trong ROM.
+
+Mặc dù mô hình ROM là một sự lý tưởng hóa -- hàm băm trong thực tế (như SHA-256) không thật sự là một tiên tri ngẫu nhiên -- ROM vẫn là công cụ chứng minh an toàn được sử dụng phổ biến và đáng tin cậy nhất hiện nay đối với các giao thức mật mã thực dụng. Trong các chương tiếp theo, đồ án sẽ sử dụng mô hình ROM làm khung lý thuyết để phân tích và đánh giá tính an toàn của các lược đồ chữ ký mù và chữ ký mù tập thể được đề xuất.

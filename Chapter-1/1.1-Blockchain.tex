@@ -1,0 +1,109 @@
+\subsection{Tổng quan về Blockchain}
+
+\subsubsection{Khái niệm Blockchain}
+
+Blockchain (chuỗi khối) là một công nghệ lưu trữ và truyền tải thông tin dưới dạng các khối (block) được liên kết với nhau theo trình tự thời gian thông qua các giá trị băm (hash) mật mã, tạo thành một chuỗi dữ liệu liên tục và khó có thể bị chỉnh sửa. Về bản chất, blockchain là một dạng sổ cái phân tán (distributed ledger) được nhân bản và đồng bộ trên nhiều nút (node) trong mạng ngang hàng (peer-to-peer), trong đó mọi thay đổi của dữ liệu đều phải được xác thực thông qua một cơ chế đồng thuận chung trước khi được ghi nhận chính thức vào hệ thống.
+
+Khái niệm blockchain lần đầu tiên được giới thiệu vào năm 2008 trong bài báo \textit{``Bitcoin: A Peer-to-Peer Electronic Cash System''} của tác giả ẩn danh Satoshi Nakamoto, với mục tiêu xây dựng một hệ thống tiền điện tử có khả năng vận hành mà không cần đến bên trung gian tin cậy như ngân hàng hay tổ chức tài chính. Đến tháng 01 năm 2009, mạng Bitcoin chính thức đi vào hoạt động, đánh dấu sự ra đời của ứng dụng blockchain đầu tiên trong thực tế. Từ đó, blockchain dần phát triển vượt ra khỏi phạm vi tiền điện tử và được nghiên cứu, ứng dụng trong nhiều lĩnh vực khác như tài chính, y tế, quản lý chuỗi cung ứng, định danh số, và đặc biệt là các hệ thống bỏ phiếu điện tử.
+
+Cơ chế hoạt động cốt lõi của blockchain dựa trên ba thành phần chính: (1) một sổ cái được phân tán trên nhiều nút mạng, (2) các kỹ thuật mật mã đảm bảo tính toàn vẹn và xác thực dữ liệu, và (3) một giao thức đồng thuận giúp các bên không hoàn toàn tin cậy lẫn nhau có thể thống nhất về trạng thái chung của hệ thống. Khi một giao dịch mới phát sinh, giao dịch đó được lan truyền tới các nút trong mạng, được kiểm tra tính hợp lệ, sau đó được gom thành khối và gắn vào chuỗi hiện có thông qua quá trình đồng thuận. Khi một khối đã được thêm vào, việc sửa đổi nội dung của nó là vô cùng khó khăn vì sẽ làm thay đổi toàn bộ chuỗi giá trị băm phía sau, đòi hỏi phải tính toán lại và đạt được đồng thuận từ phần lớn các nút trong mạng.
+
+Nhờ những đặc điểm phi tập trung, gần như không thể bị sửa đổi và có khả năng kiểm chứng công khai, blockchain được xem là một trong những công nghệ nền tảng quan trọng của cuộc cách mạng công nghiệp lần thứ tư. Công nghệ này mở ra hướng tiếp cận mới cho việc thiết kế các hệ thống đòi hỏi mức độ tin cậy cao mà không cần đến cơ chế quản lý tập trung truyền thống.
+
+\subsubsection{Đặc điểm cơ bản của Blockchain}
+
+Blockchain sở hữu một số đặc điểm nền tảng giúp nó trở nên khác biệt rõ rệt so với các mô hình cơ sở dữ liệu tập trung truyền thống. Những đặc điểm này không chỉ là ưu thế về mặt kỹ thuật mà còn là cơ sở để xây dựng các ứng dụng yêu cầu mức độ tin cậy và an toàn cao như bỏ phiếu điện tử.
+
+\begin{itemize}
+    \item \textbf{Tính phân tán (Decentralization):} Khác với mô hình tập trung – nơi toàn bộ dữ liệu được lưu trữ và quản lý bởi một máy chủ duy nhất, dữ liệu trong blockchain được nhân bản và lưu trữ trên nhiều nút độc lập trong mạng ngang hàng. Mỗi nút đều giữ một bản sao đầy đủ hoặc một phần của sổ cái, do đó hệ thống không có điểm yếu trung tâm và vẫn có thể hoạt động bình thường ngay cả khi một số nút bị tấn công hoặc ngừng hoạt động.
+
+    \item \textbf{Tính bất biến (Immutability):} Sau khi một khối được thêm vào chuỗi và được xác nhận bởi mạng lưới, nội dung của khối đó gần như không thể bị thay đổi. Mỗi khối chứa giá trị băm của khối trước đó, tạo thành một liên kết mật mã chặt chẽ. Mọi thay đổi nhỏ trong dữ liệu của một khối sẽ làm thay đổi giá trị băm của nó, kéo theo việc tất cả các khối tiếp sau cũng phải được tính toán lại. Để thực hiện được điều này, kẻ tấn công phải kiểm soát được phần lớn năng lực tính toán hoặc phần lớn các nút xác thực trong mạng, điều gần như không khả thi đối với các blockchain có quy mô lớn.
+
+    \item \textbf{Tính minh bạch (Transparency):} Trong các blockchain công khai, mọi giao dịch đều được ghi lại và có thể được kiểm tra bởi bất kỳ người dùng nào. Mỗi cá nhân tham gia mạng có quyền tra cứu lịch sử giao dịch, từ đó có khả năng tự xác minh tính đúng đắn của dữ liệu mà không cần phải tin tưởng vào một bên thứ ba. Đây là đặc điểm rất phù hợp với các hệ thống đòi hỏi khả năng kiểm tra độc lập, chẳng hạn như bầu cử điện tử.
+
+    \item \textbf{Tính bảo mật và toàn vẹn (Security and Integrity):} Blockchain sử dụng nhiều kỹ thuật mật mã hiện đại như hàm băm, mã hóa khóa công khai và chữ ký số để bảo vệ dữ liệu. Mỗi giao dịch được ký số bằng khóa bí mật của người gửi và chỉ có thể được xác minh thông qua khóa công khai tương ứng, đảm bảo nguồn gốc và tính toàn vẹn của thông tin được lan truyền trong mạng.
+
+    \item \textbf{Tính có thể kiểm chứng (Verifiability):} Mọi giao dịch trên blockchain đều có thể được kiểm chứng độc lập bởi bất kỳ thành viên nào trong mạng. Nhờ cấu trúc chuỗi khối liên kết bằng hàm băm, người dùng có thể xác minh xem một giao dịch nào đó có thực sự nằm trong khối được tuyên bố hay không mà không cần phải tin cậy vào bên trung gian.
+
+    \item \textbf{Tính đồng thuận (Consensus):} Các nút trong mạng blockchain phải đạt được sự thống nhất về trạng thái chung của sổ cái thông qua một giao thức đồng thuận xác định. Điều này đảm bảo rằng dữ liệu được ghi nhận là nhất quán giữa các nút và không xảy ra hiện tượng chia tách hay xung đột dữ liệu.
+\end{itemize}
+
+\subsubsection{Cấu trúc dữ liệu Blockchain}
+
+Dữ liệu trong blockchain được tổ chức dưới dạng một chuỗi tuần tự các khối được liên kết bằng giá trị băm. Cấu trúc này được thiết kế nhằm đảm bảo các thuộc tính toàn vẹn, bất biến và có khả năng kiểm chứng. Các thành phần cốt lõi của cấu trúc dữ liệu blockchain bao gồm khối (block), giao dịch (transaction), hàm băm (hash) và cây Merkle (Merkle Tree).
+
+\begin{itemize}
+    \item \textbf{Block (Khối):} Mỗi khối là một đơn vị dữ liệu cơ bản của blockchain, thường gồm hai phần là phần đầu (header) và phần thân (body). Phần đầu chứa các trường thông tin quan trọng như: số phiên bản, dấu thời gian (timestamp), giá trị băm của khối trước đó (previous hash), giá trị gốc của cây Merkle (Merkle root), độ khó (difficulty) và giá trị ngẫu nhiên nonce (nếu áp dụng cơ chế Proof of Work). Phần thân chứa danh sách các giao dịch đã được xác nhận trong khối. Việc liên kết giữa khối hiện tại và khối trước thông qua giá trị băm tạo ra một chuỗi liên tục, trong đó khối đầu tiên được gọi là khối khởi tạo (genesis block).
+
+    \item \textbf{Transaction (Giao dịch):} Giao dịch là đơn vị thông tin được ghi nhận trên blockchain, thể hiện một hành động giữa các bên tham gia như chuyển tiền, lưu trữ dữ liệu hoặc thực thi hợp đồng thông minh. Mỗi giao dịch thường bao gồm thông tin về người gửi, người nhận, nội dung, dấu thời gian và chữ ký số. Chữ ký số được dùng để xác thực nguồn gốc và đảm bảo rằng giao dịch không bị giả mạo trong quá trình truyền tải trên mạng.
+
+    \item \textbf{Hash (Hàm băm):} Hàm băm mật mã là thành phần cốt lõi tạo nên tính an toàn của blockchain. Hàm băm nhận một đầu vào có độ dài tùy ý và sinh ra một chuỗi đầu ra có độ dài cố định, mang tính một chiều, không thể đảo ngược và có tính chống va chạm cao. Trong blockchain, các giao dịch và khối được biểu diễn bằng giá trị băm để đảm bảo tính toàn vẹn. Các thuật toán băm phổ biến được sử dụng bao gồm SHA-256 (trong Bitcoin) và Keccak-256 (trong Ethereum). Mọi thay đổi nhỏ trong dữ liệu đầu vào – dù chỉ một bit – đều dẫn đến sự thay đổi đáng kể trong giá trị đầu ra, giúp dễ dàng phát hiện các nỗ lực can thiệp.
+
+    \item \textbf{Merkle Tree (Cây Merkle):} Cây Merkle là một cấu trúc dữ liệu dạng cây nhị phân, trong đó mỗi nút lá lưu trữ giá trị băm của một giao dịch, và mỗi nút cha lưu giá trị băm được tính từ hai nút con. Giá trị băm tại gốc cây – gọi là Merkle root – là một bản tóm lược của toàn bộ giao dịch trong khối. Nhờ cấu trúc này, việc kiểm chứng xem một giao dịch có thuộc khối hay không có thể được thực hiện hiệu quả thông qua đường dẫn Merkle (Merkle proof), với độ phức tạp chỉ là $O(\log n)$ thay vì $O(n)$. Đây là một trong những yếu tố giúp blockchain có khả năng mở rộng tốt và cho phép các nút nhẹ (light node) xác thực giao dịch mà không cần tải toàn bộ khối.
+\end{itemize}
+
+\subsubsection{Phân loại Blockchain}
+
+Dựa trên mức độ phân quyền và phạm vi tham gia của các thực thể trong mạng, blockchain được chia thành ba loại chính: blockchain công khai (Public), blockchain riêng tư (Private) và blockchain liên hợp (Consortium).
+
+\begin{itemize}
+    \item \textbf{Public Blockchain (Blockchain công khai):} Đây là loại blockchain hoàn toàn mở, cho phép bất kỳ ai trên Internet đều có thể tham gia với vai trò người dùng hoặc nút xác thực mà không cần xin phép. Mọi người đều có quyền đọc dữ liệu, gửi giao dịch và tham gia vào quá trình đồng thuận. Public blockchain có mức độ phi tập trung cao nhất và minh bạch nhất, song hiệu năng thường bị hạn chế do phải xử lý số lượng nút lớn và áp dụng các cơ chế đồng thuận tốn nhiều tài nguyên. Các ví dụ tiêu biểu của loại này bao gồm Bitcoin, Ethereum và Litecoin.
+
+    \item \textbf{Private Blockchain (Blockchain riêng tư):} Trái ngược với loại công khai, blockchain riêng tư chỉ cho phép các thành viên đã được xác thực và cấp phép trước mới có thể tham gia. Quyền đọc, ghi và xác thực giao dịch thường do một tổ chức duy nhất kiểm soát, tương tự như mô hình cơ sở dữ liệu nội bộ nhưng được tăng cường bằng cơ chế blockchain. Loại này có ưu điểm về hiệu năng cao, độ trễ thấp và bảo mật thông tin nội bộ, nhưng đánh đổi bằng mức độ phi tập trung thấp hơn. Private blockchain thường được dùng trong nội bộ doanh nghiệp để quản lý các loại dữ liệu nhạy cảm.
+
+    \item \textbf{Consortium Blockchain (Blockchain liên hợp):} Đây là dạng kết hợp giữa hai loại trên, trong đó quyền tham gia mạng được giới hạn trong một nhóm các tổ chức hoặc thực thể đã được phép. Quá trình đồng thuận và xác thực giao dịch được thực hiện bởi một số nút được chỉ định, thay vì toàn bộ thành viên mạng. Mô hình này cân bằng giữa tính bảo mật, hiệu năng và mức độ tin cậy, phù hợp với các ứng dụng đòi hỏi nhiều bên tham gia mà không hoàn toàn tin cậy lẫn nhau, ví dụ như các nền tảng tài chính liên ngân hàng, quản lý chuỗi cung ứng, hay các hệ thống bỏ phiếu điện tử. Hyperledger Fabric, Corda và Quorum là các nền tảng tiêu biểu thuộc nhóm consortium blockchain.
+\end{itemize}
+
+\subsubsection{Cơ chế đồng thuận}
+
+Cơ chế đồng thuận (consensus mechanism) là thành phần thiết yếu của blockchain, giúp các nút trong mạng đạt được sự thống nhất về thứ tự và nội dung của các giao dịch được ghi nhận vào sổ cái. Đây là yếu tố then chốt giúp hệ thống chống lại các hành vi gian lận và đảm bảo tính nhất quán của dữ liệu trên toàn mạng, ngay cả khi một số nút có thể không trung thực hoặc gặp lỗi.
+
+\begin{itemize}
+    \item \textbf{Proof of Work (PoW):} Đây là cơ chế đồng thuận đầu tiên được áp dụng trong Bitcoin. Các nút trong mạng (thợ đào – miner) phải thực hiện một bài toán tính toán phức tạp nhằm tìm ra giá trị nonce sao cho giá trị băm của khối nhỏ hơn một ngưỡng nhất định. Nút nào tìm ra trước sẽ có quyền tạo khối mới và nhận phần thưởng tương ứng. PoW có tính an toàn cao nhưng tiêu tốn nhiều năng lượng và có tốc độ xử lý giao dịch tương đối thấp.
+
+    \item \textbf{Proof of Stake (PoS):} Trong cơ chế này, quyền tạo khối được phân bổ dựa trên lượng tài sản (stake) mà nút sở hữu và đặt cọc trong hệ thống, thay vì dựa vào năng lực tính toán. PoS tiêu tốn ít năng lượng hơn nhiều so với PoW và có khả năng mở rộng tốt hơn. Ethereum đã chính thức chuyển từ PoW sang PoS vào năm 2022 thông qua sự kiện The Merge.
+
+    \item \textbf{Practical Byzantine Fault Tolerance (PBFT):} PBFT là cơ chế đồng thuận phù hợp với các blockchain riêng tư hoặc liên hợp, trong đó các nút trao đổi thông điệp qua nhiều vòng để đạt được sự nhất quán. PBFT có khả năng chịu đựng tới một phần ba số nút bị lỗi hoặc gian lận và đạt được độ trễ thấp. Tuy nhiên, mức độ trao đổi thông điệp tăng nhanh theo số lượng nút, khiến PBFT khó áp dụng cho mạng có quy mô rất lớn.
+
+    \item \textbf{Raft và Proof of Authority (PoA):} Các cơ chế này thường được sử dụng trong các blockchain doanh nghiệp khi số lượng nút có hạn và đã được xác thực danh tính. Hyperledger Fabric, chẳng hạn, sử dụng Raft như một cơ chế sắp xếp giao dịch (ordering service) nhằm đảm bảo thứ tự thống nhất giữa các nút xác thực. PoA cho phép một số nút có thẩm quyền được phép tạo khối mới, đem lại hiệu năng cao và độ trễ thấp, phù hợp với các môi trường có yêu cầu xử lý nhanh.
+\end{itemize}
+
+\subsubsection{Smart Contract}
+
+Hợp đồng thông minh (Smart Contract) là một chương trình tự động được lưu trữ và thực thi trên blockchain, có khả năng tự động hóa các điều khoản đã được thỏa thuận giữa các bên tham gia mà không cần đến trung gian. Khái niệm này được đề xuất lần đầu bởi nhà khoa học máy tính Nick Szabo vào năm 1994, song chỉ trở nên phổ biến và được hiện thực hóa rộng rãi từ khi nền tảng Ethereum ra đời vào năm 2015.
+
+Một hợp đồng thông minh bao gồm các đoạn mã chứa các quy tắc, điều kiện và hành động sẽ được thực thi tự động khi các điều kiện đầu vào được đáp ứng. Vì được lưu trữ trên blockchain, hợp đồng thông minh kế thừa các đặc điểm như tính bất biến, tính minh bạch và khả năng kiểm chứng. Sau khi được triển khai, mã của hợp đồng thông minh không thể bị sửa đổi và mọi lần thực thi đều được ghi nhận công khai trên sổ cái.
+
+Trong các nền tảng blockchain hiện đại, hợp đồng thông minh được sử dụng để xây dựng các ứng dụng phi tập trung (Decentralized Applications – dApp) trong nhiều lĩnh vực như tài chính phi tập trung (DeFi), bảo hiểm tự động, đấu giá, định danh số, quản lý tài sản số và các hệ thống bỏ phiếu điện tử. Đối với hệ thống bỏ phiếu, hợp đồng thông minh có thể được sử dụng để định nghĩa các luật bầu cử, tự động kiểm phiếu và đảm bảo rằng quá trình diễn ra theo đúng quy trình đã được công khai từ trước.
+
+Trong nền tảng Hyperledger Fabric, hợp đồng thông minh được hiện thực dưới dạng \textit{chaincode} – một mô-đun phần mềm được viết bằng các ngôn ngữ phổ thông như Go, Java hoặc Node.js. Chaincode được thực thi trong môi trường biệt lập trên các nút xác thực, đảm bảo tính nhất quán giữa các bên tham gia mạng.
+
+\subsubsection{Ưu điểm và hạn chế của Blockchain}
+
+\textit{Ưu điểm:} Blockchain mang lại nhiều lợi ích nổi bật so với các mô hình cơ sở dữ liệu tập trung truyền thống:
+\begin{itemize}
+    \item Loại bỏ sự phụ thuộc vào bên trung gian tin cậy, giúp giảm thiểu chi phí giao dịch và rủi ro do sự cố từ một điểm tập trung.
+
+    \item Nhờ cơ chế phân tán và đồng thuận, dữ liệu trên blockchain có tính toàn vẹn cao và khó bị giả mạo.
+
+    \item Tính minh bạch của blockchain cho phép mọi thành viên tham gia tự xác minh kết quả, từ đó nâng cao niềm tin trong cộng đồng.
+
+    \item Blockchain hỗ trợ tự động hóa các quy trình thông qua hợp đồng thông minh, giúp giảm sai sót do con người và tăng tốc độ xử lý.
+
+    \item Khả năng truy vết và kiểm tra lịch sử giao dịch giúp blockchain trở nên đặc biệt phù hợp với các ứng dụng đòi hỏi kiểm toán độc lập như tài chính, chuỗi cung ứng và bầu cử điện tử.
+\end{itemize}
+
+\textit{Hạn chế:} Bên cạnh các ưu điểm, blockchain vẫn tồn tại một số hạn chế cần được xem xét:
+\begin{itemize}
+    \item Hiệu năng và khả năng mở rộng còn hạn chế, đặc biệt với các blockchain công khai có lưu lượng giao dịch lớn.
+
+    \item Việc lưu trữ toàn bộ chuỗi khối trên nhiều nút khiến yêu cầu về dung lượng và băng thông tăng nhanh theo thời gian.
+
+    \item Một số cơ chế đồng thuận như PoW tiêu tốn lượng năng lượng đáng kể, gây ảnh hưởng đến môi trường.
+
+    \item Tính bất biến của blockchain – dù là một ưu điểm cốt lõi – cũng đặt ra thách thức khi cần chỉnh sửa các dữ liệu sai sót hoặc tuân thủ các quy định về quyền được lãng quên trong các quy định bảo vệ dữ liệu cá nhân.
+
+    \item Công nghệ blockchain vẫn còn tương đối mới mẻ, khung pháp lý chưa hoàn thiện, và đòi hỏi mức độ chuyên môn cao trong quá trình triển khai cũng như vận hành.
+\end{itemize}
+
+Tóm lại, với những đặc tính nổi bật về phân tán, minh bạch, toàn vẹn và khả năng kiểm chứng, blockchain là nền tảng phù hợp để xây dựng các hệ thống có yêu cầu tin cậy cao như bỏ phiếu điện tử. Tuy nhiên, để khai thác tối đa hiệu quả của công nghệ này, việc lựa chọn nền tảng cụ thể, cơ chế đồng thuận và mô hình triển khai cần được cân nhắc kỹ lưỡng. Trong các phần tiếp theo của chương, đồ án sẽ tiếp tục đi sâu vào nền tảng Hyperledger Fabric – một blockchain liên hợp tiêu biểu được sử dụng trong hệ thống đề xuất.

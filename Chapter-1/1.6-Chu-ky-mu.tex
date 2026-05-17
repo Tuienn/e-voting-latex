@@ -1,0 +1,119 @@
+\subsection{Chữ ký mù}
+
+Trong các giao dịch điện tử hiện đại, bên cạnh yêu cầu xác thực nguồn gốc và toàn vẹn của thông điệp, một yêu cầu ngày càng cấp thiết là bảo vệ \textit{tính riêng tư} của người sử dụng -- đặc biệt là trong các ứng dụng như bỏ phiếu điện tử, thanh toán nặc danh hay tiền điện tử. Lược đồ chữ ký số thông thường, dù đảm bảo được tính xác thực và toàn vẹn, lại không thoả mãn được nhu cầu này bởi người ký luôn biết rõ nội dung mà mình đã ký và do đó có thể truy ngược lại danh tính hoặc hành vi của người yêu cầu. Để giải quyết bài toán trên, năm 1983 David Chaum đã đề xuất khái niệm \textit{chữ ký số mù} (blind signature) -- một dạng đặc biệt của chữ ký số cho phép người ký ký lên một thông điệp mà không biết nội dung thực sự của thông điệp đó. Đây là một trong những công cụ mật mã quan trọng và cũng là nền tảng để xây dựng lược đồ chữ ký mù tập thể được trình bày trong mục tiếp theo của đồ án.
+
+\subsubsection{Khái niệm chữ ký mù}
+
+Khái niệm chữ ký số mù lần đầu tiên được David Chaum đề xuất vào năm 1983 trong công trình ``\textit{Blind Signatures for Untraceable Payments}'', với mục đích ban đầu là cho phép khách hàng thực hiện các giao dịch mua hàng nặc danh trong hệ thống thương mại điện tử. Theo Chaum, một lược đồ chữ ký số mù là một lược đồ ký số mà người yêu cầu (requester) có thể nhận được chữ ký $\textsf{Sig}(M)$ trên thông điệp $M$ của mình từ người ký (signer), nhưng người ký chỉ thực hiện nhiệm vụ ký mà không biết bất kỳ thông tin nào về nội dung của thông điệp. Sau này, khi được công bố cặp thông điệp -- chữ ký $(M, \textsf{Sig}(M))$, người ký chỉ có thể xác thực được chữ ký đó là hợp lệ chứ không thể truy lại mối liên kết giữa cặp $(M, \textsf{Sig}(M))$ với phiên ký cụ thể nào trước đó đã được thực hiện để sinh ra chữ ký này.
+
+Câu hỏi đặt ra là tại sao một người ký lại đồng ý ký lên một thông điệp mà mình không biết nội dung? Mặc dù điều này có vẻ phản trực giác trong các tình huống thông thường, nhưng nó lại đặc biệt hữu ích trong các bài toán đòi hỏi sự nặc danh -- nơi mà người ký chỉ đóng vai trò \textit{chứng thực quyền} của người yêu cầu (ví dụ: cử tri đã được đăng ký, khách hàng đã trả tiền) chứ không cần biết \textit{nội dung} mà người yêu cầu lựa chọn. Ví dụ điển hình là hệ thống bỏ phiếu điện tử: cơ quan tổ chức cần chứng thực rằng một người là cử tri hợp lệ và đủ tư cách bỏ phiếu, nhưng không được phép biết người đó đã bỏ phiếu cho ai. Tương tự, trong các hệ thống thanh toán nặc danh, ngân hàng cần chứng thực rằng đồng tiền điện tử là hợp lệ và đã được phát hành đúng giá trị, nhưng không được phép biết ai là người sử dụng đồng tiền đó để mua hàng. Khi các đồng tiền điện tử đã được ký mù, người mua hàng có thể giao dịch nặc danh trên hệ thống mà vẫn đảm bảo tính tin cậy của giao dịch.
+
+\subsubsection{Mô hình tổng quát của chữ ký mù}
+
+Trên cơ sở các phân tích của Chaum, một lược đồ chữ ký số mù có thể được xem như là sự kết hợp của một hệ thống chữ ký số hai khóa với một hệ thống khóa công khai kiểu \textit{giao hoán}. Mô hình tổng quát của lược đồ chữ ký mù bao gồm hai thực thể tham gia chính và bốn hàm cơ bản.
+
+Các thực thể tham gia:
+\begin{itemize}
+    \item \textbf{Người yêu cầu (Requester) -- ký hiệu là $A$:} là chủ thể sở hữu thông điệp $M$ cần được ký nhưng muốn giữ kín nội dung của $M$ đối với người ký.
+    \item \textbf{Người ký (Signer) -- ký hiệu là $B$:} là chủ thể có khóa bí mật, đóng vai trò ký xác nhận trên một biến thể đã được làm mù của thông điệp mà không biết nội dung thực.
+\end{itemize}
+
+Các hàm cơ bản:
+\begin{itemize}
+    \item \textbf{Hàm ký $\textsf{Sig}$:} chỉ được biết bởi người ký $B$ và được sử dụng để tạo chữ ký. Hàm nghịch đảo tương ứng $\textsf{Sig}'$ được công bố công khai, thỏa mãn $\textsf{Sig}'(\textsf{Sig}(M)) = M$ với mọi $M$, đồng thời $\textsf{Sig}'$ không cung cấp bất kỳ manh mối nào cho phép tìm ra $\textsf{Sig}$. Cặp hàm này tương ứng với cặp khóa bí mật -- công khai của người ký trong các lược đồ chữ ký số thông thường.
+    \item \textbf{Hàm giao hoán (commuting function) $f$ và \textbf{hàm nghịch đảo} $f'$:} chỉ được biết đến bởi người yêu cầu $A$, thoả mãn tính chất \textit{giao hoán} với hàm ký:
+    \begin{equation}
+        f'(\textsf{Sig}(f(M))) = \textsf{Sig}(M)
+        \label{eq:blind-commutative}
+    \end{equation}
+    đồng thời $f(M)$ không tiết lộ bất kỳ thông tin nào về thông điệp gốc $M$. Hàm $f$ đóng vai trò ``làm mù'' thông điệp trước khi gửi cho người ký, còn $f'$ đóng vai trò ``giải mù'' chữ ký nhận được để thu được chữ ký hợp lệ trên thông điệp gốc.
+\end{itemize}
+
+Chính tính chất giao hoán \eqref{eq:blind-commutative} của cặp hàm $(f, f')$ với hàm ký $\textsf{Sig}$ là yếu tố cốt lõi làm nên cơ chế chữ ký mù: nó cho phép tách rời quá trình ký (do người ký thực hiện trên dạng đã làm mù) khỏi quá trình thu được chữ ký cuối cùng (do người yêu cầu thực hiện trên dạng đã giải mù), trong khi vẫn đảm bảo chữ ký cuối cùng hợp lệ trên thông điệp gốc.
+
+\subsubsection{Các thuộc tính an toàn}
+
+Là một loại chữ ký số đặc biệt, chữ ký số mù kế thừa toàn bộ các thuộc tính an toàn chung của chữ ký số thông thường (tính toàn vẹn, tính xác thực, tính chống chối bỏ), đồng thời phải thoả mãn ba thuộc tính đặc trưng riêng sau đây:
+
+\begin{itemize}
+    \item \textbf{Tính mù (Blindness):} Nội dung thông điệp được làm mù hoàn toàn đối với người ký, nghĩa là người ký không thể thu được bất kỳ thông tin nào về nội dung thực của thông điệp $M$ trong suốt quá trình ký. Một cách hình thức, với mọi thuật toán hiệu năng cao trong thời gian đa thức nào của kẻ tấn công đóng vai trò người ký, xác suất phân biệt được giữa hai phiên ký trên hai thông điệp khác nhau $(M_0, M_1)$ và trả về đúng $b' \in \{0, 1\}$ tương ứng với thứ tự thực tế là một hàm vô cùng nhỏ (negligible function):
+    \begin{equation}
+        \left| \Pr[b' = b] - \frac{1}{2} \right| < \frac{1}{p^c}
+        \label{eq:blindness}
+    \end{equation}
+    với $p$ là số nguyên tố đủ lớn và $c$ là một hằng số bất kỳ.
+
+    \item \textbf{Tính không thể giả mạo (Unforgeability):} Đây là một dạng tăng cường của tính không thể giả mạo cổ điển. Trong trường hợp chữ ký mù, kẻ tấn công không được phép sinh ra nhiều cặp $(M, \sigma)$ hợp lệ hơn số lần tương tác hợp pháp với người ký. Cụ thể, sau $\lambda$ lần giao tiếp với người ký hợp pháp, một thuật toán hiệu năng cao trong thời gian đa thức của kẻ tấn công chỉ có xác suất vô cùng nhỏ trong việc tạo ra được $\lambda + 1$ cặp thông điệp -- chữ ký hợp lệ với các thông điệp khác nhau. Một lược đồ chữ ký số có bộ tham số $(\varepsilon, t, q_h, q_e, q_s)$ được gọi là an toàn chống giả mạo trong mô hình ROM nếu xác suất giả mạo thành công $\varepsilon$ là vô cùng nhỏ, trong đó $(q_h, q_e, q_s)$ lần lượt là số truy vấn đến hàm băm, hàm trích xuất và hàm ký.
+
+    \item \textbf{Tính không thể liên kết (Unlinkability / không truy vết):} Người ký không thể truy lại mối liên kết giữa cặp $(M, \textsf{Sig}(M))$ với phiên ký cụ thể nào đã thực hiện trong quá khứ, ngay cả khi chữ ký đã được công bố công khai. Cụ thể, giả sử người ký đã thực hiện $n$ phiên ký với $n$ giá trị làm mù khác nhau $\{f(M_1), f(M_2), \ldots, f(M_n)\}$ và sau đó quan sát được một cặp $(M^*, \textsf{Sig}(M^*))$ công bố công khai với $M^* \in \{M_1, M_2, \ldots, M_n\}$. Khi đó xác suất để người ký xác định đúng chỉ số $i$ sao cho $M^* = M_i$ chỉ bằng $1/n$ -- tức là tương đương với việc đoán ngẫu nhiên. Đây là thuộc tính đảm bảo tính nặc danh của người yêu cầu trong các ứng dụng nặc danh.
+\end{itemize}
+
+Ba thuộc tính nói trên là điều kiện cần và đủ để một lược đồ chữ ký mù có thể được áp dụng an toàn trong các hệ thống yêu cầu bảo vệ tính riêng tư của người sử dụng như bỏ phiếu điện tử, thanh toán nặc danh và tiền điện tử.
+
+\subsubsection{Quy trình tạo và xác minh chữ ký mù}
+
+Trên cơ sở mô hình tổng quát, một lược đồ chữ ký mù được mô tả thông qua bốn pha chính: pha làm mù, pha ký số, pha giải mù và pha xác thực. Sơ đồ luồng cấu trúc của lược đồ chữ ký mù được mô tả khái quát trong Hình~\ref{fig:luong-chu-ky-mu}.
+
+\begin{figure}[!h]
+    \centering
+    \begin{tikzpicture}[node distance=1.2cm and 2cm,
+                       box/.style={draw, rounded corners=4pt, minimum width=2.4cm, minimum height=0.9cm, align=center, font=\small},
+                       group/.style={draw, dashed, rounded corners=6pt, inner sep=10pt},
+                       arrow/.style={-Latex, thick}]
+        % Người yêu cầu side
+        \node[box] (lammu) {(1) Làm mù};
+        \node[box, below=of lammu] (giaimu) {(3) Giải mù};
+        \node[group, fit=(lammu)(giaimu), label=above:\textbf{Người yêu cầu}] (left) {};
+        % Người ký side
+        \node[box, right=3cm of lammu] (ky) {(2) Ký};
+        \node[group, fit=(ky), label=above:\textbf{Người ký}] (right) {};
+        % Verification
+        \node[box, below=2.0cm of $(giaimu.south)!0.5!(ky.south)$] (xacthuc) {(4) Kiểm tra chữ ký};
+        \node[below=0.5cm of xacthuc, font=\small\itshape] (out) {Đúng / Sai};
+        % Arrows
+        \draw[arrow] (lammu) -- node[above, font=\small]{$f(M)$} (ky);
+        \draw[arrow] (ky) -- node[right, font=\small]{$\textsf{Sig}(f(M))$} (giaimu);
+        \draw[arrow] (giaimu) -- node[left, font=\small]{$\textsf{Sig}(M)$} (xacthuc);
+        \draw[arrow] (xacthuc) -- (out);
+        \node[left=2.5cm of xacthuc, font=\small] (m) {Thông điệp $M$};
+        \draw[arrow] (m) -- (xacthuc);
+    \end{tikzpicture}
+    \caption{Sơ đồ luồng cấu trúc của lược đồ chữ ký mù}
+    \label{fig:luong-chu-ky-mu}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{Pha 1 -- Làm mù (Blinding):} Người yêu cầu $A$ chọn thông điệp $M$ cần được ký và sử dụng hàm làm mù $f$ cùng với một (hoặc một số) tham số làm mù ngẫu nhiên được giữ bí mật để tạo ra giá trị $M' = f(M)$. Việc làm mù có thể được thực hiện thông qua phép nhân thông điệp với một số ngẫu nhiên, mã hoá thông điệp bằng một khóa ngẫu nhiên hoặc kết hợp với hàm băm. Sau đó người yêu cầu gửi $M'$ cho người ký $B$.
+
+    \item \textbf{Pha 2 -- Ký số (Signing):} Người ký $B$ thực hiện ký trên giá trị $M'$ đã được làm mù bằng cách áp dụng hàm ký $\textsf{Sig}$ với khóa bí mật của mình để thu được chữ ký mù $\sigma' = \textsf{Sig}(M') = \textsf{Sig}(f(M))$, rồi trả $\sigma'$ về cho người yêu cầu. Đặc điểm quan trọng của pha này là $B$ chỉ thấy được $M'$ chứ không thấy được $M$, đồng thời không thu được bất kỳ thông tin nào về tham số làm mù.
+
+    \item \textbf{Pha 3 -- Giải mù (Unblinding):} Người yêu cầu $A$ áp dụng hàm nghịch đảo $f'$ trên chữ ký mù nhận được để loại bỏ ảnh hưởng của tham số làm mù:
+    \begin{equation}
+        \sigma = f'(\sigma') = f'(\textsf{Sig}(f(M))) = \textsf{Sig}(M)
+        \label{eq:unblinding}
+    \end{equation}
+    Kết quả $\sigma = \textsf{Sig}(M)$ chính là chữ ký hợp lệ của người ký $B$ trên thông điệp gốc $M$. Bước này được thực hiện hoàn toàn cục bộ tại phía người yêu cầu, không có sự tham gia của người ký.
+
+    \item \textbf{Pha 4 -- Xác minh chữ ký (Verification):} Bất kỳ thực thể nào trong hệ thống cũng có thể xác minh tính hợp lệ của cặp $(M, \sigma)$ bằng cách áp dụng hàm nghịch đảo công khai $\textsf{Sig}'$ và kiểm tra điều kiện:
+    \begin{equation}
+        \textsf{Sig}'(\sigma) \overset{?}{=} M
+        \label{eq:blind-verify}
+    \end{equation}
+    Nếu đẳng thức thoả mãn thì chữ ký được chấp nhận, ngược lại bị từ chối. Quy trình xác minh ở pha này hoàn toàn giống với quy trình xác minh trong lược đồ chữ ký số thông thường, không có sự khác biệt nào với người xác minh.
+\end{itemize}
+
+\subsubsection{Một số lược đồ chữ ký mù tiêu biểu}
+
+Kể từ khi Chaum đề xuất khái niệm chữ ký mù vào năm 1983, đã có rất nhiều lược đồ chữ ký mù được công bố, được xây dựng trên các cơ sở toán học khác nhau và dành cho các bối cảnh ứng dụng khác nhau. Dưới đây trình bày một số lược đồ tiêu biểu, đặc biệt là các lược đồ có liên quan đến nội dung nghiên cứu của đồ án.
+
+\textit{Lược đồ chữ ký mù Chaum dựa trên RSA (1983)} là lược đồ chữ ký mù đầu tiên trong lịch sử mật mã, được xây dựng trực tiếp từ lược đồ chữ ký số RSA. Sử dụng cặp khóa RSA $(n, e)$ công khai và $d$ bí mật, người yêu cầu thực hiện làm mù thông điệp bằng phép nhân $M' = M \cdot r^e \bmod n$ với $r$ là số ngẫu nhiên thỏa $\gcd(r, n) = 1$. Người ký tính $\sigma' = (M')^d \bmod n$ và người yêu cầu giải mù bằng $\sigma = \sigma' \cdot r^{-1} \bmod n = M^d \bmod n$. Tính an toàn của lược đồ dựa trên độ khó của bài toán phân tích thừa số nguyên tố (IFP).
+
+\textit{Lược đồ chữ ký mù dựa trên Schnorr} được Camenisch và các cộng sự đề xuất, áp dụng cơ chế làm mù lên giá trị cam kết $c = g^k$ và lên thành phần thử thách $r$ trong lược đồ Schnorr cổ điển. Tính an toàn của lược đồ dựa trên độ khó của bài toán logarit rời rạc DLP và đã được chứng minh chặt chẽ trong mô hình ROM thông qua kỹ thuật Forking Lemma.
+
+\textit{Lược đồ chữ ký mù dựa trên EC-Schnorr} là biến thể của lược đồ chữ ký mù Schnorr trên nhóm điểm của đường cong elliptic. Lược đồ này kế thừa toàn bộ ưu điểm của EC-Schnorr (kích thước khóa và chữ ký ngắn, tính toán nhanh) đồng thời bổ sung tính riêng tư cho người yêu cầu. Đây cũng là cơ sở trực tiếp để xây dựng lược đồ chữ ký mù tập thể dựa trên EC-Schnorr -- thành phần mật mã quan trọng được áp dụng trong hệ thống bỏ phiếu điện tử blockchain được đề xuất trong các chương tiếp theo của đồ án.
+
+\textit{Lược đồ chữ ký mù dựa trên chuẩn GOST R34.10-2012} của Liên bang Nga là biến thể chữ ký mù được xây dựng trên chuẩn chữ ký số quốc gia Nga, cũng dựa trên nhóm điểm đường cong elliptic. Lược đồ này được sử dụng làm cơ sở so sánh và đánh giá hiệu năng với lược đồ chữ ký mù dựa trên EC-Schnorr trong các phần phân tích thực nghiệm.
+
+\textit{Lược đồ chữ ký mù dựa trên hai bài toán khó}, ví dụ kết hợp IFP và DLP hoặc kết hợp RSA và Schnorr, là hướng nghiên cứu được phát triển nhằm tăng cường tính an toàn của lược đồ -- bởi vì để phá vỡ được lược đồ kẻ tấn công bắt buộc phải giải đồng thời cả hai bài toán khó, do đó độ phức tạp của tấn công cao hơn đáng kể so với các lược đồ chỉ dựa trên một bài toán khó duy nhất.
+
+Trong khuôn khổ đồ án, lược đồ chữ ký mù dựa trên EC-Schnorr được lựa chọn làm cơ sở phát triển do tính cân bằng tốt giữa độ an toàn, hiệu năng tính toán và kích thước chữ ký -- những đặc tính đặc biệt phù hợp với yêu cầu triển khai trên môi trường blockchain Hyperledger Fabric của hệ thống bỏ phiếu điện tử được đề xuất. Việc mở rộng lược đồ chữ ký mù sang trường hợp có nhiều người ký cùng tham gia -- tức là chữ ký mù tập thể -- sẽ được trình bày chi tiết trong mục tiếp theo.

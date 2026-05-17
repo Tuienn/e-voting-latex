@@ -1,0 +1,113 @@
+\subsection{Tổng quan về Hyperledger Fabric}
+
+\subsubsection{Giới thiệu Hyperledger Fabric}
+
+Hyperledger Fabric là một nền tảng công nghệ sổ cái phân tán (Distributed Ledger Technology -- DLT) mã nguồn mở, được thiết kế ở cấp độ doanh nghiệp (enterprise-grade) và được điều phối phát triển bởi dự án Hyperledger thuộc Quỹ Linux (Linux Foundation). Khác với các blockchain công khai như Bitcoin hay Ethereum -- vốn hướng tới một mạng lưới mở, không cần cấp phép và sử dụng tiền điện tử làm động lực kinh tế -- Hyperledger Fabric được xây dựng để phục vụ các kịch bản hợp tác giữa các tổ chức (B2B), nơi các bên tham gia đã được định danh rõ ràng và cần một cơ sở hạ tầng tin cậy để chia sẻ dữ liệu, thực thi quy trình nghiệp vụ và lưu trữ bằng chứng về các giao dịch chung.
+
+Hyperledger Fabric được khởi động vào năm 2015 với sự đóng góp ban đầu từ IBM và một số tập đoàn công nghệ lớn, sau đó liên tục được phát triển qua nhiều phiên bản. Các phiên bản từ \textit{v2.x} trở đi đã hoàn thiện đáng kể về kiến trúc, quản trị hợp đồng thông minh và hiệu năng; phiên bản \textit{v3.x} tiếp tục mở rộng hỗ trợ các cơ chế đồng thuận chịu lỗi Byzantine (BFT). Nhờ tính chất là mạng có cấp phép (permissioned), hỗ trợ kênh giao dịch riêng tư và bảo mật dữ liệu mức cao, Hyperledger Fabric đã được ứng dụng rộng rãi trong các lĩnh vực tài chính -- ngân hàng, chuỗi cung ứng, y tế, chính phủ điện tử và đặc biệt phù hợp với các bài toán cần kiểm soát danh tính và quyền hạn chặt chẽ như hệ thống bỏ phiếu điện tử.
+
+Trong khuôn khổ của đồ án, Hyperledger Fabric được lựa chọn làm nền tảng triển khai do khả năng đáp ứng đồng thời các yêu cầu về tính phi tập trung trong xác thực, định danh người dùng dựa trên chứng chỉ số và khả năng xử lý số lượng phiếu lớn với độ trễ thấp.
+
+\subsubsection{Đặc điểm của Hyperledger Fabric}
+
+So với các nền tảng blockchain phổ biến khác, Hyperledger Fabric có một số đặc điểm cốt lõi giúp nó trở thành nền tảng phù hợp cho các hệ thống doanh nghiệp đòi hỏi mức độ tin cậy và bảo mật cao:
+
+\begin{itemize}
+    \item \textbf{Mạng lưới cấp quyền (Permissioned Network):} Mọi thực thể tham gia mạng -- bao gồm người dùng, ứng dụng khách, nút xác thực và nút sắp xếp giao dịch -- đều phải được định danh thông qua chứng chỉ số do Cơ quan cấp chứng chỉ (Certificate Authority -- CA) phát hành. Điều này loại bỏ tính ẩn danh, cho phép thiết lập trách nhiệm pháp lý rõ ràng và phù hợp với các môi trường kinh doanh đòi hỏi tuân thủ pháp luật.
+
+    \item \textbf{Kiến trúc mô-đun (Modular Architecture):} Hyperledger Fabric được thiết kế theo hướng các thành phần có thể \textit{cắm rút} (pluggable), bao gồm cơ chế đồng thuận, hệ thống quản lý danh tính, cơ sở dữ liệu trạng thái và môi trường thực thi hợp đồng thông minh. Tính mô-đun này cho phép các tổ chức tùy biến nền tảng theo nhu cầu nghiệp vụ thay vì phải chấp nhận một mô hình cứng nhắc.
+
+    \item \textbf{Hiệu năng và khả năng mở rộng (High Performance and Scalability):} Quá trình thực thi hợp đồng thông minh được tách biệt khỏi quá trình đồng thuận, giúp các giao dịch được xử lý song song trên nhiều nút và sau đó mới được sắp xếp theo thứ tự. Cách tiếp cận này giúp Hyperledger Fabric đạt được tốc độ xử lý hàng nghìn giao dịch mỗi giây với độ trễ chỉ ở mức vài trăm mili giây, vượt trội so với các blockchain công khai sử dụng cơ chế đào.
+
+    \item \textbf{Tính bảo mật và riêng tư cao (Confidentiality):} Hyperledger Fabric hỗ trợ chia sẻ dữ liệu có chọn lọc thông qua hai cơ chế chính: kênh giao tiếp riêng tư (Channels) và bộ dữ liệu riêng tư (Private Data Collections). Nhờ đó, các đối tác kinh doanh có thể giao dịch trên cùng một mạng nhưng vẫn đảm bảo bí mật dữ liệu của riêng mình đối với các bên không liên quan.
+
+    \item \textbf{Không yêu cầu tiền điện tử (No Native Cryptocurrency):} Khác với Bitcoin hay Ethereum, Hyperledger Fabric không phát hành đồng tiền số nội tại và không sử dụng cơ chế đào (mining). Việc xác thực giao dịch dựa trên chính sách phê duyệt được các tổ chức thống nhất từ trước, qua đó loại bỏ chi phí năng lượng khổng lồ và giúp hệ thống phù hợp với các quy định pháp lý ở nhiều quốc gia.
+\end{itemize}
+
+\subsubsection{Kiến trúc tổng thể}
+
+Một trong những điểm khác biệt cơ bản nhất giữa Hyperledger Fabric với các blockchain truyền thống nằm ở mô hình kiến trúc xử lý giao dịch. Trong khi các nền tảng như Bitcoin hay Ethereum sử dụng mô hình \textit{Order -- Execute} -- tức là các giao dịch được sắp xếp trước rồi mới được thực thi tuần tự trên toàn bộ nút mạng -- thì Hyperledger Fabric áp dụng mô hình \textit{Execute -- Order -- Validate} (Thực thi -- Sắp xếp -- Kiểm tra). Theo mô hình này, giao dịch trước tiên được thực thi mô phỏng tại một nhóm nhỏ các nút có thẩm quyền, sau đó kết quả được gửi đến dịch vụ sắp xếp để xếp thứ tự, và cuối cùng các nút trong mạng mới kiểm tra tính hợp lệ trước khi ghi vào sổ cái. Cách tiếp cận này giúp loại bỏ các giao dịch xung đột ngay từ giai đoạn thực thi, đồng thời cho phép xử lý song song nhiều giao dịch không liên quan.
+
+Một đặc điểm quan trọng khác trong kiến trúc của Hyperledger Fabric là \textbf{sự tách biệt vai trò} (Separation of Roles) giữa các loại nút. Thay vì để mỗi nút đảm nhiệm toàn bộ quy trình như trong các blockchain công khai, Hyperledger Fabric tách rời tầng đồng thuận (Ordering Service) khỏi tầng thực thi ứng dụng (Peers). Các nút Peer tập trung vào việc thực thi hợp đồng thông minh, lưu trữ sổ cái và xác thực giao dịch, trong khi các nút Orderer chỉ chịu trách nhiệm sắp xếp giao dịch và tạo khối. Sự chuyên môn hóa này giúp tối ưu hóa băng thông và tài nguyên tính toán, đồng thời cho phép mở rộng độc lập từng tầng tùy theo nhu cầu thực tế.
+
+Về \textbf{cơ chế đồng thuận}, Hyperledger Fabric không cố định một thuật toán duy nhất mà cung cấp khả năng đồng thuận đa tầng có thể cắm rút (Pluggable Consensus). Trong các phiên bản phổ biến hiện nay, dịch vụ sắp xếp thường sử dụng giao thức Raft -- một thuật toán chịu lỗi do sự cố (Crash Fault Tolerant -- CFT) với mô hình lãnh đạo -- người theo. Bên cạnh đó, các phiên bản mới nhất đã bổ sung hỗ trợ các giải pháp chịu lỗi Byzantine (Byzantine Fault Tolerant -- BFT) để đáp ứng các kịch bản đa tổ chức không hoàn toàn tin cậy lẫn nhau, qua đó tăng tính linh hoạt và khả năng áp dụng cho nhiều mô hình quản trị khác nhau.
+
+\subsubsection{Các thành phần chính}
+
+Hyperledger Fabric bao gồm nhiều thành phần được phối hợp chặt chẽ để cấu thành một mạng lưới hoàn chỉnh. Các thành phần cốt lõi bao gồm: nút Peer, dịch vụ sắp xếp Orderer, cơ quan cấp chứng chỉ, kênh giao tiếp và sổ cái.
+
+\begin{itemize}
+    \item \textbf{Peer (Nút mạng):} Peer là thành phần cơ bản và trung tâm của mạng Hyperledger Fabric. Mỗi tổ chức tham gia mạng thường vận hành một hoặc nhiều Peer, trực tiếp lưu trữ bản sao của sổ cái và các chaincode đã được triển khai. Dựa trên vai trò trong từng giao dịch, Peer được phân thành hai nhóm chính: \textit{Endorsing Peer} (Nút xác thực) chịu trách nhiệm tiếp nhận đề xuất giao dịch từ Client, thực thi mô phỏng chaincode trên trạng thái sổ cái hiện tại, ký số xác nhận kết quả và gửi phản hồi về cho Client; \textit{Committing Peer} (Nút ghi nhận) nhận các khối giao dịch đã được sắp xếp từ Orderer, kiểm tra lại tính hợp lệ và cập nhật chính thức vào sổ cái cục bộ. Trong thực tế, một Peer có thể đồng thời đảm nhiệm cả hai vai trò trên tùy theo cấu hình của mạng.
+
+    \item \textbf{Orderer (Dịch vụ sắp xếp -- Ordering Service):} Orderer là thành phần đặc thù của Hyperledger Fabric, không tồn tại trong các blockchain công khai theo cách tương tự. Vai trò của Orderer là tiếp nhận các giao dịch đã được xác thực bởi các Endorsing Peer, sắp xếp chúng theo thứ tự thời gian tuyến tính và đóng gói thành các khối (Blocks) với kích thước hoặc khoảng thời gian được cấu hình từ trước. Sau khi tạo khối, Orderer phân phối các khối đến toàn bộ các Committing Peer trong kênh thông qua giao thức truyền tin Gossip, đảm bảo tính nhất quán của sổ cái trên toàn mạng. Do tách biệt khỏi tầng thực thi, dịch vụ sắp xếp có thể được triển khai dưới dạng cụm nhiều nút Orderer để đảm bảo tính sẵn sàng cao và chịu lỗi.
+
+    \item \textbf{Certificate Authority (Cơ quan cấp chứng chỉ -- Fabric CA):} Fabric CA là thành phần đóng vai trò \textit{gốc rễ của lòng tin} (Root of Trust) trong mạng. Cơ quan này cung cấp và quản lý các chứng chỉ số theo chuẩn X.509 cho mọi thực thể trong mạng, bao gồm người dùng cuối, Peer, Orderer và các ứng dụng khách. Bên cạnh chức năng cấp phát chứng chỉ ban đầu, Fabric CA còn hỗ trợ các nghiệp vụ quản lý vòng đời chứng chỉ như gia hạn, thu hồi và quản lý danh sách thu hồi chứng chỉ (CRL). Một mạng Hyperledger Fabric có thể có nhiều CA, mỗi CA thường thuộc về một tổ chức và chịu trách nhiệm cấp danh tính cho các thành viên trong tổ chức đó.
+
+    \item \textbf{Channel (Kênh giao tiếp):} Channel là một cơ chế độc đáo của Hyperledger Fabric, được hình dung như một \textit{đường ống} truyền thông riêng tư kết nối một nhóm các tổ chức cụ thể. Mỗi Channel có sổ cái, tập hợp Peer thành viên, chính sách quản trị và chaincode riêng biệt. Các giao dịch và dữ liệu trao đổi trong một Channel hoàn toàn tách biệt và bí mật đối với các tổ chức không phải là thành viên của Channel đó. Cơ chế này đặc biệt hữu ích trong các kịch bản kinh doanh khi nhiều tổ chức chia sẻ chung một hạ tầng nhưng có những hợp tác song phương hoặc đa phương riêng cần được bảo mật.
+
+    \item \textbf{Ledger (Sổ cái):} Sổ cái của Hyperledger Fabric được cấu thành từ hai phần cốt lõi có tính bổ trợ chặt chẽ. \textit{World State} (Trạng thái hiện tại) lưu trữ giá trị hiện tại của tài sản và dữ liệu nghiệp vụ dưới dạng cặp khóa -- giá trị (key-value), cho phép truy vấn nhanh trạng thái tức thời mà không cần duyệt toàn bộ lịch sử giao dịch. Hyperledger Fabric hỗ trợ hai hệ quản trị cơ sở dữ liệu phổ biến cho World State là LevelDB (mặc định, phù hợp với truy vấn theo khóa đơn giản) và CouchDB (cho phép truy vấn phong phú bằng các biểu thức JSON phức tạp). \textit{Blockchain} (Nhật ký giao dịch) là chuỗi các khối được liên kết bằng giá trị băm theo cơ chế chỉ ghi đè/thêm mới (append-only), lưu trữ toàn bộ lịch sử các giao dịch dẫn đến trạng thái hiện tại. Sự kết hợp này vừa đảm bảo hiệu năng truy vấn cao, vừa giữ được khả năng truy vết và kiểm chứng toàn diện -- một yêu cầu thiết yếu trong các hệ thống đòi hỏi tính minh bạch như bỏ phiếu điện tử.
+\end{itemize}
+
+\subsubsection{Chaincode}
+
+Chaincode là cách gọi của Hyperledger Fabric đối với hợp đồng thông minh. Về bản chất, chaincode là một chương trình phần mềm triển khai logic nghiệp vụ đã được các bên tham gia mạng thống nhất, có khả năng đọc và ghi dữ liệu trực tiếp vào World State của sổ cái. Mỗi chaincode thường biểu diễn một loại hợp đồng hoặc một nhóm nghiệp vụ cụ thể như quản lý phiếu bầu, theo dõi tài sản, kiểm tra điều kiện thực hiện giao dịch, v.v.
+
+Khác với Ethereum -- nơi hợp đồng thông minh chạy trong máy ảo Ethereum Virtual Machine (EVM) cùng tiến trình với nút mạng -- chaincode trong Hyperledger Fabric được thực thi trong một môi trường cô lập, thường là một Docker container riêng biệt được khởi tạo bởi Peer khi cần. Sự cô lập này mang lại hai lợi ích quan trọng: bảo vệ Peer khỏi các sự cố hoặc mã độc trong chaincode, và cho phép sử dụng nhiều ngôn ngữ lập trình thông dụng để viết hợp đồng thông minh. Hiện nay, Hyperledger Fabric hỗ trợ chính thức ba ngôn ngữ phổ biến trong doanh nghiệp là Go (Golang), Node.js (JavaScript/TypeScript) và Java. Điều này giúp các nhóm phát triển có thể tận dụng nguồn nhân lực sẵn có thay vì phải đào tạo từ đầu với một ngôn ngữ đặc thù như Solidity.
+
+Từ phiên bản v2.0, Hyperledger Fabric giới thiệu quy trình quản lý vòng đời chaincode mới (Fabric Chaincode Lifecycle), trong đó các bước triển khai chaincode được phân tách rõ ràng và đòi hỏi sự đồng thuận của nhiều tổ chức thay vì chỉ một quản trị viên duy nhất. Quy trình này bao gồm các bước chính: (1) \textit{Đóng gói} (Package) -- chaincode được đóng gói thành một tệp triển khai duy nhất; (2) \textit{Cài đặt} (Install) -- mỗi tổ chức cài đặt gói chaincode lên các Peer của mình; (3) \textit{Phê duyệt} (Approve) -- các tổ chức tham gia kênh đưa ra phê duyệt với định nghĩa chaincode (bao gồm tên, phiên bản, chính sách phê duyệt, v.v.); và (4) \textit{Cam kết} (Commit) -- khi đủ số tổ chức theo chính sách đã phê duyệt, chaincode chính thức được cam kết lên kênh và sẵn sàng phục vụ giao dịch. Cách tổ chức này phản ánh tinh thần quản trị phi tập trung, trong đó mọi thay đổi quan trọng đối với logic nghiệp vụ chung đều phải có sự đồng thuận của các bên liên quan.
+
+\subsubsection{Membership Service Provider}
+
+Membership Service Provider (MSP -- Dịch vụ thành viên) là một thành phần trừu tượng hóa kiến trúc mật mã của Hyperledger Fabric, đóng vai trò cầu nối giữa hệ thống chứng chỉ số do Fabric CA cấp phát và mô hình quản trị phi tập trung của mạng. Trong khi CA chịu trách nhiệm phát hành các chứng chỉ X.509 nhằm chứng minh danh tính của một thực thể, thì MSP định nghĩa cách các chứng chỉ đó được diễn giải thành các \textit{vai trò} và \textit{quyền hạn} cụ thể bên trong một mạng hoặc một kênh.
+
+Cụ thể, MSP cung cấp các thông tin cấu hình như: danh sách CA gốc được tin cậy, danh sách CA trung gian, danh sách thu hồi chứng chỉ (CRL), các quy tắc xác định vai trò (Admin, Client, Peer, Orderer), cũng như các định danh tổ chức được phép tham gia. Khi một thực thể gửi một thông điệp hoặc giao dịch, MSP sẽ kiểm tra chữ ký số đính kèm, đối chiếu với các CA tin cậy và xác định thực thể đó thuộc về tổ chức nào, có vai trò gì và được phép thực hiện những thao tác nào trong ngữ cảnh hiện tại.
+
+Tầm quan trọng của MSP thể hiện ở chỗ nó là cơ sở cho các \textit{Chính sách} (Policies) của Hyperledger Fabric. Mọi quyết định trong mạng -- từ việc ai được phép gọi một chaincode, ai có quyền thay đổi cấu hình kênh, đến chính sách phê duyệt giao dịch -- đều được biểu diễn dưới dạng các tổ hợp logic của các vai trò do MSP định nghĩa. Nhờ đó, Hyperledger Fabric có thể triển khai mô hình quản trị phi tập trung linh hoạt, trong đó quyền lực không tập trung vào một bên duy nhất mà được phân bổ theo các quy tắc đã được công khai thống nhất giữa các tổ chức.
+
+\subsubsection{Quy trình xử lý giao dịch}
+
+Quy trình xử lý giao dịch trong Hyperledger Fabric là sự kết hợp chặt chẽ giữa các thành phần đã trình bày ở trên, thể hiện rõ nét mô hình kiến trúc \textit{Execute -- Order -- Validate}. Một giao dịch điển hình đi qua năm bước chính, từ lúc được khởi tạo bởi ứng dụng phía Client cho đến khi được ghi nhận chính thức vào sổ cái.
+
+\begin{itemize}
+    \item \textbf{Bước 1 -- Đề xuất giao dịch (Transaction Proposal):} Ứng dụng phía Client, thông qua bộ thư viện phát triển (SDK) của Hyperledger Fabric, tạo ra một đề xuất giao dịch chứa thông tin về chaincode cần gọi, các tham số đầu vào và danh tính của người gửi. Đề xuất này được ký số bằng chứng chỉ của Client và được gửi tới một tập hợp các Endorsing Peer được xác định theo \textit{Chính sách xác thực} (Endorsement Policy) của chaincode tương ứng.
+
+    \item \textbf{Bước 2 -- Thực thi mô phỏng và ký xác thực (Endorsement):} Mỗi Endorsing Peer nhận được đề xuất sẽ kiểm tra chữ ký, sau đó thực thi mô phỏng chaincode trên trạng thái hiện tại của World State. Kết quả mô phỏng tạo ra một tập dữ liệu đọc/ghi (Read-Write Set -- RW Set), gồm các khóa đã được đọc cùng với phiên bản tương ứng và các khóa dự kiến sẽ được cập nhật cùng giá trị mới. Endorsing Peer ký số lên RW Set và gửi phản hồi (Proposal Response) về cho Client. Một điểm cần lưu ý là ở bước này, không có dữ liệu nào được ghi thực sự vào sổ cái -- toàn bộ chỉ là mô phỏng để xác định tác động tiềm tàng của giao dịch.
+
+    \item \textbf{Bước 3 -- Phát tán giao dịch (Submit Transaction):} Client thu thập đầy đủ các phản hồi từ Endorsing Peer, kiểm tra tính nhất quán giữa các RW Set (các Peer phải đưa ra cùng một kết quả mô phỏng) và đối chiếu với Chính sách xác thực để đảm bảo đã có đủ chữ ký theo yêu cầu. Sau đó, Client đóng gói các phản hồi này thành một thông điệp giao dịch hoàn chỉnh và gửi tới Ordering Service.
+
+    \item \textbf{Bước 4 -- Sắp xếp và đóng khối (Ordering and Batching):} Orderer tiếp nhận các giao dịch từ nhiều Client khác nhau trong cùng một kênh, sắp xếp chúng theo một thứ tự nhất quán dựa trên giao thức đồng thuận đã cấu hình (chẳng hạn Raft), và đóng gói thành các khối mới với kích thước hoặc khoảng thời gian được định trước. Khối sau khi tạo sẽ được phân phối tới toàn bộ Committing Peer trong kênh.
+
+    \item \textbf{Bước 5 -- Xác thực và cập nhật sổ cái (Validation and Commit):} Mỗi Committing Peer khi nhận được khối mới sẽ thực hiện hai bước kiểm tra: kiểm tra chữ ký xác thực có thỏa mãn Endorsement Policy hay không, và kiểm tra tính nhất quán của RW Set với trạng thái hiện tại của World State theo cơ chế kiểm soát đồng thời đa phiên bản (MVCC -- Multi-Version Concurrency Control). Các giao dịch hợp lệ sẽ được cập nhật vào World State, trong khi cả giao dịch hợp lệ và không hợp lệ đều được ghi nhận vào Blockchain dưới dạng bằng chứng lịch sử (kèm theo cờ trạng thái tương ứng). Cuối cùng, Peer phát đi sự kiện (Event) để thông báo kết quả tới ứng dụng phía Client.
+\end{itemize}
+
+Mô hình xử lý giao dịch theo kiểu \textit{Execute -- Order -- Validate} này mang lại nhiều ưu thế: cho phép xử lý song song các giao dịch không xung đột, giảm tải cho dịch vụ sắp xếp, và cho phép linh hoạt cấu hình ai có quyền xác thực giao dịch nào thông qua Endorsement Policy. Đặc biệt, trong bối cảnh của hệ thống bỏ phiếu điện tử, mô hình này cho phép thiết kế các chính sách phê duyệt phù hợp -- chẳng hạn yêu cầu chữ ký của nhiều tổ chức giám sát bầu cử cho mỗi phiếu bầu -- mà vẫn đảm bảo hiệu năng tổng thể của hệ thống.
+
+\subsubsection{Ưu điểm và hạn chế của Hyperledger Fabric}
+
+\textit{Ưu điểm:} Là một nền tảng blockchain liên hợp được thiết kế dành riêng cho môi trường doanh nghiệp, Hyperledger Fabric mang lại một số lợi thế nổi bật:
+
+\begin{itemize}
+    \item Cung cấp khả năng bảo mật và phân quyền dữ liệu xuất sắc nhờ cơ chế Channel và Private Data Collection, đáp ứng tốt các kịch bản hợp tác giữa nhiều bên với mức độ tin cậy không đồng đều.
+
+    \item Kiến trúc mô-đun hóa cao cho phép doanh nghiệp dễ dàng bảo trì, thay đổi cơ chế đồng thuận hoặc cơ sở dữ liệu trạng thái khi nhu cầu nghiệp vụ thay đổi mà không phải xây dựng lại toàn bộ hệ thống.
+
+    \item Hiệu năng cao với tốc độ xử lý lớn và độ trễ thấp nhờ loại bỏ cơ chế Proof of Work, đồng thời tách biệt quá trình thực thi và sắp xếp giao dịch.
+
+    \item Thân thiện với lập trình viên: các hợp đồng thông minh có thể được viết bằng những ngôn ngữ phổ biến như Go, Java hay Node.js thay vì phải học một ngôn ngữ chuyên biệt, qua đó giảm đáng kể chi phí đào tạo và rút ngắn thời gian phát triển.
+
+    \item Hệ sinh thái phong phú với sự hậu thuẫn của Linux Foundation và nhiều tập đoàn công nghệ lớn, cùng với cộng đồng phát triển năng động và tài liệu kỹ thuật chi tiết.
+\end{itemize}
+
+\textit{Hạn chế:} Bên cạnh các ưu điểm, Hyperledger Fabric cũng tồn tại một số hạn chế cần được lưu ý khi triển khai:
+
+\begin{itemize}
+    \item Kiến trúc hệ thống tương đối phức tạp với nhiều thành phần phối hợp (Peer, Orderer, CA, MSP, Channel, chaincode, v.v.), tạo ra rào cản học tập (steep learning curve) đáng kể đối với các nhóm phát triển mới làm quen.
+
+    \item Quy trình thiết lập ban đầu và quản trị mạng lưới (Network Governance) giữa nhiều tổ chức đòi hỏi nhiều thời gian và công sức, từ việc thống nhất chính sách, cấp phát chứng chỉ, đến cấu hình kênh và phê duyệt chaincode.
+
+    \item Do là blockchain có cấp phép, Hyperledger Fabric không phù hợp với các bài toán đòi hỏi tính chất công khai hoàn toàn, phi tập trung tuyệt đối và ẩn danh -- chẳng hạn các ứng dụng tiền điện tử mở rộng quy mô toàn cầu.
+
+    \item Việc phụ thuộc vào hạ tầng chứng chỉ số đặt ra yêu cầu cao về bảo mật khóa và quản lý vòng đời chứng chỉ; rò rỉ khóa của một CA có thể gây ảnh hưởng nghiêm trọng tới toàn bộ tổ chức liên quan.
+\end{itemize}
+
+Tổng kết lại, Hyperledger Fabric là một nền tảng blockchain doanh nghiệp mạnh mẽ, kết hợp được các yếu tố về bảo mật, hiệu năng, khả năng tùy biến và quản trị phi tập trung. Với cơ chế định danh chặt chẽ, hỗ trợ chữ ký số dựa trên chứng chỉ X.509 và khả năng triển khai chaincode bằng các ngôn ngữ thông dụng, Hyperledger Fabric đặc biệt phù hợp với việc xây dựng hệ thống bỏ phiếu điện tử -- nơi đồng thời cần đảm bảo tính xác thực của cử tri, sự riêng tư của lá phiếu, tính minh bạch trong kiểm phiếu và khả năng kiểm chứng độc lập của các bên giám sát. Đây là lý do nền tảng này được lựa chọn làm hạ tầng triển khai cho hệ thống đề xuất trong đồ án.
