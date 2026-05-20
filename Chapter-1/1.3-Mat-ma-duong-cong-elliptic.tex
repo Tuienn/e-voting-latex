@@ -1,0 +1,135 @@
+\subsection{Mật mã đường cong elliptic}
+
+Mật mã học hiện đại là nền tảng lý thuyết cho mọi cơ chế xác thực, toàn vẹn và bảo mật trong các hệ thống bỏ phiếu điện tử. Mục này trước tiên trình bày cô đọng các nguyên thủy mật mã được sử dụng xuyên suốt đồ án -- hàm băm mật mã, chữ ký số, tiêu chuẩn an toàn EUF-CMA và mô hình tiên tri ngẫu nhiên (Random Oracle Model -- ROM) -- sau đó tập trung trình bày chi tiết \textbf{mật mã đường cong elliptic} (Elliptic Curve Cryptography -- ECC), khối kiến thức trọng tâm và là nền tảng toán học của các lược đồ chữ ký mù tập thể được đề xuất ở các mục tiếp theo.
+
+\subsubsection{Các nguyên thủy mật mã nền tảng}
+
+\textbf{Hàm băm mật mã:} Hàm băm mật mã là một hàm toán học
+\begin{equation}
+H: \{0,1\}^{*} \rightarrow \{0,1\}^{k}
+\label{eq:hash-def}
+\end{equation}
+nhận đầu vào là chuỗi bit có độ dài bất kỳ và sinh ra giá trị tóm lược $H(M)$ có độ dài cố định $k$ (thường là 256 hoặc 512 bit). Để được coi là an toàn về mặt mật mã, hàm $H$ phải đồng thời thỏa mãn ba thuộc tính:
+
+\begin{itemize}
+    \item \textbf{Tính kháng tiền ảnh (Preimage Resistance):} với giá trị băm $h$ cho trước, không tồn tại thuật toán hiệu quả trong thời gian đa thức tìm được $M$ sao cho $H(M) = h$.
+
+    \item \textbf{Tính kháng tiền ảnh thứ hai (Second Preimage Resistance):} cho trước $M_1$, không tồn tại thuật toán hiệu quả tìm được $M_2 \neq M_1$ sao cho $H(M_1) = H(M_2)$.
+
+    \item \textbf{Tính kháng xung đột (Collision Resistance):} không tồn tại thuật toán hiệu quả tìm được hai thông điệp khác nhau $M_1 \neq M_2$ thỏa mãn $H(M_1) = H(M_2)$.
+\end{itemize}
+
+Trong các lược đồ chữ ký số, hàm băm được sử dụng để rút gọn thông điệp về kích thước cố định trước khi ký, vừa nâng cao hiệu năng vừa loại trừ các tấn công khai thác cấu trúc thông điệp.
+
+\textbf{Chữ ký số:} Một lược đồ chữ ký số (Digital Signature) được xác định bởi bộ ba thuật toán $(Gen, Sig, Ver)$ trên nền hệ mật khóa công khai:
+
+\begin{itemize}
+    \item \textbf{Sinh khóa (Gen):} nhận tham số an toàn $1^k$, sinh ra cặp khóa công khai -- bí mật $(pk, sk)$.
+
+    \item \textbf{Ký (Sig):} sử dụng khóa bí mật $sk$ để tạo chữ ký $s \leftarrow Sig(sk, M)$ tương ứng với thông điệp $M$. Trên thực tế, người ký không ký trực tiếp lên $M$ mà ký lên giá trị băm $H(M)$.
+
+    \item \textbf{Xác thực (Ver):} sử dụng khóa công khai $pk$ để kiểm tra tính hợp lệ của cặp $(M, s)$, trả về kết quả thuộc $\{0, 1\}$.
+\end{itemize}
+
+Nhờ cơ chế này, chữ ký số đảm nhiệm đồng thời ba chức năng cốt lõi: \textit{xác thực nguồn gốc} thông điệp, \textit{đảm bảo tính toàn vẹn} của dữ liệu được ký, và \textit{chống chối bỏ} đối với người ký.
+
+\textbf{Tiêu chuẩn an toàn EUF-CMA:} Theo phân loại của Goldwasser \textit{et al.}, các tấn công vào chữ ký số được sắp xếp theo lượng thông tin mà kẻ tấn công có thể thu thập (từ \textit{Key-Only Attack} đến \textit{Adaptive Chosen Message Attack -- ACMA}), còn mức độ thành công được phân thành bốn dạng phá vỡ (\textit{Total Break}, \textit{Universal Forgery}, \textit{Selective Forgery}, \textit{Existential Forgery}). Một lược đồ chữ ký số được coi là \textit{an toàn} theo nghĩa mạnh nhất hiện nay nếu nó không bị \textbf{giả mạo có tồn tại dưới tấn công văn bản lựa chọn thích ứng} (existentially unforgeable under adaptive chosen message attack -- EUF-CMA). Đây là tiêu chuẩn an toàn được áp dụng cho mọi lược đồ chữ ký số hiện đại và là mục tiêu phải đạt khi đề xuất các biến thể chữ ký mới như chữ ký mù tập thể được trình bày trong các mục sau.
+
+\textbf{Mô hình tiên tri ngẫu nhiên (ROM):} Việc chứng minh chặt chẽ tính an toàn của một lược đồ chữ ký số trong mô hình tính toán chuẩn thường rất khó khăn, đặc biệt với các lược đồ sử dụng hàm băm. Năm 1993, Bellare và Rogaway đề xuất \textit{mô hình tiên tri ngẫu nhiên} (Random Oracle Model -- ROM): trong mô hình này, hàm băm $H$ được coi là một \textit{tiên tri ngẫu nhiên} -- một hộp đen lý tưởng trả về giá trị ngẫu nhiên đều trên toàn miền giá trị với mỗi truy vấn mới và ghi nhớ để trả về cùng kết quả khi truy vấn lặp lại. Một lược đồ được coi là an toàn trong ROM nếu mọi thuật toán hiệu quả của kẻ tấn công đều có xác suất giả mạo thành công là một hàm vô cùng nhỏ $\varepsilon(k)$ theo tham số an toàn $k$. Mặc dù là một sự lý tưởng hóa, ROM hiện vẫn là khung chứng minh an toàn được sử dụng phổ biến và đáng tin cậy nhất cho các giao thức mật mã thực dụng -- và sẽ được sử dụng làm khung lý thuyết trong các phân tích an toàn ở các mục sau của đồ án.
+
+\subsubsection{Khái niệm đường cong elliptic}
+
+Mật mã đường cong elliptic được giới thiệu độc lập bởi Neal Koblitz và Victor Miller vào năm 1985, dựa trên độ khó của bài toán logarit rời rạc trên nhóm điểm của đường cong elliptic (Elliptic Curve Discrete Logarithm Problem -- ECDLP) -- một bài toán cho đến nay vẫn chưa có giải thuật hiệu quả thời gian đa thức.
+
+Cho $K$ là một trường hữu hạn có đặc số khác $2$ và $3$. Một \textit{đường cong elliptic} trên trường $K$ được định nghĩa là tập hợp tất cả các nghiệm $(x, y) \in K \times K$ của phương trình Weierstrass rút gọn:
+\begin{equation}
+E: y^2 = x^3 + ax + b
+\label{eq:ec-weierstrass}
+\end{equation}
+cùng với một điểm đặc biệt $\mathcal{O}$ được gọi là \textit{điểm vô cùng} (point at infinity), trong đó các hệ số $a, b \in K$ thỏa mãn điều kiện không suy biến:
+\begin{equation}
+\Delta = -16(4a^3 + 27b^2) \neq 0
+\label{eq:ec-discriminant}
+\end{equation}
+Điều kiện trên đảm bảo đường cong không có nghiệm bội, tức là đồ thị của nó là một đường cong trơn không có điểm tự cắt hoặc điểm kỳ dị. Đại lượng $\Delta$ được gọi là \textit{biệt thức} (discriminant) của đường cong.
+
+Trong các ứng dụng mật mã, đường cong elliptic được xét trên trường hữu hạn nguyên tố $\mathbb{F}_p$ với $p$ là một số nguyên tố lớn. Khi đó phương trình đường cong được viết dưới dạng đồng dư modulo $p$:
+\begin{equation}
+E(\mathbb{F}_p): y^2 \equiv x^3 + ax + b \pmod{p}
+\label{eq:ec-fp}
+\end{equation}
+với điều kiện $4a^3 + 27b^2 \not\equiv 0 \pmod{p}$. Bất biến đặc trưng cho lớp các đường cong tương đương về mặt đẳng cấu là \textit{bất biến $j$} (j-invariant):
+\begin{equation}
+J(E) = 1728 \cdot \frac{4a^3}{4a^3 + 27b^2} \bmod p
+\label{eq:ec-jinvariant}
+\end{equation}
+
+\subsubsection{Nhóm điểm trên đường cong elliptic}
+
+Tập hợp tất cả các điểm $(x, y) \in \mathbb{F}_p \times \mathbb{F}_p$ thỏa mãn phương trình \eqref{eq:ec-fp} cùng với điểm vô cùng $\mathcal{O}$ tạo thành một \textit{nhóm Abel}, ký hiệu là $E(\mathbb{F}_p)$. Số lượng phần tử của nhóm này được gọi là \textit{cấp} (order) của đường cong, ký hiệu $\#E(\mathbb{F}_p) = m$. Theo định lý Hasse, cấp $m$ thỏa mãn bất đẳng thức:
+\begin{equation}
+p + 1 - 2\sqrt{p} \leq m \leq p + 1 + 2\sqrt{p}
+\label{eq:hasse}
+\end{equation}
+Bất đẳng thức Hasse cho biết số điểm của đường cong xấp xỉ bằng kích thước của trường nền và là cơ sở cho việc đếm số điểm khi lựa chọn tham số mật mã.
+
+Trong các ứng dụng mật mã, người ta chọn một điểm gốc $G \in E(\mathbb{F}_p)$, $G \neq \mathcal{O}$, có cấp là số nguyên tố lớn $q$ -- tức $q$ là số nguyên dương nhỏ nhất thỏa mãn $q \times G \equiv \mathcal{O}$. Khi đó, $G$ sinh ra một \textit{nhóm con cyclic} của $E(\mathbb{F}_p)$:
+\begin{equation}
+\langle G \rangle = \{\mathcal{O}, G, 2G, 3G, \ldots, (q-1)G\}
+\label{eq:cyclic-subgroup}
+\end{equation}
+Cấp $q$ của nhóm con này là ước của cấp $m$ của đường cong, tức $m = n \cdot q$ với $n$ là số nguyên dương được gọi là \textit{đối cấp} (cofactor). Để đảm bảo tính an toàn, đối cấp $n$ thường được chọn rất nhỏ (thường $n = 1$, $n = 2$ hoặc $n = 4$) và $q$ phải là số nguyên tố đủ lớn (thường $q \geq 2^{160}$ hoặc $q \geq 2^{256}$ cho mức an toàn cao).
+
+\subsubsection{Phép toán trên đường cong elliptic}
+
+Trên nhóm điểm $E(\mathbb{F}_p)$, phép \textit{cộng hai điểm} được định nghĩa theo nguyên tắc \textit{tiếp tuyến và dây cung} (chord-and-tangent rule) như sau. Cho hai điểm $P_1 = (x_1, y_1)$ và $P_2 = (x_2, y_2)$ thuộc $E(\mathbb{F}_p)$, điểm tổng $P_3 = P_1 + P_2 = (x_3, y_3)$ được xác định bởi các công thức:
+
+\textbf{Trường hợp 1 -- Cộng hai điểm phân biệt} ($P_1 \neq \pm P_2$, tức $x_1 \neq x_2$):
+\begin{equation}
+\lambda = \frac{y_2 - y_1}{x_2 - x_1} \bmod p, \quad x_3 = \lambda^2 - x_1 - x_2 \bmod p, \quad y_3 = \lambda(x_1 - x_3) - y_1 \bmod p
+\label{eq:point-add}
+\end{equation}
+
+\textbf{Trường hợp 2 -- Nhân đôi điểm} ($P_1 = P_2$, $y_1 \neq 0$): sử dụng tiếp tuyến của đường cong tại $P_1$ với hệ số góc:
+\begin{equation}
+\lambda = \frac{3x_1^2 + a}{2y_1} \bmod p, \quad x_3 = \lambda^2 - 2x_1 \bmod p, \quad y_3 = \lambda(x_1 - x_3) - y_1 \bmod p
+\label{eq:point-double}
+\end{equation}
+
+\textbf{Trường hợp 3 -- Phần tử trung hòa và phần tử đối:} với mọi điểm $P \in E(\mathbb{F}_p)$, ta có $P + \mathcal{O} = \mathcal{O} + P = P$. Đối của điểm $P = (x, y)$ là điểm $-P = (x, -y \bmod p)$, và $P + (-P) = \mathcal{O}$.
+
+Trên cơ sở phép cộng điểm, \textit{phép nhân điểm với một số nguyên} (scalar multiplication) -- phép toán cốt lõi của mọi hệ mật trên đường cong elliptic -- được định nghĩa như phép cộng lặp:
+\begin{equation}
+k \times P = \underbrace{P + P + \cdots + P}_{k \text{ lần}}
+\label{eq:scalar-mult}
+\end{equation}
+trong đó $k$ là số nguyên dương và $P \in E(\mathbb{F}_p)$. Trong thực tế, phép nhân điểm không được thực hiện bằng cách cộng lặp $k$ lần mà được tính toán hiệu quả bằng thuật toán \textit{double-and-add} (nhân đôi và cộng) dựa trên biểu diễn nhị phân của $k$, với độ phức tạp $O(\log_2 k)$ phép cộng điểm. Đây cũng là cơ sở cho tính an toàn của bài toán ECDLP được trình bày trong mục tiếp theo: việc tính $Q = k \times P$ là dễ dàng, nhưng việc tìm ngược lại $k$ khi biết $P$ và $Q$ là một bài toán khó.
+
+\subsubsection{Bài toán logarit rời rạc trên đường cong elliptic}
+
+\textbf{Định nghĩa bài toán ECDLP:} Cho đường cong elliptic $E$ trên trường hữu hạn $\mathbb{F}_p$, một điểm $G \in E(\mathbb{F}_p)$ có cấp là số nguyên tố $q$ và một điểm $P \in \langle G \rangle$ thuộc nhóm con cyclic sinh bởi $G$. Bài toán logarit rời rạc trên đường cong elliptic yêu cầu tìm số nguyên duy nhất $k$, $0 \leq k \leq q - 1$, sao cho:
+\begin{equation}
+P = k \times G
+\label{eq:ecdlp}
+\end{equation}
+Số nguyên $k$ được gọi là \textit{logarit rời rạc} của $P$ theo cơ sở $G$, ký hiệu $k = \log_G P$. Bài toán ECDLP được xem là khó về mặt tính toán theo nghĩa không tồn tại thuật toán hiệu quả trong thời gian đa thức để giải nó với các tham số được lựa chọn hợp lý. Đây chính là nền tảng cho tính an toàn của toàn bộ các hệ mật và lược đồ chữ ký số xây dựng trên đường cong elliptic.
+
+Các thuật toán tấn công ECDLP được biết đến cho đến nay chia thành hai nhóm: (i) nhóm thuật toán đa dụng áp dụng cho mọi nhóm cyclic, tiêu biểu là \textit{Baby-step Giant-step} của Shanks và \textit{Pollard's rho}, với độ phức tạp $O(\sqrt{q})$ phép toán nhóm; (ii) nhóm thuật toán chuyên dụng khai thác cấu trúc nhóm, tiêu biểu là \textit{Pohlig-Hellman} cho phép quy ECDLP về các bài toán con tương ứng với các ước nguyên tố của $q$. Sự kết hợp của Pohlig-Hellman và Pollard's rho hiện được xem là phương pháp tấn công tốt nhất, với độ phức tạp $O(\sqrt{p'})$, trong đó $p'$ là ước nguyên tố lớn nhất của cấp $q$. Đáng chú ý, khác với các bài toán IFP và DLP trên trường hữu hạn, đối với ECDLP trên đường cong được lựa chọn cẩn thận, hiện \textbf{không tồn tại thuật toán index-calculus dưới mũ} -- thuật toán từng là công cụ phá vỡ hiệu quả các hệ mật dựa trên IFP và DLP.
+
+Để chống lại các tấn công nói trên, các tham số đường cong elliptic dùng cho mật mã phải được lựa chọn sao cho cấp $q$ của nhóm con cyclic là một số nguyên tố đủ lớn, thông thường $q \geq 2^{160}$ cho mức an toàn $80$ bit và $q \geq 2^{256}$ cho mức an toàn $128$ bit -- mức được khuyến nghị theo các tiêu chuẩn NIST và Brainpool. Đường cong cũng cần tránh các lớp đặc biệt như đường cong dị thường (anomalous), đường cong siêu kỳ dị (supersingular) với nhúng nhỏ và đường cong có cấp chứa thừa số nhỏ.
+
+\subsubsection{Ưu điểm và lý do lựa chọn ECC}
+
+So với các hệ mật khóa công khai cổ điển như RSA hay ElGamal trên trường hữu hạn, mật mã đường cong elliptic sở hữu nhiều ưu điểm vượt trội khiến nó trở thành lựa chọn ưu tiên cho các lược đồ chữ ký mù và chữ ký mù tập thể được trình bày trong các mục tiếp theo, cũng như cho các hệ thống blockchain nơi mỗi byte dữ liệu và mỗi phép tính đều phát sinh chi phí giao dịch trực tiếp:
+
+\begin{itemize}
+    \item \textbf{Độ dài khóa ngắn hơn nhiều với cùng mức an toàn:} do không tồn tại thuật toán index-calculus dưới mũ cho ECDLP, độ dài khóa cần thiết để đạt cùng mức an toàn của ECC nhỏ hơn nhiều lần so với RSA. Theo khuyến nghị của NIST, khóa ECC $256$ bit cung cấp mức an toàn tương đương khóa RSA $3072$ bit, và khóa ECC $384$ bit tương đương khóa RSA $7680$ bit.
+
+    \item \textbf{Tốc độ tính toán nhanh và chi phí tài nguyên thấp:} do độ dài khóa và chữ ký ngắn hơn, các phép toán mật mã trên đường cong elliptic được thực hiện nhanh hơn, tiêu thụ ít bộ nhớ, ít băng thông truyền dẫn và ít năng lượng tiêu thụ hơn -- đặc biệt phù hợp với thiết bị di động, thẻ thông minh, cảm biến IoT và môi trường blockchain.
+
+    \item \textbf{Tính linh hoạt cao trong thiết kế:} trên cùng một trường hữu hạn $\mathbb{F}_p$, có thể xây dựng vô số đường cong elliptic khác nhau bằng cách thay đổi các tham số $a, b$, cho phép tùy chỉnh phù hợp với từng ứng dụng và mức an toàn yêu cầu.
+
+    \item \textbf{Nền tảng cho các giao thức mật mã hiện đại:} ECC là cơ sở toán học của hàng loạt giao thức và chuẩn mật mã đang được sử dụng rộng rãi: ECDSA (FIPS 186-4), lược đồ EC-Schnorr, chuẩn GOST R34.10-2012, giao thức trao đổi khóa ECDH/ECDHE trong TLS, cũng như các lược đồ chữ ký mù và chữ ký mù tập thể -- chủ đề trọng tâm của các mục tiếp theo.
+\end{itemize}
+
+Với những ưu điểm nói trên, mật mã đường cong elliptic là lựa chọn phù hợp nhất cho việc triển khai các lược đồ chữ ký số trong hệ thống bỏ phiếu điện tử dựa trên công nghệ chuỗi khối được đề xuất trong đồ án, nơi yêu cầu đồng thời về mức an toàn cao, hiệu năng xử lý nhanh và chi phí giao dịch thấp trên môi trường blockchain.

@@ -94,9 +94,9 @@ Quá trình xác minh chỉ sử dụng các tham số công khai $(E, p, q, G, 
 
 \subsubsection{Tính đúng đắn của lược đồ}
 
-\textit{Định lý:} Lược đồ chữ ký số EC-Schnorr là đúng đắn, tức là với mọi cặp khóa $(d, P)$ sinh ra bởi thuật toán $\textsf{Gen}$ và mọi thông điệp $M$, chữ ký $(r, s)$ tạo bởi thuật toán $\textsf{Sig}(M, d)$ luôn được chấp nhận bởi thuật toán $\textsf{Ver}(M, (r,s), P)$.
+\textbf{Định lý:} Lược đồ chữ ký số EC-Schnorr là đúng đắn, tức là với mọi cặp khóa $(d, P)$ sinh ra bởi thuật toán $\textsf{Gen}$ và mọi thông điệp $M$, chữ ký $(r, s)$ tạo bởi thuật toán $\textsf{Sig}(M, d)$ luôn được chấp nhận bởi thuật toán $\textsf{Ver}(M, (r,s), P)$.
 
-\textit{Chứng minh:} Để chứng minh tính đúng đắn của lược đồ, cần chỉ ra rằng điểm $C'$ tính trong quá trình xác minh theo công thức \eqref{eq:ec-schnorr-verify-c} chính là điểm cam kết $C$ tính trong quá trình ký theo công thức \eqref{eq:ec-schnorr-sign-c}. Thay thế các giá trị tương ứng vào vế phải của \eqref{eq:ec-schnorr-verify-c} và sử dụng tính chất phân phối của phép nhân điểm trên đường cong elliptic, ta có:
+\textbf{Chứng minh:} Để chứng minh tính đúng đắn của lược đồ, cần chỉ ra rằng điểm $C'$ tính trong quá trình xác minh theo công thức \eqref{eq:ec-schnorr-verify-c} chính là điểm cam kết $C$ tính trong quá trình ký theo công thức \eqref{eq:ec-schnorr-sign-c}. Thay thế các giá trị tương ứng vào vế phải của \eqref{eq:ec-schnorr-verify-c} và sử dụng tính chất phân phối của phép nhân điểm trên đường cong elliptic, ta có:
 \begin{align}
     C' &= s \times G + r \times P \pmod{p} \notag \\
        &= (k - r d) \times G + r \times (d \times G) \pmod{p} \notag \\

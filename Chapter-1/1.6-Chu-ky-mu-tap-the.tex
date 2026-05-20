@@ -1,0 +1,144 @@
+\subsection{Chữ ký mù tập thể}
+\label{sec:chu-ky-mu-tap-the}
+
+Trong nhiều ứng dụng thực tế, một thông điệp cần được chứng thực đồng thời bởi nhiều thực thể trong một tổ chức -- chẳng hạn ban tổ chức bầu cử gồm nhiều thành viên cùng cấp phiếu cho cử tri. Lược đồ chữ ký số tập thể (multi-signature) đáp ứng nhu cầu nhiều người ký nhưng không bảo đảm tính riêng tư; ngược lại, chữ ký mù (mục 1.5) đảm bảo tính riêng tư nhưng chỉ có một người ký. \textit{Chữ ký mù tập thể} (blind multi-signature -- BMS) kết hợp cả hai: nhiều người ký cùng ký lên thông điệp đã làm mù mà vẫn giữ kín nội dung đối với mọi người ký. Đây là công cụ mật mã cốt lõi được sử dụng trong hệ thống bỏ phiếu điện tử blockchain được đề xuất trong đồ án.
+
+\subsubsection{Khái niệm chữ ký mù tập thể}
+
+Lược đồ chữ ký mù tập thể cho phép một \textit{tập thể người ký} $\mathbf{U} = \{U_1, U_2, \ldots, U_n\}$ cùng ký trên thông điệp $M$ của người yêu cầu $A$, sao cho không một người ký nào -- kể cả khi tất cả thoả hiệp -- nhận biết được nội dung của $M$ hay liên kết được chữ ký công bố với phiên ký cụ thể trong quá khứ.
+
+Cách tiếp cận đơn giản nhất là mỗi người ký tự ký bằng lược đồ chữ ký mù riêng lẻ rồi ghép các chữ ký lại; tuy nhiên, cách này có kích thước chữ ký và thời gian xác minh tăng tuyến tính theo số lượng người ký, không phù hợp với hệ thống quy mô lớn hoặc tài nguyên hạn chế như blockchain. Do đó, các nghiên cứu hiện nay tập trung xây dựng các lược đồ \textit{tích hợp}, trong đó chữ ký tập thể có kích thước cố định và xác minh trong một bước duy nhất bằng khoá công khai tập thể.
+
+\subsubsection{Mô hình tổng quát của chữ ký mù tập thể}
+
+Lược đồ chữ ký mù tập thể là sự tổng quát hóa của cả mô hình chữ ký mù (mục 1.5) và chữ ký tập thể, gồm bốn thuật toán chính:
+
+\begin{itemize}
+    \item \textbf{Sinh khóa (Gen):} mỗi thành viên $U_i$ sinh cặp khóa $(sk_i, pk_i)$. Từ tập khóa công khai riêng, hệ thống tính \textit{khóa công khai tập thể} $pk_{\mathbf{U}}$ làm khóa xác minh chung.
+    \item \textbf{Làm mù (Blind):} $A$ thực hiện cục bộ trên $M$ với tham số làm mù ngẫu nhiên bí mật, tạo $M'$ gửi cho tập thể người ký.
+    \item \textbf{Ký tập thể (BlindSig):} giao thức tương tác nhiều bên giữa $A$ và các thành viên trong $\mathbf{U}$; mỗi người ký đóng góp phần chữ ký riêng từ khoá bí mật của mình, được tổng hợp thành chữ ký tập thể bởi $A$ hoặc bên thứ ba tin cậy (TTP).
+    \item \textbf{Giải mù (Unblind) và xác minh (Ver):} $A$ giải mù thu chữ ký hợp lệ trên $M$; bất kỳ thực thể nào cũng có thể xác minh $(M, \sigma)$ bằng $pk_{\mathbf{U}}$ và bộ tham số công khai.
+\end{itemize}
+
+Tiến trình tổng quát: $A$ làm mù $M$ thành $M'$ trước khi đưa cho $\mathbf{U}$ ký; tập thể $\mathbf{U}$ thực hiện giao thức ký trên $M'$ và trả về $\sigma'$; $A$ giải mù thu được chữ ký $\sigma$ trên $M$. Như vậy $A$ có chữ ký hợp lệ của $\mathbf{U}$ trên $M$ mà các thành viên không biết bất kỳ thông tin nào về $M$.
+
+\subsubsection{Vai trò của các thực thể tham gia}
+
+Trong một lược đồ chữ ký mù tập thể có bốn vai trò chính:
+
+\begin{itemize}
+    \item \textbf{Người yêu cầu $A$ (Requester):} chủ thể sở hữu $M$, là thực thể duy nhất biết nội dung thực của $M$ và nắm giữ các tham số làm mù bí mật $(\alpha, \beta, \ldots)$. Trong bỏ phiếu điện tử, $A$ chính là cử tri.
+
+    \item \textbf{Tập thể người ký $\mathbf{U}$ (Signing Group):} nhóm thực thể có thẩm quyền chứng thực; mỗi $U_i$ nắm khoá bí mật riêng $sk_i = d_i$ và đóng góp một phần chữ ký. Không một $U_i$ nào (kể cả khi tất cả thoả hiệp) có thể thu được thông tin về $M$. Trong bỏ phiếu điện tử, $\mathbf{U}$ là ban tổ chức bầu cử.
+
+    \item \textbf{Bên thứ ba tin cậy (TTP):} thực thể tùy chọn điều phối giao thức ký -- thu thập phần chữ ký riêng, tổng hợp và trả về cho $A$. Vai trò này có thể được phân tán hoặc gán cho chính $A$.
+
+    \item \textbf{Người xác minh (Verifier):} thực thể bất kỳ truy cập được khoá công khai tập thể $pk_{\mathbf{U}}$ để kiểm tra tính hợp lệ của $(M, \sigma)$.
+\end{itemize}
+
+\subsubsection{Quy trình tạo chữ ký mù tập thể}
+
+Quy trình gồm năm pha tuần tự:
+
+\begin{itemize}
+    \item \textbf{Pha 1 -- Sinh khóa:} Mỗi $U_i$ độc lập sinh $d_i$ và tính $P_i$; khóa công khai tập thể $P$ được tổng hợp và công bố cùng danh sách thành viên.
+    \item \textbf{Pha 2 -- Sinh cam kết tập thể:} Mỗi $U_i$ chọn $k_i$ ngẫu nhiên, tính điểm cam kết $C_i$; các $C_i$ được tổng hợp thành $C$ và gửi cho $A$.
+    \item \textbf{Pha 3 -- Làm mù:} $A$ dùng các tham số làm mù bí mật $(\alpha, \beta)$ biến đổi $C$ thành $C'$, tính thử thách đã làm mù $e$ dựa trên $C'$ và $M$, gửi $e$ về tập thể.
+    \item \textbf{Pha 4 -- Ký tập thể:} Mỗi $U_i$ dùng $d_i$, $k_i$ và $e$ tính phần chữ ký riêng $s_i$; các $s_i$ được tổng hợp thành phần chữ ký tập thể đã làm mù $s'$.
+    \item \textbf{Pha 5 -- Giải mù và xác minh:} $A$ giải mù $s'$ thu được chữ ký $\sigma$ trên $M$; mọi thực thể có thể xác minh $(M, \sigma)$ bằng $P$.
+\end{itemize}
+
+\subsubsection{Lược đồ chữ ký mù tập thể dựa trên EC-Schnorr}
+
+Trên cơ sở EC-Schnorr (mục 1.4) và mô hình chữ ký mù (mục 1.5), lược đồ chữ ký mù tập thể dựa trên EC-Schnorr được xây dựng như sau. Bộ tham số miền gồm đường cong elliptic $E$ trên trường $\mathbb{F}_p$, điểm gốc $G$ cấp $q$, hàm băm $H: \{0,1\}^* \rightarrow \mathbb{Z}_q$, tập thể $n$ người ký $\mathbf{U}$ và người yêu cầu $A$.
+
+\begin{itemize}
+    \item \textbf{Sinh khóa:} Mỗi $U_i$ chọn $d_i \in (1, q-1)$ ngẫu nhiên, tính $P_i = d_i \times G$. Khóa công khai tập thể:
+    \begin{equation}
+        P = \sum_{i=1}^{n} P_i = D \times G \bmod p
+        \label{eq:bms-pubkey}
+    \end{equation}
+    với $D = \sum_{i=1}^{n} d_i \bmod q$ là khoá bí mật tập thể (không được tính tường minh, không một thành viên đơn lẻ nào biết).
+
+    \item \textbf{Sinh cam kết:} Mỗi $U_i$ chọn $k_i \in (1, q-1)$ ngẫu nhiên, tính $C_i = k_i \times G \bmod p$. Tổng hợp thành điểm cam kết tập thể:
+    \begin{equation}
+        C = \sum_{i=1}^{n} C_i = K \times G \bmod p, \quad K = \sum_{i=1}^{n} k_i \bmod q
+        \label{eq:bms-commit}
+    \end{equation}
+
+    \item \textbf{Làm mù:} $A$ chọn $\alpha, \beta \in \mathbb{Z}_q$ ngẫu nhiên, tính:
+    \begin{equation}
+        C' = C + \alpha \times G + \beta \times P \bmod p
+        \label{eq:bms-blind-c}
+    \end{equation}
+    \begin{equation}
+        r' = H(M, x_{C'}) \bmod q, \qquad e = (r' - \beta) \bmod q
+        \label{eq:bms-blind-challenge}
+    \end{equation}
+    với $x_{C'}$ là hoành độ điểm $C'$. $A$ gửi $e$ tới mọi thành viên trong $\mathbf{U}$.
+
+    \item \textbf{Ký tập thể:} Mỗi $U_i$ nhận $e$ và tính:
+    \begin{equation}
+        s_i = (k_i - e \cdot d_i) \bmod q
+        \label{eq:bms-sign-i}
+    \end{equation}
+    Tổng hợp thành phần chữ ký tập thể đã làm mù:
+    \begin{equation}
+        s'' = \sum_{i=1}^{n} s_i \bmod q
+        \label{eq:bms-sign-aggregate}
+    \end{equation}
+
+    \item \textbf{Giải mù:} $A$ tính thành phần thứ hai của chữ ký:
+    \begin{equation}
+        s' = (s'' + \alpha) \bmod q
+        \label{eq:bms-unblind}
+    \end{equation}
+    Cặp $(r', s')$ là chữ ký mù tập thể trên $M$.
+
+    \item \textbf{Xác minh:} Người xác minh tính:
+    \begin{equation}
+        C^* = s' \times G + r' \times P \bmod p, \qquad r^* = H(M, x_{C^*}) \bmod q
+        \label{eq:bms-verify}
+    \end{equation}
+    Chữ ký hợp lệ nếu $r^* = r'$.
+\end{itemize}
+
+\subsubsection{Phân tích tính đúng đắn}
+
+\textit{Định lý}: Với mọi $M$, mọi tập khóa $\{d_i\}$ và các giá trị ngẫu nhiên hợp lệ $\{k_i\}, \alpha, \beta$, chữ ký mù tập thể $(r', s')$ sinh bởi giao thức trên luôn được thuật toán xác minh chấp nhận.
+
+\textit{Chứng minh}: Thay \eqref{eq:bms-unblind}, \eqref{eq:bms-sign-aggregate}, \eqref{eq:bms-sign-i} và \eqref{eq:bms-blind-challenge} vào vế phải của \eqref{eq:bms-verify}:
+\begin{align}
+    C^* &= s' \times G + r' \times P = (s'' + \alpha) \times G + r' \times P \notag \\
+        &= \left( \sum_{i=1}^{n} (k_i - e d_i) + \alpha \right) \times G + r' \times P \notag \\
+        &= (K - eD + \alpha) \times G + r' \times P \notag \\
+        &= C - e \times P + \alpha \times G + r' \times P \notag \\
+        &= C + \alpha \times G + (r' - e) \times P
+        \label{eq:bms-proof-1}
+\end{align}
+Vì $e = r' - \beta \Rightarrow r' - e = \beta$, suy ra:
+\begin{equation}
+    C^* = C + \alpha \times G + \beta \times P = C'
+    \label{eq:bms-proof-2}
+\end{equation}
+Do đó $x_{C^*} = x_{C'}$, dẫn đến $r^* = H(M, x_{C^*}) \bmod q = r'$. Điều kiện $r^* = r'$ luôn thoả mãn, tính đúng đắn được chứng minh. $\hfill \blacksquare$
+
+\subsubsection{Phân tích tính an toàn}
+
+Tính an toàn của lược đồ được đánh giá qua bốn khía cạnh:
+
+\begin{itemize}
+    \item \textbf{Tính mù:} Với mỗi $U_i$, các giá trị quan sát gồm $C_i$, $e$, $s_i$. Do $\alpha, \beta \in \mathbb{Z}_q$ được chọn ngẫu nhiên phân bố đều và ánh xạ $(r', e) \mapsto (\alpha, \beta)$ với $\beta = r' - e$ là song ánh với mỗi cặp $(C, e)$ cho trước, mọi cặp $(M, r', s')$ hợp lệ đều có cùng phân bố xác suất với bất kỳ phiên ký nào. Xác suất phân biệt hai phiên ký khác nhau là một hàm vô cùng nhỏ trong cấp $q$.
+
+    \item \textbf{Tính không thể giả mạo:} Được chứng minh trong mô hình ROM bằng quy giảm về bài toán ECDLP. Nếu tồn tại đối thủ $\mathcal{A}$ giả mạo được với xác suất $\varepsilon$ không bỏ qua được, có thể xây dựng thuật toán $\mathcal{B}$ giải ECDLP với xác suất
+    \begin{equation*}
+        \varepsilon' = \left(1 - \frac{q_h(q_e + q_s)}{q}\right)\left(1 - \frac{1}{q}\right)\frac{\varepsilon}{q_h}
+    \end{equation*}
+    thông qua kỹ thuật \textit{Forking Lemma} của Pointcheval và Stern, với $(q_h, q_e, q_s)$ là số truy vấn tới hàm băm, hàm trích xuất và hàm ký. Do ECDLP được giả thiết là khó với tham số chuẩn, lược đồ an toàn EUF-CMA.
+
+    \item \textbf{Tính không thể liên kết:} Do tính mù được đảm bảo và $(\alpha, \beta)$ được chọn độc lập, ngẫu nhiên cho mỗi phiên ký, không có tương quan thống kê nào giữa $(C, e, \{s_i\})$ và $(M, r', s')$. Ngay cả khi toàn bộ $n$ người ký thoả hiệp, xác suất xác định đúng phiên ký tương ứng với chữ ký công bố chỉ bằng $1/N$ với $N$ là số phiên đã thực hiện.
+
+    \item \textbf{An toàn của khóa bí mật:} Khoá tập thể $D = \sum d_i$ không bao giờ được tính tường minh; khôi phục $D$ từ $P = D \times G$ tương đương ECDLP. Mỗi $k_i$ phải được sinh ngẫu nhiên, bí mật và không tái sử dụng -- nếu hai phần chữ ký $s_i$ trên hai thử thách $e$ khác nhau dùng cùng $k_i$ thì $d_i$ bị khôi phục ngay. Tập thể cần kênh truyền tin xác thực để chống tấn công \textit{rogue-key}.
+\end{itemize}
+
+Với các phân tích trên, lược đồ chữ ký mù tập thể dựa trên EC-Schnorr đáp ứng đầy đủ yêu cầu về tính mù, không thể giả mạo và không thể liên kết theo các định nghĩa trong mục 1.5.3, đồng thời kế thừa hiệu năng và kích thước chữ ký của EC-Schnorr. Kích thước chữ ký tập thể cố định bằng $2 \lceil \log_2 q \rceil$ bit -- không phụ thuộc số lượng người ký $n$ -- và xác minh chỉ cần một phép kiểm tra duy nhất bằng $P$. Đây là những đặc tính khiến lược đồ trở thành lựa chọn lý tưởng cho hệ thống bỏ phiếu điện tử dựa trên Hyperledger Fabric được đề xuất trong các chương tiếp theo.
