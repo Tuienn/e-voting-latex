@@ -1,0 +1,214 @@
+\subsection{Thiết kế cơ sở dữ liệu}
+
+Hệ thống được tổ chức theo kiến trúc microservice, trong đó mỗi service nghiệp vụ sở hữu một cơ sở dữ liệu logic riêng biệt (\textit{database per service}) nhằm bảo đảm tính cô lập, tránh phụ thuộc chéo và hỗ trợ khả năng triển khai độc lập.
+
+Hệ thống bao gồm bốn cơ sở dữ liệu tương ứng với bốn nhóm dịch vụ: \textit{Identity}, \textit{Coordinator}, \textit{Signing Node} và \textit{Reveal-Vote}. Liên kết giữa các cơ sở dữ liệu này không sử dụng khóa ngoại vật lý mà được duy trì ở tầng ứng dụng thông qua định danh \texttt{ObjectId} dùng chung và các thông điệp TCP nội bộ.
+
+\subsubsection{Bảng \texttt{users} (Identity Service)}
+
+Bảng \texttt{users} lưu trữ toàn bộ tài khoản trong hệ thống, bao gồm cả ba vai trò: quản trị viên, cử tri và ứng viên. Mật khẩu được băm bằng thuật toán bcrypt trước khi lưu, hệ thống không bao giờ lưu trữ mật khẩu nguyên bản.
+
+\begin{longtable}{|p{0.22\textwidth}|p{0.22\textwidth}|p{0.50\textwidth}|}
+    \caption{Cấu trúc bảng \texttt{users}}
+    \label{tab:db-users} \\
+    \hline
+    \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \endlastfoot
+    id        & ObjectId  & Khóa chính của bản ghi, sinh tự động. \\ \hline
+    email     & String    & Địa chỉ thư điện tử dùng để đăng nhập, có ràng buộc duy nhất. \\ \hline
+    password  & String    & Chuỗi băm mật khẩu theo thuật toán bcrypt. \\ \hline
+    name      & String    & Họ và tên hiển thị của người dùng. \\ \hline
+    role      & Enum (\textit{Role}) & Vai trò của tài khoản, nhận một trong các giá trị \texttt{ADMIN}, \texttt{VOTER}, \texttt{CANDIDATE}; mặc định là \texttt{VOTER}. \\ \hline
+    isActive  & Boolean   & Trạng thái kích hoạt của tài khoản; mặc định là \texttt{true}. \\ \hline
+    createdAt & DateTime  & Thời điểm tạo bản ghi, sinh tự động. \\ \hline
+    updatedAt & DateTime  & Thời điểm cập nhật gần nhất, sinh tự động. \\ \hline
+\end{longtable}
+
+\textbf{Ràng buộc và chỉ mục:} thuộc tính \texttt{email} có ràng buộc duy nhất nhằm bảo đảm mỗi địa chỉ chỉ tương ứng với một tài khoản; chỉ mục đơn trên trường \texttt{role} hỗ trợ thao tác lọc nhanh theo vai trò khi quản trị viên duyệt danh sách người dùng.
+
+\subsubsection{Bảng \texttt{elections} (Coordinator Service)}
+
+Bảng \texttt{elections} là bảng trung tâm của nghiệp vụ bầu cử, lưu trữ thông tin định danh, trạng thái vòng đời, danh sách ứng viên, khóa công khai tập thể và các tham chiếu blockchain của mỗi cuộc bầu cử.
+
+\begin{longtable}{|p{0.24\textwidth}|p{0.22\textwidth}|p{0.48\textwidth}|}
+    \caption{Cấu trúc bảng \texttt{elections}}
+    \label{tab:db-elections} \\
+    \hline
+    \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \endlastfoot
+    id                  & ObjectId  & Khóa chính của cuộc bầu cử, sinh tự động. \\ \hline
+    name                & String    & Tên cuộc bầu cử, có ràng buộc duy nhất. \\ \hline
+    status              & Enum (\textit{ElectionStatus}) & Trạng thái vòng đời, nhận một trong các giá trị \texttt{PENDING}, \texttt{ACTIVE}, \texttt{CLOSED}, \texttt{COMPLETED}; mặc định là \texttt{PENDING}. \\ \hline
+    candidateIds        & String[]  & Danh sách định danh của các ứng viên thuộc cuộc bầu cử, tham chiếu sang \texttt{users.id}. \\ \hline
+    collectivePublicKey & String?   & Khóa công khai tập thể EC-Schnorr (điểm trên đường cong secp256k1, biểu diễn dưới dạng hex 66 ký tự), được sinh khi bắt đầu cuộc bầu cử. \\ \hline
+    merkleRoot          & String?   & Nút gốc Merkle của tập phiếu mù, biểu diễn dưới dạng chuỗi băm SHA-256 hex 64 ký tự, được tính khi đóng cuộc bầu cử. \\ \hline
+    blockchainRef       & String?   & Mã giao dịch Hyperledger Fabric của lệnh ghi nhận \texttt{CommitMerkleRoot}. \\ \hline
+    startDate           & DateTime? & Thời điểm cuộc bầu cử chuyển sang trạng thái \texttt{ACTIVE}. \\ \hline
+    endDate             & DateTime? & Thời điểm cuộc bầu cử chuyển sang trạng thái \texttt{COMPLETED}. \\ \hline
+    createdAt           & DateTime  & Thời điểm tạo bản ghi, sinh tự động. \\ \hline
+    updatedAt           & DateTime  & Thời điểm cập nhật gần nhất, sinh tự động. \\ \hline
+\end{longtable}
+
+\textbf{Ràng buộc và chỉ mục:} thuộc tính \texttt{name} có ràng buộc duy nhất; chỉ mục tổ hợp \texttt{(status, startDate, endDate)} hỗ trợ truy vấn danh sách cuộc bầu cử theo trạng thái trong một khoảng thời gian.
+
+\subsubsection{Bảng \texttt{election\_voters} (Coordinator Service)}
+
+Bảng \texttt{election\_voters} mô hình hóa quan hệ nhiều-nhiều giữa cuộc bầu cử và cử tri, ghi nhận danh sách cử tri đủ điều kiện tham gia một cuộc bầu cử cụ thể.
+
+\begin{longtable}{|p{0.22\textwidth}|p{0.22\textwidth}|p{0.50\textwidth}|}
+    \caption{Cấu trúc bảng \texttt{election\_voters}}
+    \label{tab:db-election-voters} \\
+    \hline
+    \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \endlastfoot
+    id         & ObjectId  & Khóa chính của bản ghi, sinh tự động. \\ \hline
+    electionId & ObjectId  & Định danh cuộc bầu cử, tham chiếu sang \texttt{elections.id}. \\ \hline
+    voterId    & ObjectId  & Định danh cử tri, tham chiếu sang \texttt{users.id} của Identity Service. \\ \hline
+    createdAt  & DateTime  & Thời điểm cử tri được thêm vào cuộc bầu cử, sinh tự động. \\ \hline
+\end{longtable}
+
+\textbf{Ràng buộc và chỉ mục:} cặp \texttt{(electionId, voterId)} có ràng buộc duy nhất nhằm bảo đảm một cử tri chỉ được ghi danh một lần cho mỗi cuộc bầu cử; chỉ mục đơn trên \texttt{voterId} hỗ trợ truy vấn danh sách cuộc bầu cử mà một cử tri được tham gia.
+
+\subsubsection{Bảng \texttt{votes} (Coordinator Service)}
+
+Bảng \texttt{votes} lưu các phiếu mù đã được ký tập thể và nộp lên hệ thống. Bản ghi chỉ chứa cam kết mù (\textit{blinded commitment}) chứ không chứa thông tin về ứng viên được chọn, bảo đảm tính ẩn danh ngay từ tầng lưu trữ.
+
+\begin{longtable}{|p{0.24\textwidth}|p{0.22\textwidth}|p{0.48\textwidth}|}
+    \caption{Cấu trúc bảng \texttt{votes}}
+    \label{tab:db-votes} \\
+    \hline
+    \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \endlastfoot
+    id                & ObjectId & Khóa chính của bản ghi phiếu, sinh tự động. \\ \hline
+    electionId        & ObjectId & Định danh cuộc bầu cử, tham chiếu sang \texttt{elections.id}. \\ \hline
+    voterId           & ObjectId & Định danh cử tri trong cuộc bầu cử, tham chiếu sang \texttt{election\_voters.id}, được sử dụng để chặn bỏ phiếu trùng. \\ \hline
+    blindedCommitment & String   & Cam kết mù của phiếu, là chuỗi băm SHA-256 hex 64 ký tự của điểm cam kết $C'$. \\ \hline
+    blockchainRef     & String   & Mã giao dịch Hyperledger Fabric của lệnh ghi nhận \texttt{SubmitVote}. \\ \hline
+    createdAt         & DateTime & Thời điểm phiếu được nộp, sinh tự động. \\ \hline
+\end{longtable}
+
+\textbf{Ràng buộc và chỉ mục:} cặp \texttt{(electionId, voterId)} có ràng buộc duy nhất nhằm chặn cử tri bỏ phiếu hai lần; cặp \texttt{(electionId, blindedCommitment)} có ràng buộc duy nhất nhằm bảo đảm không tồn tại hai phiếu trùng cam kết mù trong cùng một cuộc bầu cử; chỉ mục tổ hợp \texttt{(electionId, createdAt)} phục vụ truy vấn danh sách phiếu theo thứ tự thời gian.
+
+\subsubsection{Bảng \texttt{key\_pairs} (Signing Node Service)}
+
+Bảng \texttt{key\_pairs} thuộc cơ sở dữ liệu của mỗi nút ký (\textit{signing node}), lưu cặp khóa EC-Schnorr riêng của nút đó cho từng cuộc bầu cử. Tổng ba khóa công khai của ba nút sẽ được Coordinator tổng hợp thành khóa công khai tập thể.
+
+\begin{longtable}{|p{0.22\textwidth}|p{0.22\textwidth}|p{0.50\textwidth}|}
+    \caption{Cấu trúc bảng \texttt{key\_pairs}}
+    \label{tab:db-key-pairs} \\
+    \hline
+    \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \endlastfoot
+    id         & ObjectId & Khóa chính của bản ghi, sinh tự động. \\ \hline
+    electionId & ObjectId & Định danh cuộc bầu cử mà cặp khóa thuộc về, tham chiếu sang \texttt{elections.id}; có ràng buộc duy nhất. \\ \hline
+    publicKey  & String   & Khóa công khai $P_i = d_i \cdot G$ của nút, biểu diễn dưới dạng điểm nén hex 66 ký tự trên đường cong secp256k1. \\ \hline
+    privateKey & String   & Khóa bí mật $d_i$ đã được mã hóa AES-256-GCM, biểu diễn dưới dạng chuỗi hex. \\ \hline
+    createdAt  & DateTime & Thời điểm sinh cặp khóa, sinh tự động. \\ \hline
+\end{longtable}
+
+\textbf{Ràng buộc và chỉ mục:} thuộc tính \texttt{electionId} có ràng buộc duy nhất nhằm bảo đảm mỗi cuộc bầu cử chỉ tương ứng với một cặp khóa duy nhất trên mỗi nút ký.
+
+\subsubsection{Bảng \texttt{signed\_voters} (Signing Node Service)}
+
+Bảng \texttt{signed\_voters} ghi nhận vĩnh viễn việc một nút ký đã phát hành chữ ký mảnh cho cặp (cuộc bầu cử, cử tri) nhằm chặn tích lũy nhiều chữ ký trên cùng một danh tính cử tri, qua đó phòng tránh cử tri tiết lộ nhiều phiếu trong giai đoạn giải mù.
+
+\begin{longtable}{|p{0.22\textwidth}|p{0.22\textwidth}|p{0.50\textwidth}|}
+    \caption{Cấu trúc bảng \texttt{signed\_voters}}
+    \label{tab:db-signed-voters} \\
+    \hline
+    \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \endlastfoot
+    id         & ObjectId & Khóa chính của bản ghi, sinh tự động. \\ \hline
+    electionId & ObjectId & Định danh cuộc bầu cử, tham chiếu sang \texttt{elections.id}. \\ \hline
+    voterId    & ObjectId & Định danh cử tri, tham chiếu sang \texttt{election\_voters.id}. \\ \hline
+    sessionId  & String   & Định danh phiên ký (chuỗi UUID v4) mà nút đã tiêu thụ \textit{nonce} để phát hành chữ ký mảnh. \\ \hline
+    signedAt   & DateTime & Thời điểm nút phát hành chữ ký mảnh, sinh tự động. \\ \hline
+\end{longtable}
+
+\textbf{Ràng buộc và chỉ mục:} cặp \texttt{(electionId, voterId)} có ràng buộc duy nhất nhằm bảo đảm mỗi cử tri chỉ được nút ký phục vụ đúng một lần cho mỗi cuộc bầu cử.
+
+\subsubsection{Bảng \texttt{revealed\_votes} (Reveal-Vote Service)}
+
+Bảng \texttt{revealed\_votes} lưu các phiếu đã được giải mù sau khi cuộc bầu cử đóng. Mỗi bản ghi chỉ chứa định danh ứng viên được chọn cùng với chữ ký Schnorr đã giải mù, không tham chiếu tới định danh cử tri để giữ tính không thể liên kết (\textit{unlinkability}).
+
+\begin{longtable}{|p{0.24\textwidth}|p{0.28\textwidth}|p{0.42\textwidth}|}
+    \caption{Cấu trúc bảng \texttt{revealed\_votes}}
+    \label{tab:db-revealed-votes} \\
+    \hline
+    \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \endlastfoot
+    id            & ObjectId & Khóa chính của bản ghi, sinh tự động. \\ \hline
+    electionId    & ObjectId & Định danh cuộc bầu cử, tham chiếu sang \texttt{elections.id}. \\ \hline
+    candidateId   & ObjectId & Định danh ứng viên được chọn (dạng nguyên bản), tham chiếu sang \texttt{users.id}. \\ \hline
+    revealKey     & String   & Vân tay chữ ký, được tính bằng $\mathrm{SHA256}(h \mathbin{\|} s')$ dưới dạng hex 64 ký tự, sử dụng làm khóa chống phát lại. \\ \hline
+    signature     & Embedded (\textit{SignatureRevealedVote}) & Đối tượng nhúng chứa chữ ký Schnorr đã giải mù gồm hai thành phần con. \\ \hline
+    signature.h   & String   & Thành phần $h$ của chữ ký, là vô hướng hex 64 ký tự. \\ \hline
+    signature.sPrime & String & Thành phần $s'$ của chữ ký (đã giải mù), là vô hướng hex 64 ký tự. \\ \hline
+    blockchainRef & String   & Mã giao dịch Hyperledger Fabric của lệnh ghi nhận \texttt{RevealVoteCompact}. \\ \hline
+    revealedAt    & DateTime & Thời điểm phiếu được giải mù, sinh tự động. \\ \hline
+\end{longtable}
+
+\textbf{Ràng buộc và chỉ mục:} cặp \texttt{(electionId, revealKey)} và bộ ba \texttt{(electionId, signature.h, signature.sPrime)} đều có ràng buộc duy nhất nhằm chặn phát lại cùng một chữ ký để tiết lộ nhiều phiếu; chỉ mục tổ hợp \texttt{(electionId, candidateId)} phục vụ truy vấn thống kê kết quả bầu cử theo từng ứng viên.

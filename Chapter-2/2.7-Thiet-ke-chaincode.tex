@@ -1,0 +1,305 @@
+\subsection{Thiết kế chaincode}
+
+Tầng sổ cái phân tán của hệ thống được hiện thực hóa bằng một chaincode Hyperledger Fabric viết bằng ngôn ngữ Go, mang tên \textit{VoteLedgerContract}. Chaincode chịu trách nhiệm ghi nhận \textbf{các sự kiện bất biến} của quy trình bỏ phiếu (nộp phiếu mù, đóng cuộc bầu cử, giải mù phiếu) và cung cấp các hàm truy vấn phục vụ \textbf{kiểm chứng độc lập}. Chaincode được triển khai theo mô hình \textit{external chaincode} — tách rời khỏi tiến trình của peer và lắng nghe trên cổng \texttt{9999} — nhằm thuận tiện cho việc nâng cấp và quan sát.
+
+Chaincode được thiết kế theo nguyên tắc tối giản: \textbf{không} lưu trữ vòng đời cuộc bầu cử (PENDING, ACTIVE, CLOSED), \textbf{không} quản lý người dùng và \textbf{không} thực thi xác thực danh tính. Toàn bộ trách nhiệm xác thực tài khoản, xác minh chữ ký EC-Schnorr và điều phối quy trình thuộc về các microservice off-chain; chaincode chỉ giữ vai trò là tầng \textit{chứng cứ} không thể chối bỏ. Các hàm được tổ chức thành ba nhóm hợp đồng tương ứng với ba nghiệp vụ cốt lõi: \textit{Vote Contract}, \textit{Merkle Contract} và \textit{Reveal Contract}.
+
+\subsubsection{Cấu trúc trạng thái trên sổ cái}
+
+Toàn bộ trạng thái của chaincode được lưu vào \textit{World State} của Fabric thông qua khóa tổ hợp (\textit{composite key}) do hàm \texttt{Create\allowbreak Composite\allowbreak Key} tạo ra. Mỗi loại đối tượng có một tiền tố riêng nhằm phân tách không gian tên và thuận tiện cho việc duyệt theo từng nhóm.
+
+\begin{longtable}{|p{0.16\textwidth}|p{0.30\textwidth}|p{0.40\textwidth}|}
+    \caption{Các không gian tên trạng thái trên ledger}
+    \label{tab:cc-state-prefix} \\
+    \hline
+    \textbf{Tiền tố} & \textbf{Khóa tổ hợp} & \textbf{Mô tả} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Tiền tố} & \textbf{Khóa tổ hợp} & \textbf{Mô tả} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \endlastfoot
+    vote       & vote / electionId / voteId & Bản ghi phiếu bầu mù đã được nộp lên chain. \\ \hline
+    root       & root / electionId          & Nút gốc Merkle của tập phiếu trong cuộc bầu cử. \\ \hline
+    tally      & tally / electionId / candidateId & Bộ đếm số phiếu theo từng ứng viên. \\ \hline
+    usedReveal & usedReveal / electionId / revealKey & Tập các khóa giải mù đã được sử dụng, phục vụ chống phát lại. \\ \hline
+    stats      & stats / electionId         & Đối tượng thống kê tổng phiếu đã nộp và đã giải mù. \\ \hline
+\end{longtable}
+
+\subsubsection{Tổng hợp các hàm chaincode}
+
+Chaincode cung cấp tổng cộng mười hàm chia thành hai loại theo bản chất giao dịch: hàm \textit{invoke} sinh giao dịch ghi lên ledger và hàm \textit{query} thực hiện truy vấn chỉ đọc. Toàn bộ các hàm được liệt kê trong Bảng \ref{tab:cc-overview}.
+
+\begin{longtable}{|p{0.25\textwidth}|p{0.08\textwidth}|p{0.16\textwidth}|p{0.35\textwidth}|}
+    \caption{Tổng hợp các hàm chaincode}
+    \label{tab:cc-overview} \\
+    \hline
+    \textbf{Tên hàm} & \textbf{Loại} & \textbf{Nhóm hợp đồng} & \textbf{Mục đích chính} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Tên hàm} & \textbf{Loại} & \textbf{Nhóm hợp đồng} & \textbf{Mục đích chính} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \endlastfoot
+    SubmitVote                & invoke & Vote    & Ghi nhận phiếu mù lên ledger. \\ \hline
+    GetVote                   & query  & Vote    & Truy xuất bản ghi phiếu để xác minh. \\ \hline
+    CommitMerkleRoot          & invoke & Merkle  & Cố định nút gốc Merkle khi đóng cuộc bầu cử. \\ \hline
+    GetMerkleRoot             & query  & Merkle  & Lấy nút gốc Merkle đã được cố định. \\ \hline
+    VerifyVoteReceipt         & query  & Merkle  & Kiểm tra phiếu có thuộc cây Merkle hay không. \\ \hline
+    GetAuditCounts            & query  & Merkle  & Lấy thống kê tổng phiếu phục vụ kiểm toán. \\ \hline
+    RevealVoteCompact         & invoke & Reveal  & Ghi nhận giải mù phiếu và cập nhật kết quả. \\ \hline
+    GetTally                  & query  & Reveal  & Lấy kết quả kiểm phiếu theo ứng viên. \\ \hline
+    GetUsedReveal             & query  & Reveal  & Tra cứu một khóa giải mù đã được dùng. \\ \hline
+    ComputeRevealPayloadHash  & query  & Reveal  & Tính lại băm tải trọng giải mù phục vụ kiểm toán. \\ \hline
+\end{longtable}
+
+\subsubsection{Hàm \texttt{SubmitVote}}
+
+Là hàm thuộc loại \textit{invoke}, được Coordinator Service gọi mỗi khi một cử tri nộp phiếu. Trước khi ghi nhận, chaincode kiểm tra cuộc bầu cử chưa cố định nút gốc Merkle và \texttt{voteID} chưa tồn tại nhằm chặn trùng lặp; sau khi ghi thành công, bộ đếm \texttt{Total\allowbreak Vote\allowbreak Count} trong đối tượng \texttt{Stats} được tăng lên một đơn vị.
+
+\begin{longtable}{|p{0.25\textwidth}|p{0.13\textwidth}|p{0.48\textwidth}|}
+    \caption{Tham số của hàm \texttt{SubmitVote}}
+    \label{tab:cc-submitvote} \\
+    \hline
+    \textbf{Tham số} & \textbf{Kiểu} & \textbf{Mô tả} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Tham số} & \textbf{Kiểu} & \textbf{Mô tả} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \endlastfoot
+    electionID        & string & Định danh cuộc bầu cử. \\ \hline
+    voteID            & string & Định danh duy nhất của phiếu (chuỗi hex của ObjectId). \\ \hline
+    blindedCommitment & string & Cam kết mù của phiếu, là chuỗi băm SHA-256 hex 64 ký tự. \\ \hline
+\end{longtable}
+
+\subsubsection{Hàm \texttt{GetVote}}
+
+Là hàm thuộc loại \textit{query}, trả về bản ghi \texttt{VoteView} tương ứng với cặp \texttt{(electionID, voteID)}. Hàm được sử dụng trong bước thứ ba của quy trình xác minh phiếu nhằm kiểm tra phiếu đã được ghi nhận trên chain với đúng giá trị cam kết mù mà cử tri lưu giữ.
+
+\begin{longtable}{|p{0.25\textwidth}|p{0.13\textwidth}|p{0.48\textwidth}|}
+    \caption{Tham số của hàm \texttt{GetVote}}
+    \label{tab:cc-getvote} \\
+    \hline
+    \textbf{Tham số} & \textbf{Kiểu} & \textbf{Mô tả} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Tham số} & \textbf{Kiểu} & \textbf{Mô tả} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \endlastfoot
+    electionID & string & Định danh cuộc bầu cử. \\ \hline
+    voteID     & string & Định danh phiếu cần truy xuất. \\ \hline
+\end{longtable}
+
+\subsubsection{Hàm \texttt{CommitMerkleRoot}}
+
+Là hàm thuộc loại \textit{invoke}, được Coordinator Service gọi đúng một lần khi quản trị viên đóng cuộc bầu cử. Chaincode đối chiếu \texttt{voteCount} truyền vào với giá trị \texttt{Total\allowbreak Vote\allowbreak Count} đã tích lũy trên chain nhằm phát hiện sai lệch giữa cơ sở dữ liệu off-chain và sổ cái; nếu khớp, nút gốc Merkle được lưu lại kèm cờ \texttt{committed = true} và không thể bị ghi đè.
+
+\begin{longtable}{|p{0.20\textwidth}|p{0.13\textwidth}|p{0.53\textwidth}|}
+    \caption{Tham số của hàm \texttt{CommitMerkleRoot}}
+    \label{tab:cc-commitmerkleroot} \\
+    \hline
+    \textbf{Tham số} & \textbf{Kiểu} & \textbf{Mô tả} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Tham số} & \textbf{Kiểu} & \textbf{Mô tả} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \endlastfoot
+    electionID   & string & Định danh cuộc bầu cử. \\ \hline
+    merkleRoot   & string & Nút gốc Merkle, là chuỗi băm SHA-256 hex 64 ký tự. \\ \hline
+    voteCountStr & string & Tổng số phiếu (giá trị \textit{uint64} biểu diễn dưới dạng chuỗi). \\ \hline
+\end{longtable}
+
+\subsubsection{Hàm \texttt{GetMerkleRoot}}
+
+Là hàm thuộc loại \textit{query}, trả về đối tượng \texttt{Merkle\allowbreak Root\allowbreak View} của một cuộc bầu cử nếu nút gốc đã được cố định. Hàm phục vụ bước sáu trong quy trình xác minh phiếu nhằm so khớp nút gốc lưu trong cơ sở dữ liệu với nút gốc trên chain.
+
+\begin{longtable}{|p{0.20\textwidth}|p{0.13\textwidth}|p{0.53\textwidth}|}
+    \caption{Tham số của hàm \texttt{GetMerkleRoot}}
+    \label{tab:cc-getmerkleroot} \\
+    \hline
+    \textbf{Tham số} & \textbf{Kiểu} & \textbf{Mô tả} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Tham số} & \textbf{Kiểu} & \textbf{Mô tả} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \endlastfoot
+    electionID & string & Định danh cuộc bầu cử. \\ \hline
+\end{longtable}
+
+\subsubsection{Hàm \texttt{VerifyVoteReceipt}}
+
+Là hàm thuộc loại \textit{query}, đóng vai trò điểm tin cậy cuối cùng trong quy trình xác minh phiếu. Chaincode tự tính lại nút gốc Merkle từ chiếc lá \texttt{leaf} sinh từ \texttt{blinded\allowbreak Commitment} cùng đường dẫn chứng minh do bên gọi cung cấp, sau đó so sánh với nút gốc đã được cố định trên chain để khẳng định phiếu có thuộc cuộc bầu cử hay không.
+
+\begin{longtable}{|p{0.23\textwidth}|p{0.13\textwidth}|p{0.50\textwidth}|}
+    \caption{Tham số của hàm \texttt{VerifyVoteReceipt}}
+    \label{tab:cc-verifyvotereceipt} \\
+    \hline
+    \textbf{Tham số} & \textbf{Kiểu} & \textbf{Mô tả} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Tham số} & \textbf{Kiểu} & \textbf{Mô tả} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \endlastfoot
+    electionID        & string & Định danh cuộc bầu cử. \\ \hline
+    blindedCommitment & string & Cam kết mù của phiếu cần kiểm chứng (hex 64 ký tự). \\ \hline
+    proofJSON         & string & Đường dẫn chứng minh Merkle, mã hóa dưới dạng chuỗi JSON. \\ \hline
+\end{longtable}
+
+\subsubsection{Hàm \texttt{GetAuditCounts}}
+
+Là hàm thuộc loại \textit{query}, trả về đối tượng \texttt{Audit\allowbreak Counts\allowbreak View} chứa tổng số phiếu đã nộp, tổng số phiếu đã giải mù, cờ cho biết nút gốc Merkle đã được cố định hay chưa và cờ so khớp hai giá trị này. Hàm phục vụ chức năng kiểm toán đối chiếu số liệu giữa cơ sở dữ liệu và chuỗi khối.
+
+\begin{longtable}{|p{0.20\textwidth}|p{0.13\textwidth}|p{0.53\textwidth}|}
+    \caption{Tham số của hàm \texttt{GetAuditCounts}}
+    \label{tab:cc-getauditcounts} \\
+    \hline
+    \textbf{Tham số} & \textbf{Kiểu} & \textbf{Mô tả} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Tham số} & \textbf{Kiểu} & \textbf{Mô tả} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \endlastfoot
+    electionID & string & Định danh cuộc bầu cử. \\ \hline
+\end{longtable}
+
+\subsubsection{Hàm \texttt{RevealVoteCompact}}
+
+Là hàm thuộc loại \textit{invoke}, đóng vai trò trung tâm trong giai đoạn kiểm phiếu. Chaincode kiểm tra nút gốc Merkle đã được cố định, đối chiếu \texttt{revealKey} chưa từng xuất hiện trong tập \texttt{usedReveal} (chống phát lại trên chuỗi), sau đó lưu khóa giải mù kèm tham chiếu ứng viên, tăng bộ đếm \texttt{tally} cho ứng viên đó và tăng \texttt{Reveal\allowbreak Count} trong đối tượng thống kê.
+
+\begin{longtable}{|p{0.26\textwidth}|p{0.13\textwidth}|p{0.47\textwidth}|}
+    \caption{Tham số của hàm \texttt{RevealVoteCompact}}
+    \label{tab:cc-revealvotecompact} \\
+    \hline
+    \textbf{Tham số} & \textbf{Kiểu} & \textbf{Mô tả} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Tham số} & \textbf{Kiểu} & \textbf{Mô tả} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \endlastfoot
+    electionID        & string & Định danh cuộc bầu cử. \\ \hline
+    candidateID       & string & Định danh ứng viên được cử tri chọn. \\ \hline
+    revealKey         & string & Vân tay chữ ký $\mathrm{SHA256}(h \mathbin{\|} s')$ hex 64 ký tự. \\ \hline
+    revealPayloadHash & string & Băm cam kết tải trọng giải mù, phục vụ kiểm toán về sau. \\ \hline
+\end{longtable}
+
+\subsubsection{Hàm \texttt{GetTally}}
+
+Là hàm thuộc loại \textit{query}, duyệt toàn bộ khóa thuộc không gian tên \texttt{tally} của một cuộc bầu cử và trả về đối tượng \texttt{TallyView} dưới dạng ánh xạ từ định danh ứng viên sang số phiếu. Đây là nguồn dữ liệu cốt lõi để công khai kết quả bầu cử.
+
+\begin{longtable}{|p{0.20\textwidth}|p{0.13\textwidth}|p{0.53\textwidth}|}
+    \caption{Tham số của hàm \texttt{GetTally}}
+    \label{tab:cc-gettally} \\
+    \hline
+    \textbf{Tham số} & \textbf{Kiểu} & \textbf{Mô tả} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Tham số} & \textbf{Kiểu} & \textbf{Mô tả} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \endlastfoot
+    electionID & string & Định danh cuộc bầu cử. \\ \hline
+\end{longtable}
+
+\subsubsection{Hàm \texttt{GetUsedReveal}}
+
+Là hàm thuộc loại \textit{query}, cho phép tra cứu một khóa giải mù đã được sử dụng hay chưa và gắn với ứng viên nào, hỗ trợ điều tra trong các tình huống tranh chấp về tính hợp lệ của phiếu bầu.
+
+\begin{longtable}{|p{0.20\textwidth}|p{0.13\textwidth}|p{0.53\textwidth}|}
+    \caption{Tham số của hàm \texttt{GetUsedReveal}}
+    \label{tab:cc-getusedreveal} \\
+    \hline
+    \textbf{Tham số} & \textbf{Kiểu} & \textbf{Mô tả} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Tham số} & \textbf{Kiểu} & \textbf{Mô tả} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \endlastfoot
+    electionID & string & Định danh cuộc bầu cử. \\ \hline
+    revealKey  & string & Vân tay chữ ký cần tra cứu (hex 64 ký tự). \\ \hline
+\end{longtable}
+
+\subsubsection{Hàm \texttt{ComputeRevealPayloadHash}}
+
+Là hàm tiện ích thuộc loại \textit{query}, cho phép tính lại giá trị \texttt{reveal\allowbreak Payload\allowbreak Hash} từ bộ ba $(\texttt{candidateId}, h, s')$, qua đó cho phép bên thứ ba kiểm tra giá trị băm được lưu trên chain có khớp với dữ liệu thực hay không.
+
+\begin{longtable}{|p{0.20\textwidth}|p{0.13\textwidth}|p{0.53\textwidth}|}
+    \caption{Tham số của hàm \texttt{ComputeRevealPayloadHash}}
+    \label{tab:cc-computerevealpayloadhash} \\
+    \hline
+    \textbf{Tham số} & \textbf{Kiểu} & \textbf{Mô tả} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Tham số} & \textbf{Kiểu} & \textbf{Mô tả} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \endlastfoot
+    candidateID & string & Định danh ứng viên. \\ \hline
+    h           & string & Thành phần $h$ của chữ ký Schnorr (hex 64 ký tự). \\ \hline
+    sPrime      & string & Thành phần $s'$ đã giải mù của chữ ký Schnorr (hex 64 ký tự). \\ \hline
+\end{longtable}
+
+\subsubsection{Luồng trạng thái cuộc bầu cử trên chuỗi khối}
+
+Mặc dù chaincode không lưu trạng thái vòng đời tường minh, các ràng buộc trong từng hàm ngầm định một trình tự ba pha bắt buộc đối với một cuộc bầu cử trên chuỗi khối:
+
+\begin{itemize}
+    \item \textbf{Pha nhận phiếu:} hàm \texttt{SubmitVote} có thể được gọi nhiều lần. Sau mỗi lần thành công, bộ đếm \texttt{Total\allowbreak Vote\allowbreak Count} trong \texttt{Stats} được tăng lên.
+    \item \textbf{Pha đóng cuộc bầu cử:} hàm \texttt{Commit\allowbreak Merkle\allowbreak Root} được gọi đúng một lần. Chaincode đối chiếu \texttt{voteCount} truyền vào với \texttt{Total\allowbreak Vote\allowbreak Count} và đặt cờ \texttt{committed = true}; sau pha này, mọi lời gọi \texttt{SubmitVote} đều bị từ chối.
+    \item \textbf{Pha kiểm phiếu:} hàm \texttt{Reveal\allowbreak Vote\allowbreak Compact} có thể được gọi nhiều lần với điều kiện tiên quyết \texttt{committed = true}. Mỗi lần thành công sẽ cập nhật \texttt{tally} của ứng viên tương ứng và tăng \texttt{Reveal\allowbreak Count}; kết quả cuối cùng được công khai qua hàm \texttt{GetTally}.
+\end{itemize}
