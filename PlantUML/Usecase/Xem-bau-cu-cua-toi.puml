@@ -1,0 +1,17 @@
+@startuml XemBauCuCuaToi_UC
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Voter" as voter
+
+usecase "Đăng nhập hệ thống" as UC_Login
+
+rectangle "Cuộc bầu cử của cử tri" {
+  usecase "Xem danh sách cuộc bầu cử đang tham gia" as UC_ListMine
+  usecase "Lọc cuộc bầu cử theo trạng thái" as UC_Filter
+}
+
+voter --> UC_ListMine
+UC_ListMine ..> UC_Login : <<include>>
+UC_Filter .> UC_ListMine : <<extend>>
+@enduml

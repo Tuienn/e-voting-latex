@@ -1,0 +1,46 @@
+@startuml CapNhatNguoiDung
+hide footbox
+autonumber
+skinparam maxMessageSize 200
+
+actor "Admin (Web Client)" as Admin
+participant "BFF Gateway\n(:3000)" as BFF
+participant "Identity Service\n(:3302)" as Identity
+database "MongoDB\n(Identity DB)" as DB
+
+Admin -> BFF: Gửi yêu cầu cập nhật thông tin người dùng
+activate BFF
+
+ref over Admin, BFF : Xác thực & Kiểm tra quyền ADMIN
+
+BFF -> Identity: Chuyển tiếp yêu cầu cập nhật thông tin
+activate Identity
+
+Identity -> DB: Truy vấn thông tin người dùng hiện tại
+activate DB
+DB --> Identity: Trả về thông tin người dùng
+deactivate DB
+
+alt Người dùng không tồn tại
+  Identity --> BFF: Thông báo không tìm thấy người dùng
+  BFF --> Admin: Hiển thị thông báo lỗi
+else Người dùng tồn tại
+  Identity -> Identity: Kiểm tra tính hợp lệ của dữ liệu cập nhật
+  alt Dữ liệu không hợp lệ
+    Identity --> BFF: Thông báo dữ liệu không hợp lệ
+    BFF --> Admin: Hiển thị lỗi nhập liệu
+  else Dữ liệu hợp lệ
+    Identity -> DB: Lưu thông tin người dùng mới
+    activate DB
+    DB --> Identity: Xác nhận cập nhật thành công
+    deactivate DB
+
+    Identity --> BFF: Trả về thông tin người dùng đã cập nhật
+    deactivate Identity
+
+    BFF --> Admin: Thông báo cập nhật thành công
+  end
+end
+
+deactivate BFF
+@enduml

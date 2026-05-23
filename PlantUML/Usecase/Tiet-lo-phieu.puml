@@ -1,0 +1,28 @@
+@startuml TietLoPhieu_UC
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Khách (ẩn danh)" as guest
+actor "Mạng Blockchain" as fabric
+
+rectangle "Tiết lộ phiếu sau khi cuộc bầu cử đóng" {
+  usecase "Gửi chữ ký giải mù" as UC_Reveal
+  usecase "Xác minh chữ ký EC-Schnorr" as UC_VerifySig
+  usecase "Ghi nhận phiếu tiết lộ lên blockchain" as UC_Chain
+  usecase "Hoàn tất cuộc bầu cử khi đủ phiếu" as UC_Complete
+}
+
+guest --> UC_Reveal
+
+UC_Reveal ..> UC_VerifySig : <<include>>
+UC_Reveal ..> UC_Chain : <<include>>
+UC_Complete .> UC_Reveal : <<extend>>
+
+UC_Chain --> fabric
+
+note bottom of UC_Reveal
+  Điểm cuối công khai, không yêu cầu xác thực.
+  Hệ thống không phân biệt được người gửi;
+  chữ ký EC-Schnorr là điểm tin cậy duy nhất.
+end note
+@enduml

@@ -28,16 +28,21 @@
 \titlespacing*{\paragraph}{0pt}{10pt}{0pt} % Heading 4
 \titleformat*{\paragraph}{\fontsize{13pt}{15.6pt}\selectfont \itshape}
 
-\renewcommand{\figurename}{\fontsize{12pt}{0pt}\selectfont \bfseries Figure}
+\renewcommand{\figurename}{\fontsize{12pt}{0pt}\selectfont \itshape Hình}
 \renewcommand{\thefigure}{\thesection.\arabic{figure}}
-\usepackage[font=bf]{caption}
-\captionsetup[figure]{labelsep=space}
+\usepackage[font=it]{caption}
+\captionsetup[figure]{labelsep=space, justification=centering, singlelinecheck=true, skip=4pt}
 
-\renewcommand{\tablename}{\fontsize{12pt}{0pt}\selectfont \bfseries Table}
+\renewcommand{\tablename}{\fontsize{12pt}{0pt}\selectfont \itshape Bảng}
 \renewcommand{\thetable}{\thesection.\arabic{table}}
-\captionsetup[table]{labelsep=space}
+\captionsetup[table]{labelsep=space, justification=centering, singlelinecheck=true, skip=4pt}
 
 \usepackage{multicol,multirow,tabularx}
+\usepackage{longtable}
+\setlength{\LTpre}{6pt}
+\setlength{\LTpost}{6pt}
+\usepackage{enumitem}
+\setlist{topsep=0pt, partopsep=0pt, parsep=0pt, itemsep=2pt}
 \newcolumntype{s}{>{\hsize=.3\hsize}X}
 \newcolumntype{y}{>{\hsize=.4\hsize}X}
 \newcolumntype{d}{>{\hsize=.1\hsize}X}

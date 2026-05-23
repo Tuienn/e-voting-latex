@@ -1,0 +1,18 @@
+@startuml QuanLyTrangThaiTaiKhoan_UC
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Admin" as admin
+
+usecase "Đăng nhập hệ thống" as UC_Login
+
+rectangle "Quản lý trạng thái tài khoản" {
+  usecase "Vô hiệu hóa tài khoản" as UC_Disable
+  usecase "Kích hoạt tài khoản" as UC_Enable
+}
+
+admin --> UC_Disable
+admin --> UC_Enable
+UC_Disable ..> UC_Login : <<include>>
+UC_Enable ..> UC_Login : <<include>>
+@enduml

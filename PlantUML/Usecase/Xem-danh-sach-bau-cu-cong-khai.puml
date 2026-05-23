@@ -1,0 +1,14 @@
+@startuml XemDanhSachBauCuCongKhai_UC
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Khách (ẩn danh)" as guest
+
+rectangle "Cổng công khai" {
+  usecase "Xem danh sách cuộc bầu cử" as UC_List
+  usecase "Lọc theo trạng thái" as UC_Filter
+}
+
+guest --> UC_List
+UC_Filter .> UC_List : <<extend>>
+@enduml

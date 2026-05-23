@@ -1,0 +1,31 @@
+@startuml TimKiemCuocBauCu
+hide footbox
+autonumber
+skinparam maxMessageSize 200
+
+actor "Admin (Web Client)" as Admin
+participant "BFF Gateway\n(:3000)" as BFF
+participant "Coordinator Service\n(:3303)" as Coordinator
+database "MongoDB\n(Coordinator DB)" as DB
+
+Admin -> BFF: Nhập điều kiện tìm kiếm cuộc bầu cử
+activate BFF
+
+ref over Admin, BFF : Xác thực & Kiểm tra quyền ADMIN
+
+BFF -> Coordinator: Gửi yêu cầu lọc danh sách cuộc bầu cử
+activate Coordinator
+
+Coordinator -> Coordinator: Xây dựng điều kiện truy vấn
+
+Coordinator -> DB: Truy vấn danh sách cuộc bầu cử theo điều kiện
+activate DB
+DB --> Coordinator: Trả về danh sách và tổng số lượng
+deactivate DB
+
+Coordinator --> BFF: Trả về kết quả tìm kiếm (có phân trang)
+deactivate Coordinator
+
+BFF --> Admin: Hiển thị kết quả tìm kiếm
+deactivate BFF
+@enduml

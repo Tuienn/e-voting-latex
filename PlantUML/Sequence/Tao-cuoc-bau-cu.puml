@@ -1,0 +1,48 @@
+@startuml TaoCuocBauCu
+hide footbox
+autonumber
+skinparam maxMessageSize 200
+
+actor "Admin (Web Client)" as Admin
+participant "BFF Gateway\n(:3000)" as BFF
+participant "Coordinator Service\n(:3303)" as Coordinator
+participant "Identity Service\n(:3302)" as Identity
+database "MongoDB\n(Identity DB)" as IdDB
+database "MongoDB\n(Coordinator DB)" as CoDB
+
+Admin -> BFF: Gửi yêu cầu tạo cuộc bầu cử mới
+activate BFF
+
+ref over Admin, BFF : Xác thực & Kiểm tra quyền ADMIN
+
+BFF -> Coordinator: Chuyển tiếp yêu cầu tạo cuộc bầu cử
+activate Coordinator
+
+Coordinator -> Identity: Yêu cầu thông tin các ứng viên được chọn
+activate Identity
+Identity -> IdDB: Truy vấn danh sách ứng viên
+activate IdDB
+IdDB --> Identity: Trả về danh sách ứng viên
+deactivate IdDB
+Identity --> Coordinator: Trả về thông tin ứng viên
+deactivate Identity
+
+Coordinator -> Coordinator: Kiểm tra các ứng viên tồn tại và đang hoạt động
+
+alt Có ứng viên không hợp lệ
+  Coordinator --> BFF: Thông báo dữ liệu ứng viên không hợp lệ
+  BFF --> Admin: Hiển thị thông báo lỗi
+else Danh sách hợp lệ
+  Coordinator -> CoDB: Tạo cuộc bầu cử ở trạng thái PENDING
+  activate CoDB
+  CoDB --> Coordinator: Xác nhận tạo thành công
+  deactivate CoDB
+
+  Coordinator --> BFF: Trả về thông tin cuộc bầu cử mới
+  deactivate Coordinator
+
+  BFF --> Admin: Thông báo tạo cuộc bầu cử thành công
+end
+
+deactivate BFF
+@enduml

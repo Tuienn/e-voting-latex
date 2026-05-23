@@ -1,0 +1,27 @@
+@startuml DieuHanhCuocBauCu_UC
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Admin" as admin
+actor "Mạng Blockchain" as fabric
+
+usecase "Đăng nhập hệ thống" as UC_Login
+
+rectangle "Điều hành cuộc bầu cử" {
+  usecase "Bắt đầu cuộc bầu cử" as UC_Start
+  usecase "Đóng cuộc bầu cử" as UC_Close
+  usecase "Sinh khóa tập thể EC-Schnorr" as UC_Keygen
+  usecase "Cam kết gốc Merkle lên blockchain" as UC_CommitRoot
+}
+
+admin --> UC_Start
+admin --> UC_Close
+
+UC_Start ..> UC_Login : <<include>>
+UC_Close ..> UC_Login : <<include>>
+
+UC_Start ..> UC_Keygen : <<include>>
+UC_Close ..> UC_CommitRoot : <<include>>
+
+UC_CommitRoot --> fabric
+@enduml

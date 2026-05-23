@@ -1,0 +1,97 @@
+@startuml XacThucNguoiDung
+hide footbox
+autonumber
+skinparam maxMessageSize 200
+
+actor "Người dùng" as User
+participant "BFF Gateway\n(:3000)" as BFF
+participant "Identity Service\n(:3302)" as Identity
+database "MongoDB\n(Identity DB)" as DB
+database "Redis\n(Session Cache)" as Redis
+
+== Đăng nhập ==
+
+User -> BFF: Gửi yêu cầu đăng nhập kèm thông tin tài khoản
+activate BFF
+
+BFF -> Identity: Chuyển tiếp yêu cầu đăng nhập
+activate Identity
+
+Identity -> DB: Truy vấn tài khoản theo email
+activate DB
+DB --> Identity: Trả về thông tin tài khoản
+deactivate DB
+
+alt Tài khoản không tồn tại hoặc mật khẩu sai
+  Identity --> BFF: Thông báo thông tin đăng nhập không hợp lệ
+  BFF --> User: Hiển thị lỗi đăng nhập
+else Tài khoản hợp lệ
+  Identity -> Identity: Phát hành access token và refresh token
+  Identity -> Redis: Lưu refresh token theo người dùng
+  activate Redis
+  Redis --> Identity: Xác nhận lưu thành công
+  deactivate Redis
+
+  Identity --> BFF: Trả về cặp token và thông tin người dùng
+  deactivate Identity
+
+  BFF --> User: Trả về kết quả đăng nhập thành công
+end
+
+deactivate BFF
+
+== Làm mới phiên ==
+
+User -> BFF: Gửi yêu cầu làm mới phiên kèm refresh token
+activate BFF
+BFF -> Identity: Chuyển tiếp yêu cầu làm mới
+activate Identity
+
+Identity -> Identity: Kiểm tra tính hợp lệ của refresh token
+Identity -> Redis: Đối chiếu refresh token đã lưu
+activate Redis
+Redis --> Identity: Trả về refresh token hiện hành
+deactivate Redis
+
+alt Refresh token không khớp hoặc hết hạn
+  Identity --> BFF: Từ chối làm mới phiên
+  BFF --> User: Yêu cầu đăng nhập lại
+else Hợp lệ
+  Identity -> Redis: Xóa refresh token cũ
+  activate Redis
+  Redis --> Identity: Xác nhận xóa
+  deactivate Redis
+
+  Identity -> Identity: Phát hành cặp token mới
+  Identity -> Redis: Lưu refresh token mới
+  activate Redis
+  Redis --> Identity: Xác nhận lưu thành công
+  deactivate Redis
+
+  Identity --> BFF: Trả về cặp token mới
+  deactivate Identity
+  BFF --> User: Trả về kết quả làm mới thành công
+end
+deactivate BFF
+
+== Đăng xuất ==
+
+User -> BFF: Gửi yêu cầu đăng xuất
+activate BFF
+
+ref over User, BFF : Xác thực & Kiểm tra quyền người dùng
+
+BFF -> Identity: Chuyển tiếp yêu cầu đăng xuất
+activate Identity
+
+Identity -> Redis: Xóa refresh token theo người dùng
+activate Redis
+Redis --> Identity: Xác nhận xóa
+deactivate Redis
+
+Identity --> BFF: Trả về kết quả đăng xuất thành công
+deactivate Identity
+
+BFF --> User: Thông báo đã đăng xuất
+deactivate BFF
+@enduml

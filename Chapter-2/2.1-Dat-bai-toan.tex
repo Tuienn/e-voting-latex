@@ -1,0 +1,70 @@
+\subsection{Đặt bài toán}
+
+\subsubsection{Mục tiêu}
+
+Trong các tổ chức quy mô vừa và nhỏ như trường học, doanh nghiệp hay cộng đồng địa phương, nhu cầu tổ chức các cuộc bỏ phiếu nội bộ ngày càng phổ biến: bầu ban chấp hành, lấy ý kiến về một chủ trương quan trọng, bình chọn cá nhân tiêu biểu, hay đơn giản là quyết định một lựa chọn chung của tập thể. Các cuộc bầu cử dạng này có chung một đặc điểm là phạm vi tham gia khép kín -- chỉ những người thuộc tổ chức và đã được xác định trước mới có quyền bỏ phiếu -- đồng thời thường được điều hành bởi một bộ phận cụ thể chịu trách nhiệm tổ chức và công bố kết quả.
+
+Hệ thống bỏ phiếu được trình bày trong đồ án này hướng đến đúng đối tượng nêu trên: các cuộc bầu cử nội bộ (\textit{private}) trong một tổ chức nhỏ, trong đó có một quản trị viên (\textit{admin}) đại diện tổ chức cấp tài khoản định danh cho từng cử tri trước khi cuộc bầu cử bắt đầu. Nhờ vậy, hệ thống biết rõ tập cử tri hợp lệ là ai và không phải xử lý vấn đề định danh ở quy mô toàn xã hội -- vốn là một bài toán rất phức tạp khi triển khai bầu cử công khai trên Internet.
+
+Mục tiêu tổng thể của hệ thống là tạo ra một môi trường bỏ phiếu điện tử thuận tiện cho người dùng, đồng thời vẫn bảo vệ được hai giá trị cốt lõi mà bất kỳ cuộc bầu cử nào cũng cần: \textbf{tính bí mật} của lá phiếu và \textbf{tính minh bạch} của kết quả. Người dùng có thể tham gia bỏ phiếu từ thiết bị cá nhân mà không phải đến tận nơi tổ chức như mô hình truyền thống, trong khi tổ chức vẫn có khả năng kiểm soát danh sách cử tri, thời điểm mở và đóng phiên, cũng như kiểm chứng tính trung thực của kết quả sau khi kết thúc.
+
+Cụ thể, hệ thống được thiết kế nhằm đạt được \textbf{ba mục tiêu lớn} sau:
+
+\begin{itemize}
+    \item \textbf{Bỏ phiếu duy nhất một lần:} Mỗi cử tri hợp lệ chỉ có thể bỏ phiếu đúng một lần trong một cuộc bầu cử. Hệ thống ngăn chặn các nỗ lực bỏ phiếu nhiều lần dù do cố ý hay do lỗi thao tác.
+
+    \item \textbf{Bí mật lá phiếu:} Lựa chọn của từng cử tri được giữ bí mật tuyệt đối. Không một thành phần nào trong hệ thống, kể cả quản trị viên hay máy chủ vận hành, có thể biết được một cử tri cụ thể đã chọn ứng viên nào.
+
+    \item \textbf{Kết quả kiểm tra lại được:} Kết quả bầu cử có thể được kiểm tra lại một cách độc lập, để các cử tri và các bên quan tâm tự xác minh rằng phiếu của mình đã được tính và tổng số phiếu công bố là chính xác.
+\end{itemize}
+
+\subsubsection{Yêu cầu chức năng}
+
+Từ mục tiêu đã đặt ra ở phần trên, hệ thống được phân tách thành hai nhóm chức năng chính tương ứng với hai vai trò người dùng: \textbf{quản trị viên} đại diện cho tổ chức và \textbf{cử tri} tham gia bỏ phiếu. Bên cạnh đó, hệ thống còn cần một số chức năng nền tảng nhằm bảo đảm các tính chất bảo mật cốt lõi mà mục tiêu đã đề ra.
+
+\begin{itemize}
+    \item \textbf{Chức năng dành cho quản trị viên:} Quản trị viên là người chịu trách nhiệm tổ chức cuộc bầu cử. Trước khi cuộc bầu cử bắt đầu, quản trị viên có khả năng tạo cuộc bầu cử mới (đặt tên, mô tả, danh sách ứng viên, thời gian mở và đóng), nhập và quản lý danh sách cử tri hợp lệ cùng với việc cấp tài khoản định danh tương ứng cho từng người. Trong quá trình diễn ra, quản trị viên có quyền mở phiên bỏ phiếu để các cử tri có thể tham gia và đóng phiên khi đến thời điểm kết thúc. Sau khi đóng phiên, quản trị viên kích hoạt quá trình kiểm phiếu và công bố kết quả chính thức.
+
+    \item \textbf{Chức năng dành cho cử tri:} Mỗi cử tri sử dụng tài khoản đã được cấp để đăng nhập vào hệ thống. Sau khi đăng nhập, cử tri có thể xem được thông tin của cuộc bầu cử, danh sách ứng viên, lựa chọn ứng viên mà mình muốn bầu và gửi lá phiếu đi. Khi quá trình gửi phiếu hoàn tất, cử tri nhận được một biên nhận làm bằng chứng cá nhân rằng phiếu của mình đã được hệ thống tiếp nhận. Sau khi cuộc bầu cử kết thúc, cử tri có thể dùng biên nhận này để kiểm tra lại xem phiếu của mình có thực sự nằm trong tập phiếu được tính hay không mà không phải tiết lộ mình đã chọn ai.
+
+    \item \textbf{Tách danh tính cử tri khỏi nội dung lá phiếu:} Đây là yêu cầu cốt lõi để bảo đảm bí mật của lá phiếu. Cử tri vẫn cần đăng nhập để hệ thống xác minh quyền tham gia và để ngăn việc bỏ phiếu nhiều lần. Tuy nhiên, đến khi lá phiếu được tiếp nhận và đưa vào kiểm phiếu, thông tin lựa chọn ứng viên không còn được gắn trực tiếp với tài khoản cử tri nữa. Nói cách khác, hệ thống chỉ biết \textit{một người đã tham gia bỏ phiếu hợp lệ}, chứ không biết \textit{người đó đã bỏ cho ai}.
+
+    \item \textbf{Xác nhận tính hợp lệ của phiếu bằng chữ ký mù:} Để vừa có thể xác nhận một lá phiếu là hợp lệ vừa không nhìn thấy nội dung lá phiếu, hệ thống áp dụng cơ chế \textbf{chữ ký mù} (\textit{blind signature}). Cụ thể, các bên có thẩm quyền sẽ ký xác nhận lên một dạng \textit{phiếu đã bị che} mà không biết nội dung thật bên trong. Nhờ đó, máy chủ và các thành phần trung gian không có đủ thông tin để liên kết một cử tri cụ thể với một lựa chọn ứng viên cụ thể, giảm rủi ro gian lận từ chính bên vận hành hệ thống.
+
+    \item \textbf{Ghi nhận dữ liệu trên sổ cái blockchain nội bộ:} Toàn bộ các phiếu hợp lệ và các sự kiện quan trọng của cuộc bầu cử (mở phiên, đóng phiên, công bố kết quả) đều được ghi nhận lên một \textbf{blockchain nội bộ} do tổ chức vận hành. Đặc tính bất biến của blockchain bảo đảm dữ liệu sau khi ghi rất khó bị sửa đổi hoặc xóa đi một cách âm thầm, qua đó nâng cao tính toàn vẹn và độ tin cậy của kết quả cuối cùng.
+
+    \item \textbf{Kiểm tra biên nhận và xác minh kết quả:} Sau khi cuộc bầu cử kết thúc, cử tri có thể công khai phần thông tin cần thiết từ biên nhận để xác minh phiếu của mình đã được tính, nhưng phần thông tin này không tiết lộ được mối liên hệ giữa danh tính cử tri và lựa chọn ứng viên. Đồng thời, mọi bên quan tâm có thể đối chiếu tổng số phiếu công bố với các phiếu đã được ghi trên blockchain, nhờ đó kết quả bầu cử trở nên \textbf{kiểm chứng được một cách độc lập}.
+\end{itemize}
+
+Tóm lại, sự gắn kết chặt chẽ giữa các mục tiêu cốt lõi và yêu cầu chức năng đã tạo nên một khung giải pháp toàn diện cho bài toán bầu cử nội bộ. Từ bối cảnh thực tế của các tổ chức vừa và nhỏ, hệ thống đã chuyển hóa thành công ba nguyên tắc lớn -- tính duy nhất của lá phiếu, sự bảo mật tuyệt đối và khả năng đối chiếu minh bạch -- thành các luồng nghiệp vụ thực tế. Sự kết hợp giữa các kỹ thuật mật mã như chữ ký mù tập thể \textit{(nhằm tách bạch danh tính khỏi nội dung phiếu)} và blockchain nội bộ \textit{(nhằm lưu vết bất biến)} đóng vai trò là xương sống công nghệ. Nhờ vậy, hệ thống không chỉ số hóa quy trình bầu cử một cách tiện lợi mà còn giải quyết triệt để nghịch lý giữa việc bảo vệ quyền riêng tư cá nhân và đảm bảo tính minh bạch.
+
+\subsubsection{Yêu cầu hệ thống}
+
+Một hệ thống bầu cử điện tử đáng tin cậy phải đồng thời thỏa mãn năm tính chất sau đây. Các tính chất này không độc lập mà bổ trợ cho nhau: thiếu một trong số đó, toàn bộ sự tin tưởng vào kết quả bầu cử sẽ bị lung lay.
+
+\begin{itemize}
+    \item \textbf{Tính bí mật:} Không ai -- kể cả quản trị viên hay bên vận hành hệ thống -- có thể biết một cử tri cụ thể đã bầu cho ứng viên nào. Bí mật của lá phiếu là nền tảng để loại trừ mọi áp lực hay tác động bên ngoài lên quyết định bỏ phiếu.
+
+    \item \textbf{Tính duy nhất:} Mỗi cử tri hợp lệ chỉ được phép bỏ đúng một phiếu trong suốt một cuộc bầu cử. Hệ thống phải ngăn chặn mọi hình thức bỏ phiếu lặp lại, dù là cố tình hay do sự cố kỹ thuật.
+
+    \item \textbf{Tính xác thực:} Chỉ những cử tri đã được tổ chức xác nhận trước mới có thể tham gia bỏ phiếu. Không một người ngoài hay tài khoản giả mạo nào có thể chen vào quá trình.
+
+    \item \textbf{Tính không thể chối bỏ:} Một khi phiếu bầu đã được nộp và ghi nhận, không bên nào có thể phủ nhận sự kiện đó. Cả cử tri lẫn hệ thống đều không thể xóa bỏ hay làm giả dấu vết của một lá phiếu đã tồn tại.
+
+    \item \textbf{Tính ẩn danh (Unlinkability):} Ngay cả khi thu thập toàn bộ dữ liệu công khai của hệ thống, không thể truy ngược từ một lá phiếu về danh tính của người đã bỏ phiếu đó. Tính ẩn danh đi xa hơn tính bí mật: không chỉ giữ bí mật nội dung, mà còn triệt tiêu mọi mối liên hệ có thể phát hiện được giữa cử tri và lựa chọn của họ.
+\end{itemize}
+
+Để đảm bảo các tính chất trên trong thực tế, hệ thống áp dụng nguyên tắc \textbf{bảo vệ đa tầng} (\textit{defense in depth}): thay vì trông cậy vào một cơ chế bảo vệ duy nhất, mỗi tầng trong kiến trúc đều có lớp kiểm soát riêng. Nhờ đó, nếu một tầng bị vượt qua, các tầng còn lại vẫn giữ vững toàn vẹn của cuộc bầu cử.
+
+\begin{itemize}
+    \item \textbf{Tầng giao tiếp mạng (HTTP):} Mọi yêu cầu từ trình duyệt của người dùng đều phải đi qua một cổng vào duy nhất. Tại đây, hệ thống tự động chặn các nguồn không được phép, giới hạn tần suất gửi yêu cầu để ngăn tấn công dồn dập, và bảo vệ các tiêu đề phản hồi để hạn chế lộ thông tin về cấu trúc bên trong.
+
+    \item \textbf{Tầng xác thực và phân quyền:} Sau khi đăng nhập thành công, mỗi người dùng nhận một thẻ xác thực điện tử có thời hạn. Mọi thao tác tiếp theo đều phải trình thẻ này. Hệ thống kiểm tra không chỉ thẻ có hợp lệ hay không, mà còn kiểm tra người dùng có đúng vai trò được phép thực hiện thao tác đó hay không -- quản trị viên và cử tri có quyền hạn hoàn toàn khác nhau.
+
+    \item \textbf{Tầng mật mã (chữ ký mù tập thể):} Lá phiếu được xử lý bằng một kỹ thuật mật mã đặc biệt: cử tri tự che nội dung lá phiếu trước khi gửi lên để ký xác nhận. Các bên ký chỉ xác nhận phiếu hợp lệ mà không nhìn thấy nội dung bên trong. Khóa ký được chia đều cho nhiều thành phần độc lập -- chỉ khi tất cả cùng tham gia mới tạo ra chữ ký hợp lệ -- loại trừ nguy cơ một bên duy nhất kiểm soát toàn bộ quá trình ký.
+
+    \item \textbf{Tầng cơ sở dữ liệu:} Ngay cả khi các tầng trên bị vượt qua, cơ sở dữ liệu vẫn áp đặt các ràng buộc cứng: mỗi cử tri chỉ có một phiếu, mỗi dấu vân tay phiếu là duy nhất, và mỗi lá phiếu chỉ được tiết lộ một lần. Bất kỳ hành động nào vi phạm các ràng buộc này đều bị từ chối tự động.
+
+    \item \textbf{Tầng blockchain (Hyperledger Fabric):} Toàn bộ sự kiện quan trọng -- từng phiếu bầu, tổng hợp kết quả, và các mốc thời gian của cuộc bầu cử -- được ghi lên một sổ cái phân tán không thể sửa đổi. Bất kỳ ai cũng có thể đối chiếu dữ liệu công bố với bản ghi trên blockchain để phát hiện nếu có sự can thiệp sau khi bầu cử kết thúc.
+\end{itemize}
+

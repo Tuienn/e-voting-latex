@@ -1,0 +1,25 @@
+@startuml ref_auth_check
+hide footbox
+skinparam maxMessageSize 200
+
+participant "BFF Gateway\n(:3000)" as BFF
+actor "Client" as Client
+
+note over BFF
+  Được tham chiếu (ref) trong các
+  biểu đồ tuần tự khác
+end note
+
+BFF -> BFF: Trích xuất Access Token\ntừ Authorization header
+alt Token không tồn tại / không hợp lệ / hết hạn
+  BFF --> Client: Từ chối yêu cầu\n(401 Unauthorized)
+else Token hợp lệ
+  BFF -> BFF: Giải mã Token, lấy userId và role\n(xử lý cục bộ, không gọi Identity)
+  BFF -> BFF: Kiểm tra role có khớp\nvới quyền yêu cầu (ADMIN / VOTER)
+  alt Role không phù hợp
+    BFF --> Client: Từ chối yêu cầu\n(403 Forbidden)
+  else Đủ quyền
+    BFF -> BFF: Gắn thông tin người dùng\nvào ngữ cảnh xử lý
+  end
+end
+@enduml

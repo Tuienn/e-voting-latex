@@ -1,0 +1,31 @@
+@startuml TaoDanhSachNguoiDung
+hide footbox
+autonumber
+skinparam maxMessageSize 200
+
+actor "Admin (Web Client)" as Admin
+participant "BFF Gateway\n(:3000)" as BFF
+participant "Identity Service\n(:3302)" as Identity
+database "MongoDB\n(Identity DB)" as DB
+
+Admin -> BFF: Tải lên danh sách người dùng cần tạo
+activate BFF
+
+ref over Admin, BFF : Xác thực & Kiểm tra quyền ADMIN
+
+BFF -> Identity: Gửi yêu cầu tạo danh sách người dùng
+activate Identity
+
+Identity -> Identity: Kiểm tra tính hợp lệ\nvà mã hóa mật khẩu từng người dùng
+
+Identity -> DB: Lưu danh sách người dùng
+activate DB
+DB --> Identity: Xác nhận lưu thành công
+deactivate DB
+
+Identity --> BFF: Trả về số lượng tài khoản đã tạo
+deactivate Identity
+
+BFF --> Admin: Thông báo tạo thành công kèm số lượng
+deactivate BFF
+@enduml

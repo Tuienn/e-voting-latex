@@ -1,0 +1,31 @@
+@startuml XemDanhSachPhieu
+hide footbox
+autonumber
+skinparam maxMessageSize 200
+
+actor "Admin (Web Client)" as Admin
+participant "BFF Gateway\n(:3000)" as BFF
+participant "Coordinator Service\n(:3303)" as Coordinator
+database "MongoDB\n(Coordinator DB)" as DB
+
+Admin -> BFF: Yêu cầu xem danh sách phiếu trong cuộc bầu cử
+activate BFF
+
+ref over Admin, BFF : Xác thực & Kiểm tra quyền ADMIN
+
+BFF -> Coordinator: Gửi yêu cầu lọc danh sách phiếu
+activate Coordinator
+
+Coordinator -> Coordinator: Xây dựng điều kiện truy vấn theo cuộc bầu cử
+
+Coordinator -> DB: Truy vấn danh sách phiếu kèm phân trang
+activate DB
+DB --> Coordinator: Trả về danh sách phiếu và tổng số lượng
+deactivate DB
+
+Coordinator --> BFF: Trả về kết quả phân trang
+deactivate Coordinator
+
+BFF --> Admin: Hiển thị danh sách cam kết phiếu mù và mã giao dịch blockchain
+deactivate BFF
+@enduml

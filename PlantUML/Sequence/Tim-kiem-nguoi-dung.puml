@@ -1,0 +1,31 @@
+@startuml TimKiemNguoiDung
+hide footbox
+autonumber
+skinparam maxMessageSize 200
+
+actor "Admin (Web Client)" as Admin
+participant "BFF Gateway\n(:3000)" as BFF
+participant "Identity Service\n(:3302)" as Identity
+database "MongoDB\n(Identity DB)" as DB
+
+Admin -> BFF: Nhập điều kiện tìm kiếm người dùng
+activate BFF
+
+ref over Admin, BFF : Xác thực & Kiểm tra quyền ADMIN
+
+BFF -> Identity: Gửi yêu cầu lọc danh sách người dùng
+activate Identity
+
+Identity -> Identity: Xây dựng điều kiện truy vấn
+
+Identity -> DB: Truy vấn danh sách người dùng theo điều kiện
+activate DB
+DB --> Identity: Trả về danh sách và tổng số lượng
+deactivate DB
+
+Identity --> BFF: Trả về kết quả tìm kiếm (có phân trang)
+deactivate Identity
+
+BFF --> Admin: Hiển thị kết quả tìm kiếm
+deactivate BFF
+@enduml

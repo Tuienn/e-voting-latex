@@ -1,0 +1,22 @@
+@startuml XemKetQuaBauCu_UC
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Khách (ẩn danh)" as guest
+actor "Mạng Blockchain" as fabric
+
+rectangle "Kết quả bầu cử" {
+  usecase "Xem kết quả tổng hợp" as UC_Tally
+  usecase "Đối chiếu kết quả giữa cơ sở dữ liệu và blockchain" as UC_Compare
+}
+
+guest --> UC_Tally
+UC_Tally ..> UC_Compare : <<include>>
+
+UC_Compare --> fabric
+
+note bottom of UC_Tally
+  Chỉ khả dụng khi cuộc bầu cử
+  đã đóng hoặc đã hoàn tất
+end note
+@enduml

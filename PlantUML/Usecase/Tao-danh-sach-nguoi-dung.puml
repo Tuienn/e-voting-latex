@@ -1,0 +1,18 @@
+@startuml TaoDanhSachNguoiDung_UC
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Admin" as admin
+
+usecase "Đăng nhập hệ thống" as UC_Login
+
+rectangle "Tạo tài khoản người dùng" {
+  usecase "Tạo tài khoản đơn lẻ" as UC_CreateOne
+  usecase "Tạo tài khoản hàng loạt" as UC_CreateBulk
+}
+
+admin --> UC_CreateOne
+admin --> UC_CreateBulk
+UC_CreateOne ..> UC_Login : <<include>>
+UC_CreateBulk ..> UC_Login : <<include>>
+@enduml

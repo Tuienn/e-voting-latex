@@ -1,0 +1,58 @@
+@startuml QuanLyCuTriTrongBauCu
+hide footbox
+autonumber
+skinparam maxMessageSize 200
+
+actor "Admin (Web Client)" as Admin
+participant "BFF Gateway\n(:3000)" as BFF
+participant "Coordinator Service\n(:3303)" as Coordinator
+participant "Identity Service\n(:3302)" as Identity
+database "MongoDB\n(Identity DB)" as IdDB
+database "MongoDB\n(Coordinator DB)" as CoDB
+
+Admin -> BFF: Gửi yêu cầu thêm hoặc xóa cử tri trong cuộc bầu cử
+activate BFF
+
+ref over Admin, BFF : Xác thực & Kiểm tra quyền ADMIN
+
+BFF -> Coordinator: Chuyển tiếp yêu cầu cập nhật danh sách cử tri
+activate Coordinator
+
+Coordinator -> CoDB: Truy vấn cuộc bầu cử
+activate CoDB
+CoDB --> Coordinator: Trả về thông tin cuộc bầu cử
+deactivate CoDB
+
+alt Cuộc bầu cử không ở trạng thái chờ
+  Coordinator --> BFF: Từ chối thay đổi do cuộc bầu cử đã khởi động
+  BFF --> Admin: Hiển thị thông báo lỗi
+else Cuộc bầu cử đang chờ
+  Coordinator -> Identity: Yêu cầu thông tin các cử tri
+  activate Identity
+  Identity -> IdDB: Truy vấn cử tri
+  activate IdDB
+  IdDB --> Identity: Trả về thông tin cử tri
+  deactivate IdDB
+  Identity --> Coordinator: Trả về danh sách cử tri hợp lệ
+  deactivate Identity
+
+  alt Có cử tri không hợp lệ
+    Coordinator --> BFF: Thông báo dữ liệu cử tri không hợp lệ
+    BFF --> Admin: Hiển thị lỗi nhập liệu
+  else Danh sách hợp lệ
+    Coordinator -> CoDB: Mở giao dịch cập nhật danh sách cử tri
+    activate CoDB
+    CoDB -> CoDB: Kiểm tra lại trạng thái cuộc bầu cử
+    CoDB -> CoDB: Thêm hoặc xóa cử tri tương ứng
+    CoDB --> Coordinator: Xác nhận giao dịch thành công
+    deactivate CoDB
+
+    Coordinator --> BFF: Trả về cuộc bầu cử và danh sách cử tri cập nhật
+    deactivate Coordinator
+
+    BFF --> Admin: Thông báo cập nhật thành công
+  end
+end
+
+deactivate BFF
+@enduml

@@ -1,0 +1,19 @@
+@startuml XemChiTietCuocBauCu_UC
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Admin" as admin
+
+usecase "Đăng nhập hệ thống" as UC_Login
+
+rectangle "Chi tiết cuộc bầu cử" {
+  usecase "Xem thông tin cuộc bầu cử" as UC_ViewInfo
+  usecase "Xem danh sách ứng viên" as UC_ViewCandidates
+  usecase "Xem danh sách cử tri" as UC_ViewVoters
+}
+
+admin --> UC_ViewInfo
+UC_ViewInfo ..> UC_Login : <<include>>
+UC_ViewCandidates ..> UC_ViewInfo : <<include>>
+UC_ViewVoters ..> UC_ViewInfo : <<include>>
+@enduml

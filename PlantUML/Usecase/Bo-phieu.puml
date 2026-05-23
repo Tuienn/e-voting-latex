@@ -1,0 +1,32 @@
+@startuml BoPhieu_UC
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Voter" as voter
+actor "Mạng Blockchain" as fabric
+
+usecase "Đăng nhập hệ thống" as UC_Login
+
+rectangle "Quy trình bỏ phiếu mù" {
+  usecase "Khởi tạo phiên bỏ phiếu" as UC_StartSession
+  usecase "Yêu cầu ký phiếu mù tập thể" as UC_Sign
+  usecase "Nộp cam kết phiếu mù" as UC_Submit
+  usecase "Ghi nhận phiếu lên blockchain" as UC_Chain
+}
+
+voter --> UC_StartSession
+voter --> UC_Sign
+voter --> UC_Submit
+
+UC_StartSession ..> UC_Login : <<include>>
+UC_Sign ..> UC_Login : <<include>>
+UC_Submit ..> UC_Login : <<include>>
+
+UC_Submit ..> UC_Chain : <<include>>
+UC_Chain --> fabric
+
+note bottom of UC_Sign
+  Thực hiện sau khi
+  cử tri làm mù phiếu trên trình duyệt
+end note
+@enduml

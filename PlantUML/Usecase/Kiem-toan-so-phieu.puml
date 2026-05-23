@@ -1,0 +1,19 @@
+@startuml KiemToanSoPhieu_UC
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Khách (ẩn danh)" as guest
+actor "Mạng Blockchain" as fabric
+
+rectangle "Kiểm toán số phiếu" {
+  usecase "Đối chiếu tổng số phiếu" as UC_Audit
+  usecase "Đối chiếu số phiếu đã tiết lộ" as UC_RevealAudit
+  usecase "Kiểm tra trạng thái cam kết gốc Merkle" as UC_RootStatus
+}
+
+guest --> UC_Audit
+UC_Audit ..> UC_RevealAudit : <<include>>
+UC_Audit ..> UC_RootStatus : <<include>>
+
+UC_RootStatus --> fabric
+@enduml

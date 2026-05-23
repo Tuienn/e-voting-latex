@@ -1,0 +1,16 @@
+@startuml XemDanhSachPhieu_UC
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Admin" as admin
+
+usecase "Đăng nhập hệ thống" as UC_Login
+usecase "Quản lý cuộc bầu cử" as UC_Manage
+usecase "Xem danh sách phiếu trong cuộc bầu cử" as UC_ViewVotes
+usecase "Lọc và phân trang danh sách phiếu" as UC_Filter
+
+admin --> UC_ViewVotes
+UC_ViewVotes ..> UC_Manage : <<include>>
+UC_Manage ..> UC_Login : <<include>>
+UC_Filter .> UC_ViewVotes : <<extend>>
+@enduml

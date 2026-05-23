@@ -1,0 +1,23 @@
+@startuml QuanLyCuTriTrongBauCu_UC
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Admin" as admin
+
+usecase "Đăng nhập hệ thống" as UC_Login
+
+rectangle "Quản lý cử tri trong cuộc bầu cử" {
+  usecase "Thêm cử tri" as UC_Add
+  usecase "Xóa cử tri" as UC_Delete
+}
+
+admin --> UC_Add
+admin --> UC_Delete
+UC_Add ..> UC_Login : <<include>>
+UC_Delete ..> UC_Login : <<include>>
+
+note bottom of UC_Add
+  Chỉ áp dụng khi
+  cuộc bầu cử ở trạng thái PENDING
+end note
+@enduml

@@ -1,0 +1,19 @@
+@startuml XacThucNguoiDung_UC
+left to right direction
+skinparam packageStyle rectangle
+
+actor "User" as user
+
+rectangle "Xác thực người dùng" {
+  usecase "Đăng nhập hệ thống" as UC_SignIn
+  usecase "Làm mới phiên đăng nhập" as UC_Refresh
+  usecase "Đăng xuất hệ thống" as UC_SignOut
+}
+
+user --> UC_SignIn
+user --> UC_Refresh
+user --> UC_SignOut
+
+UC_Refresh ..> UC_SignIn : <<include>>
+UC_SignOut ..> UC_SignIn : <<include>>
+@enduml

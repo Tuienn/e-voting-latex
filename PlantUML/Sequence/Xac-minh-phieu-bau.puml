@@ -1,0 +1,70 @@
+@startuml XacMinhPhieuBau
+hide footbox
+autonumber
+skinparam maxMessageSize 200
+
+actor "Khách (Web Client, ẩn danh)" as Guest
+participant "BFF Gateway\n(:3000)" as BFF
+participant "Coordinator Service\n(:3303)" as Coordinator
+participant "Chainlaunch Gateway\n(:8100)" as Fabric
+database "MongoDB\n(Coordinator DB)" as DB
+
+Guest -> BFF: Gửi yêu cầu xác minh phiếu kèm cam kết và mã giao dịch
+activate BFF
+
+note over BFF
+  Điểm cuối công khai, không yêu cầu xác thực
+end note
+
+BFF -> Coordinator: Chuyển tiếp yêu cầu xác minh
+activate Coordinator
+
+Coordinator -> DB: Truy vấn cuộc bầu cử
+activate DB
+DB --> Coordinator: Trả về thông tin cuộc bầu cử
+deactivate DB
+
+Coordinator -> DB: Truy vấn phiếu theo định danh
+activate DB
+DB --> Coordinator: Trả về thông tin phiếu
+deactivate DB
+
+Coordinator -> Coordinator: So khớp cam kết phiếu mù và mã giao dịch trong cơ sở dữ liệu
+
+Coordinator -> Fabric: Yêu cầu thông tin phiếu trên blockchain
+activate Fabric
+Fabric --> Coordinator: Trả về phiếu đã ghi nhận
+deactivate Fabric
+
+Coordinator -> Coordinator: So khớp cam kết phiếu mù và mã giao dịch với blockchain
+
+alt Cuộc bầu cử đã đóng hoặc đã hoàn tất
+  Coordinator -> DB: Truy vấn toàn bộ cam kết phiếu mù của cuộc bầu cử
+  activate DB
+  DB --> Coordinator: Trả về danh sách cam kết phiếu mù
+  deactivate DB
+
+  Coordinator -> Coordinator: Dựng cây Merkle và tính bằng chứng cho cam kết cần xác minh
+  Coordinator -> Coordinator: Kiểm tra bằng chứng Merkle cục bộ với gốc đã lưu
+
+  Coordinator -> Fabric: Yêu cầu gốc Merkle đã cam kết
+  activate Fabric
+  Fabric --> Coordinator: Trả về gốc Merkle trên blockchain
+  deactivate Fabric
+
+  Coordinator -> Coordinator: So khớp gốc Merkle giữa cơ sở dữ liệu và blockchain
+
+  Coordinator -> Fabric: Yêu cầu xác minh bằng chứng Merkle trực tiếp trên blockchain
+  activate Fabric
+  Fabric --> Coordinator: Trả về kết quả xác minh
+  deactivate Fabric
+end
+
+Coordinator -> Coordinator: Tổng hợp kết luận từ các nguồn kiểm chứng
+
+Coordinator --> BFF: Trả về chi tiết kết quả xác minh
+deactivate Coordinator
+
+BFF --> Guest: Hiển thị kết quả xác minh theo từng bước
+deactivate BFF
+@enduml

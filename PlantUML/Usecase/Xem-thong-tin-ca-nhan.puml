@@ -1,0 +1,18 @@
+@startuml XemThongTinCaNhan_UC
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Admin" as admin
+actor "Voter" as voter
+
+usecase "Đăng nhập hệ thống" as UC_Login
+
+rectangle "Thông tin tài khoản cá nhân" {
+  usecase "Xem thông tin cá nhân" as UC_ViewProfile
+}
+
+admin --> UC_ViewProfile
+voter --> UC_ViewProfile
+
+UC_ViewProfile ..> UC_Login : <<include>>
+@enduml

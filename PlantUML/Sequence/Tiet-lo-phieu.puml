@@ -1,0 +1,82 @@
+@startuml TietLoPhieu
+hide footbox
+autonumber
+skinparam maxMessageSize 200
+
+actor "Khách (Web Client, ẩn danh)" as Voter
+participant "Reveal-Vote Service\n(:3308 HTTP)" as Reveal
+participant "Coordinator Service\n(:3303)" as Coordinator
+collections "Signing Nodes\n(:3304 / :3305 / :3306)" as Nodes
+participant "Chainlaunch Gateway\n(:8100)" as Fabric
+database "MongoDB\n(Reveal DB)" as ReDB
+database "MongoDB\n(Coordinator DB)" as CoDB
+
+Voter -> Reveal: Gửi yêu cầu tiết lộ phiếu kèm chữ ký giải mù
+activate Reveal
+
+note right of Voter
+  Yêu cầu hoàn toàn ẩn danh, không kèm phiên đăng nhập.
+  Hệ thống không thể phân biệt người gửi;
+  chữ ký EC-Schnorr là điểm tin cậy duy nhất.
+end note
+
+Reveal -> Reveal: Kiểm tra tính hợp lệ định dạng của chữ ký
+
+Reveal -> Coordinator: Yêu cầu thông tin cuộc bầu cử
+activate Coordinator
+Coordinator -> CoDB: Truy vấn cuộc bầu cử
+activate CoDB
+CoDB --> Coordinator: Trả về thông tin cuộc bầu cử và khóa tập thể
+deactivate CoDB
+Coordinator --> Reveal: Trả về cuộc bầu cử và khóa công khai tập thể
+deactivate Coordinator
+
+Reveal -> Reveal: Kiểm tra cuộc bầu cử đã đóng và ứng viên thuộc cuộc bầu cử
+
+Reveal -> Reveal: Xác minh chữ ký EC-Schnorr với khóa công khai tập thể
+
+alt Chữ ký không hợp lệ
+  Reveal --> Voter: Từ chối tiết lộ phiếu
+else Chữ ký hợp lệ
+  Reveal -> Reveal: Tính khóa định danh phiếu tiết lộ và mã băm tải trọng
+
+  Reveal -> Fabric: Gửi phiếu tiết lộ lên blockchain
+  activate Fabric
+  Fabric -> Fabric: Kiểm tra gốc Merkle đã cam kết và khóa chưa được dùng
+  Fabric -> Fabric: Ghi nhận phiếu, tăng kết quả ứng viên
+  Fabric --> Reveal: Trả về mã giao dịch
+  deactivate Fabric
+
+  Reveal -> ReDB: Lưu phiếu tiết lộ kèm mã giao dịch
+  activate ReDB
+  ReDB --> Reveal: Xác nhận lưu phiếu
+  deactivate ReDB
+
+  Reveal -> ReDB: Đếm số phiếu đã tiết lộ
+  activate ReDB
+  ReDB --> Reveal: Trả về số lượng đã tiết lộ
+  deactivate ReDB
+
+  Reveal -> Coordinator: Yêu cầu tổng số phiếu của cuộc bầu cử
+  activate Coordinator
+  Coordinator --> Reveal: Trả về tổng số phiếu đã nộp
+  deactivate Coordinator
+
+  alt Đã tiết lộ đủ toàn bộ phiếu
+    Reveal -> Coordinator: Yêu cầu hoàn tất cuộc bầu cử
+    activate Coordinator
+    Coordinator -> CoDB: Cập nhật trạng thái sang đã hoàn tất
+    activate CoDB
+    CoDB --> Coordinator: Xác nhận cập nhật
+    deactivate CoDB
+
+    Coordinator ->> Nodes: Yêu cầu dọn dẹp khóa và danh sách đã ký
+    Coordinator --> Reveal: Xác nhận đã hoàn tất cuộc bầu cử
+    deactivate Coordinator
+  end
+
+  Reveal --> Voter: Trả về biên nhận tiết lộ phiếu
+end
+
+deactivate Reveal
+@enduml

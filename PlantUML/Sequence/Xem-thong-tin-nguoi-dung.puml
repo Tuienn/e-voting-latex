@@ -1,0 +1,61 @@
+@startuml XemThongTinNguoiDung
+hide footbox
+autonumber
+skinparam maxMessageSize 200
+
+actor "Admin (Web Client)" as Admin
+participant "BFF Gateway\n(:3000)" as BFF
+participant "Identity Service\n(:3302)" as Identity
+participant "Coordinator Service\n(:3303)" as Coordinator
+database "MongoDB\n(Identity DB)" as IdDB
+database "MongoDB\n(Coordinator DB)" as CoDB
+
+Admin -> BFF: Yêu cầu xem thông tin đầy đủ của người dùng
+activate BFF
+
+ref over Admin, BFF : Xác thực & Kiểm tra quyền ADMIN
+
+BFF -> Identity: Gửi yêu cầu lấy thông tin tài khoản
+activate Identity
+Identity -> IdDB: Truy vấn người dùng
+activate IdDB
+IdDB --> Identity: Trả về thông tin người dùng
+deactivate IdDB
+Identity --> BFF: Trả về thông tin tài khoản
+deactivate Identity
+
+alt Người dùng không tồn tại
+  BFF --> Admin: Hiển thị thông báo không tìm thấy
+else Người dùng tồn tại
+
+  BFF -> BFF: Kiểm tra vai trò người dùng
+
+  alt Vai trò là Cử tri
+    BFF -> Coordinator: Gửi yêu cầu lấy danh sách bầu cử của cử tri
+    activate Coordinator
+    Coordinator -> CoDB: Truy vấn các cuộc bầu cử có cử tri tham gia
+    activate CoDB
+    CoDB --> Coordinator: Trả về danh sách cuộc bầu cử
+    deactivate CoDB
+    Coordinator --> BFF: Trả về danh sách cuộc bầu cử của cử tri
+    deactivate Coordinator
+  else Vai trò là Ứng viên
+    BFF -> Coordinator: Gửi yêu cầu lấy danh sách bầu cử của ứng viên
+    activate Coordinator
+    Coordinator -> CoDB: Truy vấn các cuộc bầu cử có ứng viên
+    activate CoDB
+    CoDB --> Coordinator: Trả về danh sách cuộc bầu cử
+    deactivate CoDB
+    Coordinator --> BFF: Trả về danh sách cuộc bầu cử của ứng viên
+    deactivate Coordinator
+  else Vai trò khác
+    BFF -> BFF: Bỏ qua bước lấy lịch sử cuộc bầu cử
+  end
+
+  BFF -> BFF: Tổng hợp thông tin tài khoản và lịch sử bầu cử
+
+  BFF --> Admin: Hiển thị thông tin chi tiết người dùng
+end
+
+deactivate BFF
+@enduml

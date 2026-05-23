@@ -1,0 +1,45 @@
+@startuml KiemToanSoPhieu
+hide footbox
+autonumber
+skinparam maxMessageSize 200
+
+actor "Khách (Web Client, ẩn danh)" as Guest
+participant "Reveal-Vote Service\n(:3308 HTTP)" as Reveal
+participant "Coordinator Service\n(:3303)" as Coordinator
+participant "Chainlaunch Gateway\n(:8100)" as Fabric
+database "MongoDB\n(Reveal DB)" as ReDB
+database "MongoDB\n(Coordinator DB)" as CoDB
+
+Guest -> Reveal: Yêu cầu kiểm toán số phiếu của cuộc bầu cử
+activate Reveal
+
+note over Reveal
+  Điểm cuối công khai, không yêu cầu xác thực
+end note
+
+par Truy vấn song song
+  Reveal -> ReDB: Đếm tổng số phiếu đã tiết lộ trong cơ sở dữ liệu
+  activate ReDB
+  ReDB --> Reveal: Trả về tổng số phiếu đã tiết lộ
+  deactivate ReDB
+else
+  Reveal -> Coordinator: Yêu cầu tổng số phiếu đã nộp
+  activate Coordinator
+  Coordinator -> CoDB: Đếm phiếu trong cuộc bầu cử
+  activate CoDB
+  CoDB --> Coordinator: Trả về tổng số phiếu đã nộp
+  deactivate CoDB
+  Coordinator --> Reveal: Trả về tổng số phiếu đã nộp
+  deactivate Coordinator
+else
+  Reveal -> Fabric: Yêu cầu thống kê kiểm toán trên blockchain
+  activate Fabric
+  Fabric --> Reveal: Trả về tổng số phiếu, số phiếu đã tiết lộ và trạng thái gốc Merkle
+  deactivate Fabric
+end
+
+Reveal -> Reveal: So sánh số liệu giữa cơ sở dữ liệu và blockchain
+
+Reveal --> Guest: Trả về báo cáo kiểm toán kèm chỉ báo khớp hoặc lệch
+deactivate Reveal
+@enduml

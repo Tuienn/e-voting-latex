@@ -1,0 +1,28 @@
+@startuml XacMinhPhieuBau_UC
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Khách (ẩn danh)" as guest
+actor "Mạng Blockchain" as fabric
+
+rectangle "Xác minh phiếu bầu" {
+  usecase "Kiểm tra phiếu trong cơ sở dữ liệu" as UC_DB
+  usecase "Kiểm tra phiếu trên blockchain" as UC_Chain
+  usecase "Kiểm tra bằng chứng Merkle" as UC_Merkle
+  usecase "Tổng hợp kết quả xác minh" as UC_Aggregate
+}
+
+guest --> UC_Aggregate
+
+UC_Aggregate ..> UC_DB : <<include>>
+UC_Aggregate ..> UC_Chain : <<include>>
+UC_Aggregate ..> UC_Merkle : <<include>>
+
+UC_Chain --> fabric
+UC_Merkle --> fabric
+
+note bottom of UC_Merkle
+  Chỉ thực hiện khi cuộc bầu cử
+  đã đóng hoặc đã hoàn tất
+end note
+@enduml

@@ -1,0 +1,41 @@
+@startuml QuanLyTrangThaiTaiKhoan
+hide footbox
+autonumber
+skinparam maxMessageSize 200
+
+actor "Admin (Web Client)" as Admin
+participant "BFF Gateway\n(:3000)" as BFF
+participant "Identity Service\n(:3302)" as Identity
+database "MongoDB\n(Identity DB)" as DB
+
+Admin -> BFF: Yêu cầu thay đổi trạng thái tài khoản
+activate BFF
+
+ref over Admin, BFF : Xác thực & Kiểm tra quyền ADMIN
+
+BFF -> Identity: Gửi yêu cầu cập nhật trạng thái người dùng
+activate Identity
+
+Identity -> DB: Truy vấn thông tin người dùng
+activate DB
+DB --> Identity: Trả về thông tin người dùng
+deactivate DB
+
+alt Người dùng không tồn tại
+  Identity --> BFF: Thông báo không tìm thấy người dùng
+  deactivate Identity
+  BFF --> Admin: Hiển thị thông báo lỗi
+  deactivate BFF
+else Người dùng tồn tại
+  Identity -> DB: Cập nhật trạng thái tài khoản
+  activate DB
+  DB --> Identity: Xác nhận cập nhật thành công
+  deactivate DB
+
+  Identity --> BFF: Trả về kết quả thành công
+  deactivate Identity
+
+  BFF --> Admin: Thông báo thay đổi trạng thái thành công
+  deactivate BFF
+end
+@enduml

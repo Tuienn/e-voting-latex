@@ -1,0 +1,17 @@
+@startuml TaoCuocBauCu_UC
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Admin" as admin
+
+usecase "Đăng nhập hệ thống" as UC_Login
+
+rectangle "Tạo cuộc bầu cử" {
+  usecase "Khởi tạo cuộc bầu cử" as UC_Create
+  usecase "Chọn danh sách ứng viên ban đầu" as UC_PickCandidates
+}
+
+admin --> UC_Create
+UC_Create ..> UC_Login : <<include>>
+UC_PickCandidates ..> UC_Create : <<include>>
+@enduml

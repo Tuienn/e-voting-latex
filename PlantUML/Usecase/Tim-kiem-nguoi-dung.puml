@@ -1,0 +1,16 @@
+@startuml TimKiemNguoiDung
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Admin" as admin
+
+usecase "Đăng nhập hệ thống" as UC_Login
+usecase "Quản lý người dùng" as UC_ManageUser
+usecase "Tìm kiếm và lọc người dùng" as UC_FilterUsers
+
+admin --> UC_ManageUser
+
+UC_ManageUser ..> UC_Login : <<include>>
+UC_FilterUsers .> UC_ManageUser : <<extend>>
+
+@enduml

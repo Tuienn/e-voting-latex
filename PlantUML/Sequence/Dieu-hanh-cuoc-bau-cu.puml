@@ -1,0 +1,96 @@
+@startuml DieuHanhCuocBauCu
+hide footbox
+autonumber
+skinparam maxMessageSize 200
+
+actor "Admin (Web Client)" as Admin
+participant "BFF Gateway\n(:3000)" as BFF
+participant "Coordinator Service\n(:3303)" as Coordinator
+collections "Signing Nodes\n(:3304 / :3305 / :3306)" as Nodes
+participant "Chainlaunch Gateway\n(:8100)" as Fabric
+database "MongoDB\n(Coordinator DB)" as CoDB
+database "Redis\n(Vote Count Cache)" as Redis
+
+== Bắt đầu cuộc bầu cử ==
+
+Admin -> BFF: Yêu cầu bắt đầu cuộc bầu cử
+activate BFF
+
+ref over Admin, BFF : Xác thực & Kiểm tra quyền ADMIN
+
+BFF -> Coordinator: Chuyển tiếp yêu cầu bắt đầu
+activate Coordinator
+
+Coordinator -> CoDB: Truy vấn cuộc bầu cử
+activate CoDB
+CoDB --> Coordinator: Trả về thông tin cuộc bầu cử
+deactivate CoDB
+
+Coordinator -> Coordinator: Kiểm tra trạng thái và số lượng tối thiểu của ứng viên, cử tri
+
+alt Không đủ điều kiện bắt đầu
+  Coordinator --> BFF: Từ chối bắt đầu cuộc bầu cử
+  BFF --> Admin: Hiển thị thông báo lỗi
+else Đủ điều kiện
+  par Yêu cầu sinh khóa song song
+    Coordinator -> Nodes: Yêu cầu sinh cặp khóa ký
+    activate Nodes
+    Nodes -> Nodes: Sinh khóa và mã hóa khóa bí mật
+    Nodes --> Coordinator: Trả về các khóa công khai thành phần
+    deactivate Nodes
+  end
+
+  Coordinator -> Coordinator: Tổng hợp khóa công khai tập thể
+
+  Coordinator -> CoDB: Cập nhật trạng thái sang đang diễn ra và lưu khóa tập thể
+  activate CoDB
+  CoDB --> Coordinator: Xác nhận cập nhật thành công
+  deactivate CoDB
+
+  Coordinator --> BFF: Trả về cuộc bầu cử đã khởi động
+  deactivate Coordinator
+
+  BFF --> Admin: Thông báo bắt đầu thành công
+end
+
+deactivate BFF
+
+== Đóng cuộc bầu cử ==
+
+Admin -> BFF: Yêu cầu đóng cuộc bầu cử
+activate BFF
+
+ref over Admin, BFF : Xác thực & Kiểm tra quyền ADMIN
+
+BFF -> Coordinator: Chuyển tiếp yêu cầu đóng
+activate Coordinator
+
+Coordinator -> CoDB: Truy vấn cuộc bầu cử và danh sách phiếu
+activate CoDB
+CoDB --> Coordinator: Trả về danh sách cam kết phiếu mù
+deactivate CoDB
+
+Coordinator -> Coordinator: Xây dựng cây Merkle và tính gốc Merkle
+
+Coordinator -> Fabric: Gửi yêu cầu cam kết gốc Merkle lên blockchain
+activate Fabric
+Fabric -> Fabric: Ghi nhận giao dịch lên sổ cái
+Fabric --> Coordinator: Trả về mã giao dịch
+deactivate Fabric
+
+Coordinator -> CoDB: Cập nhật trạng thái sang đã đóng kèm gốc Merkle
+activate CoDB
+CoDB --> Coordinator: Xác nhận cập nhật thành công
+deactivate CoDB
+
+Coordinator -> Redis: Lưu cache tổng số phiếu của cuộc bầu cử
+activate Redis
+Redis --> Coordinator: Xác nhận lưu cache
+deactivate Redis
+
+Coordinator --> BFF: Trả về cuộc bầu cử đã đóng
+deactivate Coordinator
+
+BFF --> Admin: Thông báo đóng cuộc bầu cử thành công
+deactivate BFF
+@enduml

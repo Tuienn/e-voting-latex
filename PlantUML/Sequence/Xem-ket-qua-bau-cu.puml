@@ -1,0 +1,61 @@
+@startuml XemKetQuaBauCu
+hide footbox
+autonumber
+skinparam maxMessageSize 200
+
+actor "Khách (Web Client, ẩn danh)" as Guest
+participant "Reveal-Vote Service\n(:3308 HTTP)" as Reveal
+participant "Coordinator Service\n(:3303)" as Coordinator
+participant "Identity Service\n(:3302)" as Identity
+participant "Chainlaunch Gateway\n(:8100)" as Fabric
+database "MongoDB\n(Reveal DB)" as ReDB
+database "MongoDB\n(Coordinator DB)" as CoDB
+database "MongoDB\n(Identity DB)" as IdDB
+
+Guest -> Reveal: Yêu cầu xem kết quả bầu cử
+activate Reveal
+
+note over Reveal
+  Điểm cuối công khai, không yêu cầu xác thực
+end note
+
+Reveal -> Coordinator: Yêu cầu thông tin cuộc bầu cử
+activate Coordinator
+Coordinator -> CoDB: Truy vấn cuộc bầu cử
+activate CoDB
+CoDB --> Coordinator: Trả về thông tin cuộc bầu cử
+deactivate CoDB
+Coordinator --> Reveal: Trả về cuộc bầu cử và danh sách ứng viên
+deactivate Coordinator
+
+alt Cuộc bầu cử chưa đóng
+  Reveal --> Guest: Từ chối hiển thị kết quả
+else Cuộc bầu cử đã đóng hoặc đã hoàn tất
+  par Truy vấn song song để giảm trễ
+    Reveal -> ReDB: Đếm phiếu tiết lộ theo từng ứng viên
+    activate ReDB
+    ReDB --> Reveal: Trả về số phiếu theo ứng viên trong cơ sở dữ liệu
+    deactivate ReDB
+  else
+    Reveal -> Fabric: Yêu cầu bảng kết quả trên blockchain
+    activate Fabric
+    Fabric --> Reveal: Trả về số phiếu theo ứng viên trên blockchain
+    deactivate Fabric
+  else
+    Reveal -> Identity: Yêu cầu thông tin các ứng viên
+    activate Identity
+    Identity -> IdDB: Truy vấn ứng viên
+    activate IdDB
+    IdDB --> Identity: Trả về thông tin ứng viên
+    deactivate IdDB
+    Identity --> Reveal: Trả về danh sách ứng viên
+    deactivate Identity
+  end
+
+  Reveal -> Reveal: Tổng hợp kết quả và đối chiếu cơ sở dữ liệu với blockchain
+
+  Reveal --> Guest: Trả về kết quả bầu cử kèm so sánh hai nguồn
+end
+
+deactivate Reveal
+@enduml

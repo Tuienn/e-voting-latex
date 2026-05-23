@@ -1,0 +1,170 @@
+@startuml BoPhieu
+hide footbox
+autonumber
+skinparam maxMessageSize 200
+
+actor "Voter (Web Client)" as Voter
+participant "BFF Gateway\n(:3000)" as BFF
+participant "Coordinator Service\n(:3303)" as Coordinator
+collections "Signing Nodes\n(:3304 / :3305 / :3306)" as Nodes
+participant "Chainlaunch Gateway\n(:8100)" as Fabric
+database "MongoDB\n(Coordinator DB)" as DB
+database "Redis\n(Vote Session)" as Redis
+
+== Bước 1: Khởi tạo phiên bỏ phiếu ==
+
+Voter -> BFF: Yêu cầu khởi tạo phiên bỏ phiếu
+activate BFF
+
+ref over Voter, BFF : Xác thực & Kiểm tra quyền VOTER
+
+BFF -> Coordinator: Chuyển tiếp yêu cầu khởi tạo phiên
+activate Coordinator
+
+Coordinator -> DB: Kiểm tra cử tri thuộc cuộc bầu cử và chưa bỏ phiếu
+activate DB
+DB --> Coordinator: Trả về thông tin tham gia
+deactivate DB
+
+alt Cử tri đã bỏ phiếu hoặc không hợp lệ
+  Coordinator --> BFF: Từ chối khởi tạo phiên
+  BFF --> Voter: Hiển thị thông báo lỗi
+else Hợp lệ
+  Coordinator -> Redis: Kiểm tra phiên cũ của cử tri
+  activate Redis
+  Redis --> Coordinator: Trả về phiên cũ nếu có
+  deactivate Redis
+
+  opt Phiên cũ tồn tại
+    Coordinator ->> Nodes: Yêu cầu hủy nonce phiên cũ
+  end
+
+  Coordinator -> Coordinator: Sinh định danh phiên mới
+
+  par Yêu cầu sinh cam kết song song
+    Coordinator -> Nodes: Yêu cầu sinh cam kết phiên
+    activate Nodes
+    Nodes -> Nodes: Sinh nonce và tính điểm cam kết
+    Nodes --> Coordinator: Trả về điểm cam kết và khóa công khai thành phần
+    deactivate Nodes
+  end
+
+  Coordinator -> Coordinator: Tổng hợp cam kết tập thể
+  Coordinator -> Coordinator: Đối chiếu khóa công khai với khóa của cuộc bầu cử
+
+  Coordinator -> Redis: Lưu phiên ở trạng thái chưa ký
+  activate Redis
+  Redis --> Coordinator: Xác nhận lưu phiên
+  deactivate Redis
+
+  Coordinator --> BFF: Trả về cam kết tập thể và định danh phiên
+  deactivate Coordinator
+
+  BFF --> Voter: Trả về cam kết tập thể và khóa công khai
+end
+
+deactivate BFF
+
+note over Voter
+  Cử tri thực hiện làm mù phiếu trên trình duyệt:
+  - Chọn ứng viên
+  - Sinh hệ số làm mù bí mật
+  - Tính cam kết phiếu mù và thử thách mù
+end note
+
+== Bước 2: Yêu cầu ký phiếu mù tập thể ==
+
+Voter -> BFF: Gửi thử thách mù kèm định danh phiên
+activate BFF
+
+ref over Voter, BFF : Xác thực & Kiểm tra quyền VOTER
+
+BFF -> Coordinator: Chuyển tiếp yêu cầu ký phiếu mù
+activate Coordinator
+
+Coordinator -> Redis: Kiểm tra phiên hợp lệ và chưa được ký
+activate Redis
+Redis --> Coordinator: Trả về trạng thái phiên
+deactivate Redis
+
+alt Phiên không hợp lệ
+  Coordinator --> BFF: Từ chối ký phiếu
+  BFF --> Voter: Hiển thị thông báo lỗi
+else Phiên hợp lệ
+  par Yêu cầu ký thành phần song song
+    Coordinator -> Nodes: Yêu cầu ký thành phần kèm thử thách mù
+    activate Nodes
+    Nodes -> Nodes: Ghi nhận cử tri đã được ký để chống ký lặp
+    Nodes -> Nodes: Tính chữ ký thành phần và xóa nonce
+    Nodes --> Coordinator: Trả về chữ ký thành phần
+    deactivate Nodes
+  end
+
+  Coordinator -> Coordinator: Tổng hợp chữ ký tập thể
+
+  Coordinator -> Redis: Cập nhật phiên sang trạng thái đã ký
+  activate Redis
+  Redis --> Coordinator: Xác nhận cập nhật
+  deactivate Redis
+
+  Coordinator --> BFF: Trả về chữ ký tập thể đã ký mù
+  deactivate Coordinator
+
+  BFF --> Voter: Trả về chữ ký tập thể
+end
+
+deactivate BFF
+
+note over Voter
+  Cử tri giải mù chữ ký trên trình duyệt và
+  kiểm tra cục bộ trước khi nộp phiếu.
+end note
+
+== Bước 3: Nộp cam kết phiếu mù ==
+
+Voter -> BFF: Nộp cam kết phiếu mù kèm chữ ký phiên
+activate BFF
+
+ref over Voter, BFF : Xác thực & Kiểm tra quyền VOTER
+
+BFF -> Coordinator: Chuyển tiếp yêu cầu nộp phiếu
+activate Coordinator
+
+Coordinator -> Redis: Đối chiếu phiên và chữ ký đã ký
+activate Redis
+Redis --> Coordinator: Trả về trạng thái phiên
+deactivate Redis
+
+Coordinator -> DB: Kiểm tra trạng thái cuộc bầu cử
+activate DB
+DB --> Coordinator: Trả về trạng thái cuộc bầu cử
+deactivate DB
+
+alt Phiên không khớp hoặc cuộc bầu cử đã đóng
+  Coordinator --> BFF: Từ chối nộp phiếu
+  BFF --> Voter: Hiển thị thông báo lỗi
+else Hợp lệ
+  Coordinator -> Fabric: Gửi cam kết phiếu mù lên blockchain
+  activate Fabric
+  Fabric -> Fabric: Ghi nhận phiếu vào sổ cái
+  Fabric --> Coordinator: Trả về mã giao dịch
+  deactivate Fabric
+
+  Coordinator -> DB: Lưu phiếu kèm mã giao dịch
+  activate DB
+  DB --> Coordinator: Xác nhận lưu phiếu
+  deactivate DB
+
+  Coordinator -> Redis: Đánh dấu phiên đã hoàn tất bỏ phiếu
+  activate Redis
+  Redis --> Coordinator: Xác nhận cập nhật
+  deactivate Redis
+
+  Coordinator --> BFF: Trả về biên nhận phiếu
+  deactivate Coordinator
+
+  BFF --> Voter: Thông báo bỏ phiếu thành công
+end
+
+deactivate BFF
+@enduml

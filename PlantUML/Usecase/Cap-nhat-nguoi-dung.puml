@@ -1,0 +1,15 @@
+@startuml CapNhatNguoiDung_UC
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Admin" as admin
+
+usecase "Đăng nhập hệ thống" as UC_Login
+
+rectangle "Cập nhật thông tin người dùng" {
+  usecase "Cập nhật hồ sơ tài khoản" as UC_Update
+}
+
+admin --> UC_Update
+UC_Update ..> UC_Login : <<include>>
+@enduml

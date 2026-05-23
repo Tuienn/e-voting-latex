@@ -1,0 +1,88 @@
+@startuml TongQuanHeThong_UC
+left to right direction
+skinparam packageStyle rectangle
+skinparam ranksep 30
+skinparam nodesep 15
+
+actor "User" as user
+actor "Admin" as admin
+actor "Voter" as voter
+actor "Khách (ẩn danh)" as guest
+
+admin --|> user
+voter --|> user
+
+together {
+  rectangle "Xác thực và hồ sơ cá nhân" {
+    usecase "Đăng nhập hệ thống" as UC_SignIn
+    usecase "Làm mới phiên đăng nhập" as UC_Refresh
+    usecase "Đăng xuất hệ thống" as UC_SignOut
+    usecase "Xem hồ sơ cá nhân" as UC_Profile
+  }
+
+  rectangle "Quản lý người dùng (Admin)" {
+    usecase "Tạo tài khoản người dùng" as UC_CreateUser
+    usecase "Tìm kiếm người dùng" as UC_SearchUser
+    usecase "Xem thông tin chi tiết người dùng" as UC_ViewUser
+    usecase "Cập nhật thông tin người dùng" as UC_UpdateUser
+    usecase "Quản lý trạng thái tài khoản" as UC_StatusUser
+  }
+}
+
+rectangle "Quản lý cuộc bầu cử (Admin)" {
+  usecase "Tạo cuộc bầu cử" as UC_CreateElec
+  usecase "Tìm kiếm cuộc bầu cử" as UC_SearchElec
+  usecase "Xem chi tiết cuộc bầu cử" as UC_ViewElec
+  usecase "Quản lý ứng viên trong cuộc bầu cử" as UC_MngCand
+  usecase "Quản lý cử tri trong cuộc bầu cử" as UC_MngVoter
+  usecase "Điều hành cuộc bầu cử" as UC_RunElec
+  usecase "Xem danh sách phiếu" as UC_ViewVotes
+  usecase "Xem cuộc bầu cử theo cử tri hoặc ứng viên" as UC_ElecByUser
+}
+
+together {
+  rectangle "Cử tri (Voter)" {
+    usecase "Xem danh sách cuộc bầu cử của mình" as UC_MyElecs
+    usecase "Xem chi tiết cuộc bầu cử đang tham gia" as UC_MyElecDetail
+    usecase "Bỏ phiếu" as UC_Vote
+  }
+
+  rectangle "Cổng công khai (ẩn danh)" {
+    usecase "Xem danh sách cuộc bầu cử công khai" as UC_PubList
+    usecase "Tiết lộ phiếu sau khi cuộc bầu cử đóng" as UC_Reveal
+    usecase "Xác minh phiếu bầu" as UC_Verify
+    usecase "Xem kết quả bầu cử" as UC_Tally
+    usecase "Kiểm toán số phiếu" as UC_Audit
+  }
+}
+
+user --> UC_SignIn
+user --> UC_Refresh
+user --> UC_SignOut
+user --> UC_Profile
+
+admin --> UC_CreateUser
+admin --> UC_SearchUser
+admin --> UC_ViewUser
+admin --> UC_UpdateUser
+admin --> UC_StatusUser
+
+admin --> UC_CreateElec
+admin --> UC_SearchElec
+admin --> UC_ViewElec
+admin --> UC_MngCand
+admin --> UC_MngVoter
+admin --> UC_RunElec
+admin --> UC_ViewVotes
+admin --> UC_ElecByUser
+
+voter --> UC_MyElecs
+voter --> UC_MyElecDetail
+voter --> UC_Vote
+
+guest --> UC_PubList
+guest --> UC_Reveal
+guest --> UC_Verify
+guest --> UC_Tally
+guest --> UC_Audit
+@enduml

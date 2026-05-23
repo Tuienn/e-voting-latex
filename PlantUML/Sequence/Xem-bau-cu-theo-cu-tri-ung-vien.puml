@@ -1,0 +1,38 @@
+@startuml XemBauCuTheoCuTriUngVien
+hide footbox
+autonumber
+skinparam maxMessageSize 200
+
+actor "Admin (Web Client)" as Admin
+participant "BFF Gateway\n(:3000)" as BFF
+participant "Coordinator Service\n(:3303)" as Coordinator
+database "MongoDB\n(Coordinator DB)" as DB
+
+Admin -> BFF: Yêu cầu xem cuộc bầu cử theo định danh người dùng
+activate BFF
+
+ref over Admin, BFF : Xác thực & Kiểm tra quyền ADMIN
+
+alt Lọc theo cử tri
+  BFF -> Coordinator: Gửi yêu cầu lấy danh sách cuộc bầu cử theo cử tri
+  activate Coordinator
+  Coordinator -> DB: Truy vấn các cuộc bầu cử có cử tri tham gia
+  activate DB
+  DB --> Coordinator: Trả về danh sách cuộc bầu cử
+  deactivate DB
+  Coordinator --> BFF: Trả về danh sách cuộc bầu cử của cử tri
+  deactivate Coordinator
+else Lọc theo ứng viên
+  BFF -> Coordinator: Gửi yêu cầu lấy danh sách cuộc bầu cử theo ứng viên
+  activate Coordinator
+  Coordinator -> DB: Truy vấn các cuộc bầu cử có ứng viên
+  activate DB
+  DB --> Coordinator: Trả về danh sách cuộc bầu cử
+  deactivate DB
+  Coordinator --> BFF: Trả về danh sách cuộc bầu cử của ứng viên
+  deactivate Coordinator
+end
+
+BFF --> Admin: Hiển thị danh sách cuộc bầu cử liên quan
+deactivate BFF
+@enduml

@@ -1,0 +1,34 @@
+@startuml XemThongTinCaNhan
+hide footbox
+autonumber
+skinparam maxMessageSize 200
+
+actor "Người dùng (Web Client)" as User
+participant "BFF Gateway\n(:3000)" as BFF
+participant "Identity Service\n(:3302)" as Identity
+database "MongoDB\n(Identity DB)" as DB
+
+User -> BFF: Yêu cầu xem thông tin cá nhân
+activate BFF
+
+ref over User, BFF : Xác thực & Kiểm tra quyền người dùng
+
+BFF -> Identity: Gửi yêu cầu lấy thông tin tài khoản theo định danh người dùng
+activate Identity
+
+Identity -> DB: Truy vấn thông tin tài khoản
+activate DB
+DB --> Identity: Trả về thông tin tài khoản
+deactivate DB
+
+alt Tài khoản không tồn tại
+  Identity --> BFF: Thông báo không tìm thấy tài khoản
+  BFF --> User: Hiển thị lỗi
+else Tài khoản tồn tại
+  Identity --> BFF: Trả về thông tin tài khoản
+  deactivate Identity
+  BFF --> User: Hiển thị thông tin cá nhân
+end
+
+deactivate BFF
+@enduml

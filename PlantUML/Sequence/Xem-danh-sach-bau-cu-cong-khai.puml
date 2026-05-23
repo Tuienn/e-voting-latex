@@ -1,0 +1,33 @@
+@startuml XemDanhSachBauCuCongKhai
+hide footbox
+autonumber
+skinparam maxMessageSize 200
+
+actor "Khách (Web Client, ẩn danh)" as Guest
+participant "BFF Gateway\n(:3000)" as BFF
+participant "Coordinator Service\n(:3303)" as Coordinator
+database "MongoDB\n(Coordinator DB)" as DB
+
+Guest -> BFF: Nhập điều kiện xem danh sách cuộc bầu cử
+activate BFF
+
+note over BFF
+  Điểm cuối công khai, không yêu cầu xác thực
+end note
+
+BFF -> Coordinator: Gửi yêu cầu lọc cuộc bầu cử
+activate Coordinator
+
+Coordinator -> Coordinator: Xây dựng điều kiện truy vấn
+
+Coordinator -> DB: Truy vấn danh sách cuộc bầu cử
+activate DB
+DB --> Coordinator: Trả về danh sách và tổng số lượng
+deactivate DB
+
+Coordinator --> BFF: Trả về kết quả phân trang
+deactivate Coordinator
+
+BFF --> Guest: Hiển thị danh sách cuộc bầu cử công khai
+deactivate BFF
+@enduml

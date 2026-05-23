@@ -1,7 +1,16 @@
 {
   "permissions": {
     "allow": [
-      "Bash(pdflatex -interaction=nonstopmode -halt-on-error main.tex)"
+      "Bash(pdflatex -interaction=nonstopmode -halt-on-error main.tex)",
+      "Bash(xelatex main.tex)",
+      "Bash(plantuml *)",
+      "Bash(rm -rf /tmp/puml-test)",
+      "Bash(rm -rf /tmp/puml-test-seq)",
+      "Bash(rsvg-convert -f pdf -o Diagrams/Usecase/TongQuanHeThong.pdf /tmp/tongquan/TongQuanHeThong_UC.svg)",
+      "Bash(xelatex -interaction=nonstopmode main.tex)",
+      "Bash(xelatex -interaction=nonstopmode -halt-on-error main.tex)",
+      "Bash(rsvg-convert -f pdf -o Diagrams/Usecase/TongQuanHeThong.pdf /tmp/tq/TongQuanHeThong_UC.svg)",
+      "Bash(pdfinfo Diagrams/Usecase/TongQuanHeThong.pdf)"
     ]
   }
 }
