@@ -2,7 +2,7 @@
 
 Phần này trình bày các biểu đồ tuần tự (\textit{Sequence Diagram}) mô tả luồng tương tác chi tiết giữa các thành phần trong hệ thống cho từng chức năng đã được đặc tả ở mục \ref{tab:uc-xac-thuc-nguoi-dung} và các mục đặc tả tiếp theo. Mỗi biểu đồ thể hiện trình tự trao đổi thông điệp qua các tầng: tác nhân, BFF Gateway, các microservice nghiệp vụ và các thành phần lưu trữ (MongoDB, Redis, Blockchain).
 
-Bước \textit{Xác thực và Kiểm tra quyền} xuất hiện lặp lại trong hầu hết các luồng yêu cầu xác thực; do đó được tách thành một biểu đồ tham chiếu dùng chung (Hình \ref{fig:seq-ref-auth}) và được tham chiếu dưới dạng \texttt{ref} trong các biểu đồ còn lại nhằm tránh trùng lặp.
+Bước \textit{Xác thực và Kiểm tra quyền} xuất hiện lặp lại trong hầu hết các luồng yêu cầu xác thực; do đó được tách thành một biểu đồ tham chiếu dùng chung (Hình \ref{fig:seq-ref-auth}) và được tham chiếu dưới dạng \pkg{ref} trong các biểu đồ còn lại nhằm tránh trùng lặp.
 
 \begin{figure}[H]
     \centering
