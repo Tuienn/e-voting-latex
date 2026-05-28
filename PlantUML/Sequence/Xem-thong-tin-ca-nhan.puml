@@ -3,7 +3,7 @@ hide footbox
 autonumber
 skinparam maxMessageSize 200
 
-actor "Người dùng (Web Client)" as User
+actor "Người dùng " as User
 participant "BFF Gateway\n(:3000)" as BFF
 participant "Identity Service\n(:3302)" as Identity
 database "MongoDB\n(Identity DB)" as DB

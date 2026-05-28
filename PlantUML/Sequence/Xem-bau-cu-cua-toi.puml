@@ -3,7 +3,7 @@ hide footbox
 autonumber
 skinparam maxMessageSize 200
 
-actor "Voter (Web Client)" as Voter
+actor "Voter " as Voter
 participant "BFF Gateway\n(:3000)" as BFF
 participant "Coordinator Service\n(:3303)" as Coordinator
 database "MongoDB\n(Coordinator DB)" as DB

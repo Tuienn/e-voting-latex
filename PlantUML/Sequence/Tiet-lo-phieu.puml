@@ -3,7 +3,7 @@ hide footbox
 autonumber
 skinparam maxMessageSize 200
 
-actor "Khách (Web Client, ẩn danh)" as Voter
+actor "Khách (ẩn danh), ẩn danh)" as Voter
 participant "Reveal-Vote Service\n(:3308 HTTP)" as Reveal
 participant "Coordinator Service\n(:3303)" as Coordinator
 collections "Signing Nodes\n(:3304 / :3305 / :3306)" as Nodes

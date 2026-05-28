@@ -3,7 +3,7 @@ hide footbox
 autonumber
 skinparam maxMessageSize 200
 
-actor "Khách (Web Client, ẩn danh)" as Guest
+actor "Khách (ẩn danh), ẩn danh)" as Guest
 participant "Reveal-Vote Service\n(:3308 HTTP)" as Reveal
 participant "Coordinator Service\n(:3303)" as Coordinator
 participant "Chainlaunch Gateway\n(:8100)" as Fabric

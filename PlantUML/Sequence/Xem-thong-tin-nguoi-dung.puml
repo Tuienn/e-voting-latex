@@ -3,7 +3,7 @@ hide footbox
 autonumber
 skinparam maxMessageSize 200
 
-actor "Admin (Web Client)" as Admin
+actor "Admin " as Admin
 participant "BFF Gateway\n(:3000)" as BFF
 participant "Identity Service\n(:3302)" as Identity
 participant "Coordinator Service\n(:3303)" as Coordinator

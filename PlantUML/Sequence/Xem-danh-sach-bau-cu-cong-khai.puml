@@ -3,7 +3,7 @@ hide footbox
 autonumber
 skinparam maxMessageSize 200
 
-actor "Khách (Web Client, ẩn danh)" as Guest
+actor "Khách (ẩn danh), ẩn danh)" as Guest
 participant "BFF Gateway\n(:3000)" as BFF
 participant "Coordinator Service\n(:3303)" as Coordinator
 database "MongoDB\n(Coordinator DB)" as DB
