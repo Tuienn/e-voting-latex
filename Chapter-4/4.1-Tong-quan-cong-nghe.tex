@@ -1,0 +1,64 @@
+\subsection{Tổng quan các công nghệ sử dụng}
+
+Hệ thống bỏ phiếu điện tử được đề xuất trong đồ án được hiện thực hóa theo mô hình kiến trúc phân tầng, trong đó mỗi tầng đảm nhiệm một nhóm chức năng riêng biệt và được xây dựng dựa trên những công nghệ phù hợp nhất với đặc thù nhiệm vụ của tầng đó. Cụ thể, tầng hạ tầng blockchain được triển khai và quản trị thông qua nền tảng \textbf{ChainLaunch}; tầng xử lý nghiệp vụ phía máy chủ (Backend) được xây dựng trên khung kiến trúc \textbf{NestJS}; tầng giao diện web (Web Frontend) sử dụng \textbf{React} kết hợp công cụ biên dịch \textbf{Vite} và hệ thống thành phần giao diện \textbf{Material UI}; còn tầng ứng dụng di động (Mobile Frontend) được phát triển trên nền tảng \textbf{Expo} cùng giải pháp thành phần \textbf{React Native Reusables} và \textbf{Tailwind CSS}.
+
+Mục này trình bày tổng quan về các nhóm công nghệ nền tảng nói trên, làm rõ vai trò, đặc điểm kỹ thuật cốt lõi và cơ sở lý luận cho việc lựa chọn từng giải pháp trong bối cảnh của một hệ thống đòi hỏi đồng thời tính bảo mật, hiệu năng và khả năng kiểm chứng cao.
+
+\subsubsection{ChainLaunch -- Nền tảng triển khai và quản trị mạng blockchain}
+
+ChainLaunch là một nền tảng mã nguồn mở (open-source) được thiết kế nhằm đơn giản hóa việc triển khai, vận hành và quản lý các nút (nodes) cũng như toàn bộ mạng lưới blockchain ở cấp độ doanh nghiệp. Mục tiêu cốt lõi của nền tảng này là cho phép nhà phát triển khởi tạo một mạng lưới blockchain phức tạp chỉ trong vòng vài phút, thay vì phải cấu hình thủ công tốn nhiều thời gian và dễ phát sinh sai sót. Trong đồ án, ChainLaunch được sử dụng để dựng và quản trị mạng Hyperledger Fabric làm hạ tầng sổ cái cho hệ thống bỏ phiếu. Người dùng có thể tương tác với nền tảng thông qua bốn giao diện linh hoạt: \textit{Web UI} (giao diện web), \textit{CLI} (dòng lệnh), \textit{REST API}, hoặc \textit{Terraform provider} để tự động hóa hạ tầng theo mô hình Infrastructure as Code (IaC).
+
+Về phạm vi hỗ trợ, ChainLaunch cho phép triển khai nhanh nhiều nền tảng blockchain phổ biến:
+
+\begin{itemize}
+    \item \textbf{Hyperledger Fabric:} Hỗ trợ cấu hình đầy đủ các thành phần như peers, orderers và CAs, với các thuật toán đồng thuận Raft và SmartBFT.
+
+    \item \textbf{Hyperledger Fabric-X:} Một biến thể tối ưu hiệu năng cao (high-throughput) của Fabric, sử dụng cơ chế đồng thuận Arma, tách biệt cấu trúc orderer và committer, đồng thời hỗ trợ dịch vụ truy vấn (query service) dựa trên cơ sở dữ liệu PostgreSQL.
+
+    \item \textbf{Hyperledger Besu:} Hỗ trợ khởi tạo các validators, bootnodes và fullnodes chạy trên thuật toán đồng thuận QBFT.
+
+    \item \textbf{Mở rộng qua plugin:} Cho phép tích hợp thêm các framework blockchain khác nhờ kiến trúc mô-đun có khả năng mở rộng.
+\end{itemize}
+
+Về mặt kiến trúc, ChainLaunch được tổ chức thành các khối chức năng (modules) độc lập nhưng phối hợp chặt chẽ. \textit{Deployment Module} xử lý việc cài đặt mạng lưới với khả năng tương thích đa nền tảng cao thông qua các cơ chế quản lý dịch vụ native của hệ điều hành (SystemD trên Linux, LaunchD trên macOS) hoặc môi trường container hóa Docker. \textit{Storage \& Persistence} lưu cấu hình và trạng thái vận hành trong cơ sở dữ liệu nhúng SQLite, với cấu trúc thư mục cục bộ chuẩn hóa dưới \texttt{\char`~/.chainlaunch/}. Bên cạnh đó là \textit{Backup Module} (sao lưu chứng chỉ và snapshot qua Restic/S3, AWS EBS hoặc VMware), \textit{Monitoring \& Notifications Module} (giám sát qua ping và metric, cảnh báo qua SMTP, tích hợp sẵn Prometheus, Grafana và block explorer) và \textit{Smart Contract AI (SCAI) Module} (môi trường phát triển chaincode trên trình duyệt có trợ giúp của trí tuệ nhân tạo qua OpenAI hoặc Claude). Kiến trúc tổng thể của nền tảng được minh họa trong Hình \ref{fig:chainlaunch-arch}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth, keepaspectratio]{Figures/Chainlainch-architecture.png}
+    \caption{Kiến trúc tổng thể của nền tảng ChainLaunch}
+    \label{fig:chainlaunch-arch}
+\end{figure}
+
+\subsubsection{Công nghệ tầng Backend}
+
+Tầng Backend đảm nhiệm toàn bộ logic nghiệp vụ, điều phối giao dịch tới mạng blockchain và quản lý dữ liệu ngoài chuỗi. Các công nghệ chủ đạo của tầng này được lựa chọn nhằm cân bằng giữa tính cấu trúc hóa của mã nguồn, độ an toàn kiểu dữ liệu và hiệu năng xử lý.
+
+\begin{itemize}
+    \item \textbf{NestJS -- Khung kiến trúc và mô hình quản trị logic:} NestJS chuẩn hóa kiến trúc máy chủ Node.js bằng cách áp dụng nghiêm ngặt mô hình \textit{Dependency Injection} (DI) và \textit{Inversion of Control} (IoC) thông qua cơ chế \textit{Decorators} và \textit{Metadata}. Nhờ đó, logic nghiệp vụ (Services) được phân tách rạch ròi khỏi logic điều phối (Controllers), giúp hệ thống đạt được tính bảo trì và khả năng kiểm thử cao. Việc tích hợp gói \texttt{@nestjs/microservices} còn cho phép trừu tượng hóa các tầng giao thức (TCP, gRPC, Redis Pub/Sub), tạo điều kiện chuyển đổi minh bạch từ mô hình đơn khối (Monolithic) sang phân tán (Microservices).
+
+    \item \textbf{MongoDB và Prisma -- Tầng lưu trữ lai định kiểu:} MongoDB là cơ sở dữ liệu hướng tài liệu (document-oriented) phù hợp với các tập dữ liệu có cấu trúc biến đổi và yêu cầu mở rộng ngang (horizontal scaling); việc sử dụng định dạng \texttt{bson} giúp lưu trữ hiệu quả các cấu trúc phức tạp như cây Merkle. Prisma bổ khuyết nhược điểm thiếu cấu trúc của NoSQL bằng một bản đồ lược đồ (Schema) định nghĩa trước; engine của Prisma được viết bằng ngôn ngữ Rust, cung cấp khả năng tối ưu hóa truy vấn và ngăn chặn các lỗi runtime liên quan đến kiểu dữ liệu -- một yếu tố then chốt khi xử lý dữ liệu nhạy cảm như phiếu bầu.
+
+    \item \textbf{Redis và cơ chế Cache -- Tối ưu hóa hiệu năng:} Hệ thống áp dụng mô hình lưu trữ đa tầng dựa trên hệ sinh thái \texttt{@keyv/redis}, \texttt{cache-manager} và \pkg{@nestjs/cache-manager}, cho phép đồng bộ hóa trạng thái giữa các instance trong môi trường Microservices, giảm độ trễ mạng và tải trọng lên cơ sở dữ liệu chính. Redis đồng thời đóng vai trò bộ nhớ đệm trung tâm cho tác vụ giới hạn lưu lượng (Rate Limiting) thông qua \texttt{@nestjs/throttler}, giúp bảo vệ tài nguyên hệ thống trước các kịch bản tấn công khai thác hoặc quá tải truy cập nhờ tốc độ xử lý trên bộ nhớ RAM ở ngưỡng micro-giây.
+\end{itemize}
+
+\subsubsection{Công nghệ tầng Web Frontend}
+
+Tầng giao diện web cung cấp môi trường tương tác cho quản trị viên và cử tri trên trình duyệt. Các công nghệ được lựa chọn nhằm tối ưu đồng thời trải nghiệm phát triển, hiệu năng tải trang và tính nhất quán về thiết kế.
+
+\begin{itemize}
+    \item \textbf{React -- Thư viện cốt lõi của tầng giao diện:} React thực thi mô hình lập trình khai báo (Declarative Programming) dựa trên kiến trúc thành phần tái sử dụng. Thông qua thuật toán so khớp (Reconciliation) trên DOM ảo (Virtual DOM), React chỉ tính toán và áp dụng phần khác biệt tối thiểu lên DOM thật mỗi khi trạng thái thay đổi, qua đó giảm chi phí hiệu năng của trình duyệt. Mô hình luồng dữ liệu một chiều (Unidirectional Data Flow) từ thành phần cha xuống thành phần con qua \textit{Props} thiết lập một cơ chế kiểm soát dữ liệu minh bạch, dễ dự đoán và cô lập lỗi.
+
+    \item \textbf{Vite -- Công cụ xây dựng và tối ưu hóa chu kỳ phát triển:} Trong giai đoạn phát triển, Vite tận dụng tính năng ES Modules nguyên bản của trình duyệt cùng bộ biên dịch \textit{esbuild} (viết bằng ngôn ngữ Go) để loại bỏ giai đoạn đóng gói toàn bộ mã nguồn, nhờ đó giảm thời gian khởi động môi trường (Cold Start) xuống mức mili-giây. Trong giai đoạn biên dịch sản phẩm, Vite sử dụng \textit{Rollup} để thực thi các kỹ thuật phân tách mã động (Code-Splitting), loại bỏ mã thừa (Tree-Shaking) và tối ưu chiến lược tải trước tài nguyên, qua đó giữ kích thước tệp đầu ra ở mức tối thiểu và cải thiện trực tiếp các chỉ số Core Web Vitals.
+
+    \item \textbf{Material UI và Emotion -- Hệ thống thiết kế và giải pháp CSS-in-JS:} Material UI (MUI) cung cấp một hệ thống thành phần giao diện chuẩn hóa dựa trên ngôn ngữ thiết kế Material Design của Google. Thông qua giải pháp CSS-in-JS của Emotion (\texttt{@emotion/react} và \texttt{@emotion/styled}), MUI đóng gói phong cách (Scoped Styling) trực tiếp vào cấu trúc thành phần, triệt tiêu xung đột định danh phong cách toàn cục (Global Namespace Pollution) và cho phép tính toán thuộc tính trực quan động tại thời điểm runtime. Việc quản lý giao diện qua một bộ cấu hình trung tâm (\textit{Theme Provider}) giúp kiểm soát tính đồng bộ về kiểu chữ, bảng màu và khoảng cách trên toàn hệ thống.
+\end{itemize}
+
+\subsubsection{Công nghệ tầng Mobile Frontend}
+
+Tầng ứng dụng di động cho phép cử tri thực hiện bỏ phiếu trực tiếp trên thiết bị cá nhân. Để bảo đảm khả năng phát triển đa nền tảng từ một kho mã nguồn duy nhất cùng giao diện linh hoạt, tầng này được xây dựng dựa trên hai trụ cột công nghệ chính.
+
+\begin{itemize}
+    \item \textbf{Expo -- Nền tảng thực thi và quản lý vòng đời ứng dụng đa nền tảng:} Expo cung cấp giải pháp toàn diện để phát triển, biên dịch và vận hành ứng dụng trên iOS, Android và Web từ một kho mã nguồn duy nhất. Nền tảng này cung cấp các API đồng bộ giúp mã JavaScript tương tác trực tiếp với tính năng native của thiết bị (lưu trữ an toàn, định vị, camera) mà không cần can thiệp vào mã nguồn Java/Kotlin hay Objective-C/Swift. Cơ chế \textit{Expo Router} áp dụng mô hình định tuyến dựa trên tệp tin (File-based Routing), tự động hóa luồng điều hướng và tối ưu việc phân tách tài nguyên cũng như quản lý vòng đời của các màn hình.
+
+    \item \textbf{React Native Reusables và Tailwind CSS -- Giải pháp thành phần ``mộc'' và định kiểu tiện ích:} Sự kết hợp này lấy cảm hứng trực tiếp từ mô hình \textit{Shadcn UI} trên nền tảng web, phân tách rạch ròi giữa logic vận hành và lớp trình bày của ứng dụng. Thay vì cung cấp các cấu phần đóng gói cứng nhắc, React Native Reusables (RNR) đưa cho nhà phát triển những mảnh ghép ``mộc'' (dựa trên \texttt{@rn-primitives}) đã được lập trình sẵn toàn bộ logic phức tạp bên dưới; nhà phát triển chỉ cần sao chép và tùy biến mã nguồn trực tiếp trong dự án, qua đó nắm quyền kiểm soát tuyệt đối và tránh phụ thuộc vào mã nguồn ẩn của bên thứ ba. Để hoàn thiện lớp vỏ ngoài, hệ thống sử dụng Tailwind CSS làm ngôn ngữ định kiểu theo hướng tiện ích (Utility-First): nhà phát triển chỉ cần gắn các \texttt{className} ngắn gọn (\texttt{flex}, \texttt{items-center}, \texttt{bg-card}, \texttt{p-4}) để chỉ định màu sắc, khoảng cách và bố cục.
+\end{itemize}
