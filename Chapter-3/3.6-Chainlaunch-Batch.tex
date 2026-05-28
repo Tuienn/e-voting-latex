@@ -1,0 +1,71 @@
+\subsection{Tối ưu thông lượng blockchain qua Chainlaunch Batch}
+
+\subsubsection{Cơ chế cắt khối của Fabric}
+
+Hyperledger Fabric không đóng khối cho từng giao dịch riêng lẻ mà \textbf{gom nhóm} các giao dịch thành lô tại tầng Orderer. Tham số \texttt{BatchSize} và \texttt{BatchTimeout} trong tệp cấu hình \texttt{configtx.yaml} quyết định khi nào một lô được đóng thành khối:
+
+\begin{verbatim}
+Orderer:
+    BatchSize:
+        MaxMessageCount:   500     # số tx tối đa trong 1 block
+        AbsoluteMaxBytes:  10 MB   # kích thước tuyệt đối tối đa
+        PreferredMaxBytes:  2 MB   # kích thước ưu tiên — cắt khi đạt
+    BatchTimeout:          2s      # thời gian tối đa chờ đủ lô
+\end{verbatim}
+
+Một khối được đóng khi \textbf{thỏa một trong bốn điều kiện}: (1) số giao dịch đạt \texttt{MaxMessageCount}; (2) tổng kích thước vượt \texttt{AbsoluteMaxBytes}; (3) tổng kích thước vượt \texttt{PreferredMaxBytes} (ngay cả khi chưa đủ \texttt{MaxMessageCount}); hoặc (4) \texttt{BatchTimeout} hết hạn dù lô chỉ có một giao dịch. Trong các điều kiện trên, \texttt{BatchTimeout} là yếu tố quyết định tính chất \textit{hành vi} của mạng — quyết định độ trễ chung quyết tối thiểu mà cử tri quan sát thấy. Cơ chế đóng khối được minh họa trong Hình~\ref{fig:batch-blockchain}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth, keepaspectratio]{Figures/Bactch-blockchain.png}
+    \caption{Cơ chế cắt khối theo BatchSize và BatchTimeout của Fabric}
+    \label{fig:batch-blockchain}
+\end{figure}
+
+\subsubsection{Đánh đổi giữa thông lượng và độ trễ}
+
+Việc chọn \texttt{BatchTimeout} là một bài toán đánh đổi: tăng giá trị cho phép gom được nhiều giao dịch hơn vào một khối (tăng thông lượng), nhưng cử tri phải chờ lâu hơn để thấy phiếu được xác nhận. Bảng~\ref{tab:batch-timeout-tradeoff} tóm tắt ba kịch bản tham khảo.
+
+\begin{table}[H]
+\centering
+\caption{Đánh đổi giữa BatchTimeout, thông lượng và độ trễ}
+\label{tab:batch-timeout-tradeoff}
+\begin{tabularx}{\textwidth}{|L{0.15}|L{0.25}|L{0.25}|L{0.35}|}
+\hline
+\textbf{Timeout} & \textbf{Thông lượng} & \textbf{Độ trễ} & \textbf{Phù hợp} \\
+\hline
+0.5 s & Thấp & Thấp (nhanh) & Hệ thống thời gian thực, ít người dùng \\
+\hline
+2 s & Trung bình & Trung bình & Cân bằng -- khuyến nghị cho bầu cử \\
+\hline
+5 s & Cao & Cao (chậm) & Nạp dữ liệu lớn, ít quan tâm độ trễ \\
+\hline
+\end{tabularx}
+\end{table}
+
+Với hệ thống bầu cử, \texttt{BatchTimeout = 2s} là điểm cân bằng phù hợp: 100 cử tri bỏ phiếu đồng thời có thể được gom vào cùng một khối, độ trễ chung quyết mà mỗi cử tri quan sát thấy nằm trong khoảng 2--3 giây — đủ ngắn để giao diện ứng dụng cập nhật trạng thái phiếu mà không cần \textit{spinner} chờ dài, đồng thời đủ thông lượng để xử lý các đợt bỏ phiếu lớn.
+
+\subsubsection{Phân biệt rõ giữa invoke và query}
+
+Một tối ưu quan trọng ở tầng backend là \textbf{phân biệt nghiêm ngặt} giữa hai loại lời gọi chaincode: \textit{invoke} tạo ra giao dịch ghi và phải qua orderer để đóng khối; \textit{query} chỉ đọc dữ liệu trực tiếp từ World State của peer, không tạo giao dịch và không tốn quota khối. Bảng~\ref{tab:invoke-vs-query} liệt kê cách phân loại các hàm chaincode chính của hệ thống.
+
+\begin{table}[H]
+\centering
+\caption{Phân loại các hàm chaincode theo invoke và query}
+\label{tab:invoke-vs-query}
+\begin{tabularx}{\textwidth}{|L{0.45}|L{0.15}|L{0.2}|L{0.2}|}
+\hline
+\textbf{Hàm chaincode} & \textbf{Loại} & \textbf{Tạo tx?} & \textbf{Độ trễ} \\
+\hline
+\texttt{SubmitVote}, \texttt{CommitMerkleRoot}, \texttt{RevealVoteCompact} & invoke & Có & 2--3 s \\
+\hline
+\texttt{GetVote}, \texttt{GetMerkleRoot}, \texttt{GetTally}, \texttt{GetAuditCounts}, \texttt{VerifyVoteReceipt} & query & Không & dưới 100 ms \\
+\hline
+\end{tabularx}
+\end{table}
+
+Việc sử dụng \texttt{query} cho mọi thao tác đọc — tra cứu phiếu, kiểm tra Merkle root, tổng hợp kết quả — giúp tải đọc của hệ thống không bao giờ chạm đến tầng đồng thuận, do đó không cạnh tranh tài nguyên với tải ghi đang đợi đóng khối.
+
+\subsubsection{Quản lý kết nối qua Chainlaunch}
+
+Chainlaunch duy trì \textbf{một pool kết nối gRPC} đến peer Fabric thay vì mở kết nối mới cho mỗi yêu cầu từ backend. Cách làm này giúp tránh chi phí thiết lập TLS lặp lại, đồng thời cho phép Chainlaunch áp dụng cân bằng tải và logic \textit{retry/circuit-breaker} ở một điểm duy nhất. Backend chỉ cần gọi REST API thông thường — toàn bộ độ phức tạp về giao tiếp gRPC với Fabric được đóng gói tại Chainlaunch.

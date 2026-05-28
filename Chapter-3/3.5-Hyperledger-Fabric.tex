@@ -1,0 +1,53 @@
+\subsection{Lớp blockchain — mạng Hyperledger Fabric riêng}
+
+\subsubsection{Lý do lựa chọn Hyperledger Fabric}
+
+Hệ thống bầu cử yêu cầu hai đặc tính trái ngược với blockchain công khai: \textbf{xác minh danh tính} của từng nút và \textbf{tính chung quyết xác định} (\textit{deterministic finality}). Một mạng công khai như Ethereum không thỏa mãn cả hai — bất kỳ ai cũng có thể trở thành nút, và các khối có thể bị thay thế tạm thời bởi nhánh dài hơn (hiện tượng \textit{fork}). Hyperledger Fabric khắc phục cả hai điểm yếu này bằng kiến trúc được cấp phép (\textit{permissioned}) và cơ chế đồng thuận xác định Raft. Bảng~\ref{tab:ethereum-vs-fabric} so sánh các tiêu chí then chốt.
+
+\begin{table}[H]
+\centering
+\caption{So sánh giữa blockchain công khai (Ethereum) và Hyperledger Fabric}
+\label{tab:ethereum-vs-fabric}
+\begin{tabularx}{\textwidth}{|L{0.25}|L{0.35}|L{0.4}|}
+\hline
+\textbf{Tiêu chí} & \textbf{Ethereum / Public} & \textbf{Hyperledger Fabric} \\
+\hline
+Quyền tham gia & Mở -- ai cũng được & Được cấp phép (\textit{permissioned}) \\
+\hline
+Danh tính nút & Ẩn danh & Chứng chỉ X.509 do CA cấp \\
+\hline
+Thông lượng & 15--30 TPS (PoW) & 3000+ TPS (PBFT/Raft) \\
+\hline
+Độ trễ chung quyết & 6--60 giây & dưới 1 giây (\textit{deterministic}) \\
+\hline
+Chi phí & Phí gas & Không có (hạ tầng riêng) \\
+\hline
+Dữ liệu nhạy cảm & Công khai & Riêng tư theo \textit{channel} \\
+\hline
+Ngôn ngữ chaincode & Solidity (EVM) & Go, Java, Node.js \\
+\hline
+\end{tabularx}
+\end{table}
+
+\subsubsection{Thành phần cấp phép — MSP và X.509}
+
+Fabric quản lý danh tính qua \textbf{Membership Service Provider} (MSP). Mỗi tổ chức tham gia mạng có một MSP riêng, được cấp phát chứng chỉ X.509 cho ba vai trò chính: \textit{Admin} (quản trị channel), \textit{Peer} (nút xác nhận và lưu sổ cái), và \textit{Client} (ứng dụng gọi chaincode). Một root CA của Fabric quản lý các CA con của từng tổ chức và CA của orderer. Mọi giao dịch gửi lên mạng đều phải mang chữ ký X.509 của client; nút peer xác minh chữ ký trước khi thực thi chaincode — không có chứng chỉ hợp lệ, giao dịch bị từ chối ngay tại tầng mạng.
+
+\subsubsection{Cô lập theo channel và chính sách xác nhận}
+
+Toàn bộ giao dịch bầu cử được ghi trên channel \texttt{votechannel} — một sổ cái độc lập chỉ các tổ chức được cấp phép mới có quyền đọc và ghi. Channel khác chạy trên cùng peer cũng không thấy được dữ liệu của \texttt{votechannel}. Bên cạnh đó, chaincode \texttt{VoteLedgerContract} được cấu hình với \textbf{chính sách xác nhận} (\textit{endorsement policy}) yêu cầu một số lượng tối thiểu peer xác nhận giao dịch trước khi orderer chấp nhận đóng khối — một peer bị xâm phạm không đủ để giả mạo giao dịch.
+
+\subsubsection{Chaincode external và bất biến của Merkle root}
+
+Chaincode được triển khai ở chế độ \textit{external} thông qua \texttt{shim.Chain\-code\-Server}: chaincode chạy như một tiến trình độc lập, kết nối với peer qua gRPC. So với chế độ \textit{embedded} (nhúng vào peer), cách làm này cho phép cập nhật chaincode mà không phải khởi động lại peer, debug dễ dàng hơn nhờ tiến trình riêng, và cho phép mở rộng theo chiều ngang. Sau khi giao dịch \texttt{SubmitVote} được đóng khối, băm khối được tính vào khối kế tiếp -- thay đổi bất kỳ giao dịch nào trong lịch sử sẽ làm tất cả khối sau đó trở nên không hợp lệ; trong khi đó để viết lại lịch sử cần chiếm quyền điều khiển \textbf{đa số} peer cùng lúc. Riêng với giao dịch \texttt{CommitMerkleRoot}, chaincode còn từ chối cả hai hành vi: gọi \texttt{CommitMerkleRoot} lần hai cho cùng một bầu cử và \texttt{SubmitVote} sau khi đã commit root.
+
+\subsubsection{Tích hợp qua Chainlaunch — phiên đăng nhập}
+
+Backend không trực tiếp giao tiếp với peer Fabric mà gián tiếp qua một \textit{API Gateway} có tên \textbf{Chainlaunch}. Chainlaunch trừu tượng hóa việc gắn chứng chỉ X.509 vào yêu cầu \textit{proposal}, duy trì kết nối gRPC tới peer và xử lý logic retry/circuit-breaker. Backend chỉ cần đăng nhập vào Chainlaunch một lần khi khởi động dịch vụ (\texttt{POST /auth/login}); cookie phiên được \texttt{axios-cookiejar-support} tự đính kèm vào mọi yêu cầu sau đó. Mô hình kết nối tổng thể được minh họa trong Hình~\ref{fig:chainlaunch-architecture}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth, keepaspectratio]{Figures/Chainlainch-architecture.png}
+    \caption{Kiến trúc Chainlaunch làm cầu nối giữa backend và mạng Fabric}
+    \label{fig:chainlaunch-architecture}
+\end{figure}

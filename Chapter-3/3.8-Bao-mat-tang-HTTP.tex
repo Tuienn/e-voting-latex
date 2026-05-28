@@ -1,0 +1,30 @@
+\subsection{Bảo mật tầng HTTP — Helmet, CORS, Rate Limit và HTTPS}
+
+Tầng HTTP là điểm tiếp xúc đầu tiên giữa cử tri và hệ thống, do đó các biện pháp phòng thủ tại tầng này được áp dụng đồng thời theo nhiều khía cạnh: \textit{cứng hóa tiêu đề HTTP} qua Helmet, giới hạn nguồn gốc qua CORS, chống lụt yêu cầu qua Rate Limiting, cắt yêu cầu kéo dài quá lâu qua Timeout, và mã hóa truyền tải qua HTTPS.
+
+\textbf{Helmet.} BFF dùng thư viện \texttt{helmet} với cấu hình phân biệt theo môi trường (Hình~\ref{fig:helmet-config}). Ở môi trường sản xuất, \textit{Content-Security-Policy} ở chế độ nghiêm ngặt với \texttt{default-src 'none'}, chỉ cho phép \texttt{connect-src 'self'} và buộc nâng cấp HTTP sang HTTPS. Các tiêu đề khác như \texttt{X-Frame-Options: DENY}, \texttt{X-Content-Type-Options: nosniff}, \texttt{Strict-Transport-Security} (HSTS có \texttt{preload} và \texttt{includeSubDomains}, hiệu lực một năm), \texttt{Referrer-Policy: no-referrer}, \texttt{Cross-Origin-Opener-Policy: same-origin} đều được bật mặc định.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth, keepaspectratio]{Figures/code/helmet-config.png}
+    \caption{Cấu hình Helmet cho môi trường sản xuất}
+    \label{fig:helmet-config}
+\end{figure}
+
+\textbf{CORS.} Tiêu đề \textit{Access-Control-Allow-Origin} chỉ chấp nhận các tên miền nằm trong biến môi trường \texttt{CORS\_ORIGINS}. Phương thức được phép giới hạn ở \texttt{GET}, \texttt{POST}, \texttt{PUT}, \texttt{PATCH}, \texttt{DELETE}, \texttt{OPTIONS}, kèm \texttt{credentials: true} để cookie phiên hợp lệ cho các tên miền tin cậy. Cấu hình này ngăn các trang web bên ngoài gọi API qua \texttt{XMLHttpRequest} hay \texttt{fetch} và đảm nhận một phần vai trò chống CSRF.
+
+\textbf{Rate Limiting.} \texttt{HttpThrottlerGuard} giới hạn 100 yêu cầu mỗi IP trong mỗi 60 giây. Đặc biệt, guard này chỉ áp dụng cho \textit{HTTP context} — trả về \texttt{true} ngay khi phát hiện ngữ cảnh là TCP — để giao tiếp nội bộ giữa các microservice không bị giới hạn.
+
+\textbf{Request Timeout.} \texttt{TimeoutInterceptor} áp dụng toán tử \texttt{timeout(5000)} của RxJS cho mọi yêu cầu — sau 5 giây hệ thống trả về \texttt{408 Request Timeout} thay vì giữ kết nối vô thời hạn. Cơ chế này quan trọng khi peer Fabric phản hồi chậm: yêu cầu của cử tri không bị treo, cho phép họ thử lại thay vì chờ đợi không xác định.
+
+\textbf{HTTPS cho BFF và Reveal-Vote.} Hai dịch vụ có cổng HTTP — BFF (cho cử tri đã đăng nhập) và Reveal-Vote (cho người xem ẩn danh) — đều được phục vụ qua HTTPS. Hệ thống áp dụng mô hình \textit{TLS termination at edge}: một reverse proxy (nginx hoặc cân bằng tải đám mây) đứng trước, đảm nhận giải mã TLS rồi chuyển tiếp yêu cầu \texttt{http://} đến container backend trong mạng nội bộ tin cậy. Cách triển khai này tận dụng phần cứng tăng tốc TLS của reverse proxy và giúp việc luân chuyển chứng chỉ trở nên đơn giản — chỉ phải cập nhật tại một điểm. Trường hợp triển khai trên một máy chủ duy nhất, NestJS hỗ trợ bật HTTPS trực tiếp như sau:
+
+\begin{verbatim}
+const httpsOptions = {
+    key:  readFileSync('certs/server.key'),
+    cert: readFileSync('certs/server.crt')
+}
+const app = await NestFactory.create(AppModule, { httpsOptions })
+\end{verbatim}
+
+Cả hai cách đều mã hóa toàn bộ payload bao gồm \texttt{Authorization} header chứa JWT, \texttt{blindedCommitment} của phiếu và cookie phiên — chống nghe lén thụ động và tấn công người-ở-giữa trên mạng công cộng.
