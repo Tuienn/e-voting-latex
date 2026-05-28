@@ -16,7 +16,7 @@ TTL:   120 giây (REDIS_SESSION_CACHE_TTL)
 
 Phiên hoạt động như một máy trạng thái phía máy chủ với ba trạng thái chính: \texttt{[start-session] $\rightarrow$ \{signed:\,false, voted:\,false\}} khi vừa khởi tạo, chuyển sang \texttt{\{signed:\,true, signatureHex\}} sau khi ba nút ký phần đã hoàn thành ký mù, và cuối cùng chuyển sang \texttt{\{voted:\,true\}} sau khi phiếu được ghi nhận trên blockchain. Mỗi bước trong giao thức bỏ phiếu đều kiểm tra trạng thái phiên trước khi xử lý — đảm bảo cử tri không thể vượt qua bước trước để gọi thẳng bước sau.
 
-Khi cử tri khởi tạo phiên mới trong lúc phiên cũ chưa hoàn thành, hệ thống thực hiện hai thao tác đồng thời: ghi đè khóa cũ trên Redis bằng phiên mới, và phát sự kiện \texttt{DELETE\_SESSION\_NONCE} đến cả ba nút ký để xóa nonce $k_i$ liên kết với phiên cũ trong bộ nhớ của chúng. Bước thứ hai là then chốt để chống \textit{nonce reuse attack} — nếu cùng một nonce $k_i$ được dùng để ký hai cặp $(r, s_i)$ khác nhau, kẻ tấn công có thể tính được khóa bí mật $d_i$ qua hai phương trình tuyến tính. Đoạn xử lý này trong \texttt{Coordinator} được trình bày trong Hình~\ref{fig:session-redis-delete-nonce}.
+Khi cử tri khởi tạo phiên mới trong lúc phiên cũ chưa hoàn thành, hệ thống thực hiện hai thao tác đồng thời: ghi đè khóa cũ trên Redis bằng phiên mới, và phát sự kiện \pkg{DELETE_SESSION_NONCE} đến cả ba nút ký để xóa nonce $k_i$ liên kết với phiên cũ trong bộ nhớ của chúng. Bước thứ hai là then chốt để chống \textit{nonce reuse attack} — nếu cùng một nonce $k_i$ được dùng để ký hai cặp $(r, s_i)$ khác nhau, kẻ tấn công có thể tính được khóa bí mật $d_i$ qua hai phương trình tuyến tính. Đoạn xử lý này trong \pkg{Coordinator} được trình bày trong Hình~\ref{fig:session-redis-delete-nonce}.
 
 \begin{figure}[H]
     \centering
@@ -25,7 +25,7 @@ Khi cử tri khởi tạo phiên mới trong lúc phiên cũ chưa hoàn thành,
     \label{fig:session-redis-delete-nonce}
 \end{figure}
 
-Sau khi xóa nonce thành công, Coordinator tạo \texttt{sessionId} mới qua \texttt{uuidv4()}, gọi ba nút ký để lấy cam kết và ghi phiên mới vào Redis với thời gian sống 120 giây (Hình~\ref{fig:session-redis-set}). Thời gian sống ngắn vừa đủ để cử tri hoàn thành quy trình bỏ phiếu (khởi tạo, ký mù, nộp phiếu), đồng thời đủ ngắn để phiên dở dang tự hết hạn và không chiếm bộ nhớ máy chủ. Khi thời gian sống của khóa Redis hết hạn, một cử tri muốn bỏ phiếu sẽ phải bắt đầu lại từ đầu — cơ chế tự thanh lọc này tránh cho hệ thống phải lập lịch dọn dẹp riêng.
+Sau khi xóa nonce thành công, Coordinator tạo \pkg{sessionId} mới qua \pkg{uuidv4()}, gọi ba nút ký để lấy cam kết và ghi phiên mới vào Redis với thời gian sống 120 giây (Hình~\ref{fig:session-redis-set}). Thời gian sống ngắn vừa đủ để cử tri hoàn thành quy trình bỏ phiếu (khởi tạo, ký mù, nộp phiếu), đồng thời đủ ngắn để phiên dở dang tự hết hạn và không chiếm bộ nhớ máy chủ. Khi thời gian sống của khóa Redis hết hạn, một cử tri muốn bỏ phiếu sẽ phải bắt đầu lại từ đầu — cơ chế tự thanh lọc này tránh cho hệ thống phải lập lịch dọn dẹp riêng.
 
 \begin{figure}[H]
     \centering

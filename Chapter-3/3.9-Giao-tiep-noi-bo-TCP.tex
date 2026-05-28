@@ -1,6 +1,6 @@
 \subsection{Giao tiếp nội bộ — TCP NestJS, mTLS và kiểm chứng dữ liệu vào}
 
-Các dịch vụ nội bộ của hệ thống (Identity, Coordinator, Signing Nodes, Reveal-Vote) giao tiếp với nhau qua \textbf{NestJS TCP transport} thay vì REST HTTP. Cách làm này loại bỏ tầng parser HTTP, giảm độ trễ trung bình từ 5--15 ms xuống còn 1--3 ms cho mỗi vòng gọi, và quan trọng hơn — các dịch vụ ngoài BFF và Reveal-Vote không cần mở cổng HTTP, do đó không trực tiếp tiếp xúc với mạng bên ngoài. Định tuyến giữa các dịch vụ dùng \texttt{@MessagePattern} với chuỗi định danh được khai báo trong \texttt{libs/constants/message-patterns.constant} — kiểu dữ liệu được đảm bảo qua TypeScript ở cả hai phía. Sơ đồ giao tiếp tổng thể được minh họa trong Hình~\ref{fig:internal-services}.
+Các dịch vụ nội bộ của hệ thống (Identity, Coordinator, Signing Nodes, Reveal-Vote) giao tiếp với nhau qua \textbf{NestJS TCP transport} thay vì REST HTTP. Cách làm này loại bỏ tầng parser HTTP, giảm độ trễ trung bình từ 5--15 ms xuống còn 1--3 ms cho mỗi vòng gọi, và quan trọng hơn — các dịch vụ ngoài BFF và Reveal-Vote không cần mở cổng HTTP, do đó không trực tiếp tiếp xúc với mạng bên ngoài. Định tuyến giữa các dịch vụ dùng \pkg{@MessagePattern} với chuỗi định danh được khai báo trong \pkg{libs/constants/message-patterns.constant} — kiểu dữ liệu được đảm bảo qua TypeScript ở cả hai phía. Sơ đồ giao tiếp tổng thể được minh họa trong Hình~\ref{fig:internal-services}.
 
 \begin{figure}[H]
     \centering
@@ -9,7 +9,7 @@ Các dịch vụ nội bộ của hệ thống (Identity, Coordinator, Signing N
     \label{fig:internal-services}
 \end{figure}
 
-\textbf{mTLS cho kênh TCP nội bộ.} Mặc dù mạng nội bộ giữa các container được giả định là tin cậy, hệ thống vẫn bật \textit{mutual TLS} cho mọi kênh TCP để đề phòng tình huống một service bị giả mạo trong nội bộ. Cấu hình microservice của NestJS được khởi tạo với \texttt{tlsOptions}:
+\textbf{mTLS cho kênh TCP nội bộ.} Mặc dù mạng nội bộ giữa các container được giả định là tin cậy, hệ thống vẫn bật \textit{mutual TLS} cho mọi kênh TCP để đề phòng tình huống một service bị giả mạo trong nội bộ. Cấu hình microservice của NestJS được khởi tạo với \pkg{tlsOptions}:
 
 \begin{verbatim}
 app.connectMicroservice<MicroserviceOptions>({
@@ -28,13 +28,13 @@ app.connectMicroservice<MicroserviceOptions>({
 
 Chỉ các dịch vụ có chứng chỉ được CA nội bộ cấp mới có thể thiết lập kết nối. Trong trường hợp một container bị xâm phạm và kẻ tấn công dựng thêm dịch vụ giả mạo, dịch vụ đó cũng không thể tham gia vào mạng TCP — handshake TLS sẽ thất bại do thiếu chứng chỉ.
 
-\textbf{Kiểm chứng dữ liệu vào bằng class-validator.} Mọi yêu cầu vào hệ thống — cả từ trình duyệt qua HTTP đến BFF lẫn từ microservice qua kênh TCP — đều được kiểm chứng tự động qua \texttt{ValidationPipe} toàn cục. Lớp DTO khai báo các ràng buộc dưới dạng decorator của \texttt{class-validator}: \texttt{@IsDefined}, \texttt{@IsString}, \texttt{@IsEmail}, \texttt{@MinLength}, \texttt{@MaxLength}, kèm thông điệp lỗi tiếng Việt cụ thể. Ví dụ điển hình là \texttt{SignInDto} và \texttt{RefreshTokenDto} trong Hình~\ref{fig:class-validator-dto}.
+\textbf{Kiểm chứng dữ liệu vào bằng class-validator.} Mọi yêu cầu vào hệ thống — cả từ trình duyệt qua HTTP đến BFF lẫn từ microservice qua kênh TCP — đều được kiểm chứng tự động qua \pkg{ValidationPipe} toàn cục. Lớp DTO khai báo các ràng buộc dưới dạng decorator của \pkg{class-validator}: \pkg{@IsDefined}, \pkg{@IsString}, \pkg{@IsEmail}, \pkg{@MinLength}, \pkg{@MaxLength}, kèm thông điệp lỗi tiếng Việt cụ thể. Ví dụ điển hình là \pkg{SignInDto} và \pkg{RefreshTokenDto} trong Hình~\ref{fig:class-validator-dto}.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\textwidth, keepaspectratio]{Figures/code/class-validator-dto.png}
-    \caption{DTO xác thực dữ liệu vào bằng decorator của \texttt{class-validator}}
+    \caption{DTO xác thực dữ liệu vào bằng decorator của \pkg{class-validator}}
     \label{fig:class-validator-dto}
 \end{figure}
 
-\texttt{ValidationPipe} được đăng ký toàn cục với các tùy chọn \texttt{whitelist: true} (loại bỏ trường không khai báo trong DTO), \texttt{forbidNonWhitelisted: true} (báo lỗi khi có trường thừa) và \texttt{transform: true} (tự động chuyển kiểu chuỗi sang số/Date theo khai báo TypeScript). Cách làm này đảm bảo controller và service luôn nhận dữ liệu đã được làm sạch — không cần lặp lại kiểm tra thủ công, đồng thời ngăn các cuộc tấn công \textit{mass-assignment} dựa trên việc gửi thêm trường không kiểm soát.
+\pkg{ValidationPipe} được đăng ký toàn cục với các tùy chọn \texttt{whitelist: true} (loại bỏ trường không khai báo trong DTO), \texttt{forbidNonWhitelisted: true} (báo lỗi khi có trường thừa) và \texttt{transform: true} (tự động chuyển kiểu chuỗi sang số/Date theo khai báo TypeScript). Cách làm này đảm bảo controller và service luôn nhận dữ liệu đã được làm sạch — không cần lặp lại kiểm tra thủ công, đồng thời ngăn các cuộc tấn công \textit{mass-assignment} dựa trên việc gửi thêm trường không kiểm soát.

@@ -2,7 +2,7 @@
 
 \subsubsection{Cơ chế cắt khối của Fabric}
 
-Hyperledger Fabric không đóng khối cho từng giao dịch riêng lẻ mà \textbf{gom nhóm} các giao dịch thành lô tại tầng Orderer. Tham số \texttt{BatchSize} và \texttt{BatchTimeout} trong tệp cấu hình \texttt{configtx.yaml} quyết định khi nào một lô được đóng thành khối:
+Hyperledger Fabric không đóng khối cho từng giao dịch riêng lẻ mà \textbf{gom nhóm} các giao dịch thành lô tại tầng Orderer. Tham số \pkg{BatchSize} và \pkg{BatchTimeout} trong tệp cấu hình \pkg{configtx.yaml} quyết định khi nào một lô được đóng thành khối:
 
 \begin{verbatim}
 Orderer:
@@ -13,7 +13,7 @@ Orderer:
     BatchTimeout:          2s      # thời gian tối đa chờ đủ lô
 \end{verbatim}
 
-Một khối được đóng khi \textbf{thỏa một trong bốn điều kiện}: (1) số giao dịch đạt \texttt{MaxMessageCount}; (2) tổng kích thước vượt \texttt{AbsoluteMaxBytes}; (3) tổng kích thước vượt \texttt{PreferredMaxBytes} (ngay cả khi chưa đủ \texttt{MaxMessageCount}); hoặc (4) \texttt{BatchTimeout} hết hạn dù lô chỉ có một giao dịch. Trong các điều kiện trên, \texttt{BatchTimeout} là yếu tố quyết định tính chất \textit{hành vi} của mạng — quyết định độ trễ chung quyết tối thiểu mà cử tri quan sát thấy. Cơ chế đóng khối được minh họa trong Hình~\ref{fig:batch-blockchain}.
+Một khối được đóng khi \textbf{thỏa một trong bốn điều kiện}: (1) số giao dịch đạt \pkg{MaxMessageCount}; (2) tổng kích thước vượt \pkg{AbsoluteMaxBytes}; (3) tổng kích thước vượt \pkg{PreferredMaxBytes} (ngay cả khi chưa đủ \pkg{MaxMessageCount}); hoặc (4) \pkg{BatchTimeout} hết hạn dù lô chỉ có một giao dịch. Trong các điều kiện trên, \pkg{BatchTimeout} là yếu tố quyết định tính chất \textit{hành vi} của mạng — quyết định độ trễ chung quyết tối thiểu mà cử tri quan sát thấy. Cơ chế đóng khối được minh họa trong Hình~\ref{fig:batch-blockchain}.
 
 \begin{figure}[H]
     \centering
@@ -24,7 +24,7 @@ Một khối được đóng khi \textbf{thỏa một trong bốn điều kiện
 
 \subsubsection{Đánh đổi giữa thông lượng và độ trễ}
 
-Việc chọn \texttt{BatchTimeout} là một bài toán đánh đổi: tăng giá trị cho phép gom được nhiều giao dịch hơn vào một khối (tăng thông lượng), nhưng cử tri phải chờ lâu hơn để thấy phiếu được xác nhận. Bảng~\ref{tab:batch-timeout-tradeoff} tóm tắt ba kịch bản tham khảo.
+Việc chọn \pkg{BatchTimeout} là một bài toán đánh đổi: tăng giá trị cho phép gom được nhiều giao dịch hơn vào một khối (tăng thông lượng), nhưng cử tri phải chờ lâu hơn để thấy phiếu được xác nhận. Bảng~\ref{tab:batch-timeout-tradeoff} tóm tắt ba kịch bản tham khảo.
 
 \begin{table}[H]
 \centering
@@ -57,14 +57,14 @@ Một tối ưu quan trọng ở tầng backend là \textbf{phân biệt nghiêm
 \hline
 \textbf{Hàm chaincode} & \textbf{Loại} & \textbf{Tạo tx?} & \textbf{Độ trễ} \\
 \hline
-\texttt{SubmitVote}, \texttt{CommitMerkleRoot}, \texttt{RevealVoteCompact} & invoke & Có & 2--3 s \\
+\pkg{SubmitVote}, \pkg{CommitMerkleRoot}, \pkg{RevealVoteCompact} & invoke & Có & 2--3 s \\
 \hline
-\texttt{GetVote}, \texttt{GetMerkleRoot}, \texttt{GetTally}, \texttt{GetAuditCounts}, \texttt{VerifyVoteReceipt} & query & Không & dưới 100 ms \\
+\pkg{GetVote}, \pkg{GetMerkleRoot}, \pkg{GetTally}, \pkg{GetAuditCounts}, \pkg{VerifyVoteReceipt} & query & Không & dưới 100 ms \\
 \hline
 \end{tabularx}
 \end{table}
 
-Việc sử dụng \texttt{query} cho mọi thao tác đọc — tra cứu phiếu, kiểm tra Merkle root, tổng hợp kết quả — giúp tải đọc của hệ thống không bao giờ chạm đến tầng đồng thuận, do đó không cạnh tranh tài nguyên với tải ghi đang đợi đóng khối.
+Việc sử dụng \pkg{query} cho mọi thao tác đọc — tra cứu phiếu, kiểm tra Merkle root, tổng hợp kết quả — giúp tải đọc của hệ thống không bao giờ chạm đến tầng đồng thuận, do đó không cạnh tranh tài nguyên với tải ghi đang đợi đóng khối.
 
 \subsubsection{Quản lý kết nối qua Chainlaunch}
 

@@ -4,7 +4,7 @@ Một số kỹ thuật tối ưu hiệu năng được áp dụng nhằm giữ 
 
 \textbf{MongoDB Replica Set và pattern giao dịch ngắn.} Cụm MongoDB được khởi tạo với \texttt{--replSet rs0}, là điều kiện bắt buộc để Prisma sử dụng \texttt{\$transaction} với nhiều thao tác ACID. Hệ thống tuân thủ pattern \textit{validate ngoài, commit trong giao dịch}: các thao tác đọc và side-effect nặng (gọi Fabric mất 2--3 giây) được thực hiện \textbf{ngoài} giao dịch; giao dịch chỉ chứa hai bước \textit{re-validate} (chống đua tranh) và \textit{ghi}. Nhờ đó thời gian giữ khóa của giao dịch ngắn, throughput tăng đáng kể so với cách bao bọc toàn bộ luồng nghiệp vụ.
 
-\textbf{Cache phản hồi HTTP.} \texttt{HttpCacheInterceptor} đệm phản hồi của các yêu cầu \texttt{GET} vào Redis. Khóa cache được sinh từ đường dẫn và chuỗi truy vấn đã được sắp xếp theo bảng chữ cái — nhờ vậy \texttt{?page=0\&pageSize=10} và \texttt{?pageSize=10\&page=0} cho cùng một khóa, tránh hiện tượng cache miss do thứ tự tham số khác nhau. Các endpoint danh sách bầu cử công khai và xem chi tiết ứng viên hưởng lợi nhiều nhất từ cơ chế này vì chúng có tải đọc cao và dữ liệu thay đổi ít.
+\textbf{Cache phản hồi HTTP.} \pkg{HttpCacheInterceptor} đệm phản hồi của các yêu cầu \pkg{GET} vào Redis. Khóa cache được sinh từ đường dẫn và chuỗi truy vấn đã được sắp xếp theo bảng chữ cái — nhờ vậy \texttt{?page=0\&pageSize=10} và \texttt{?pageSize=10\&page=0} cho cùng một khóa, tránh hiện tượng cache miss do thứ tự tham số khác nhau. Các endpoint danh sách bầu cử công khai và xem chi tiết ứng viên hưởng lợi nhiều nhất từ cơ chế này vì chúng có tải đọc cao và dữ liệu thay đổi ít.
 
 \textbf{Cache số phiếu của bầu cử.} Sau khi đóng bầu cử, tổng số phiếu được tính một lần và cache với khóa \texttt{election:vote:count:\{electionId\}} trong 7 ngày. Dịch vụ Reveal-Vote dùng giá trị này để so sánh \texttt{revealCount $\geq$ voteCount} khi quyết định cho phép xem kết quả — không cần đếm phiếu trong MongoDB ở mỗi lần xem.
 
@@ -18,18 +18,18 @@ Một số kỹ thuật tối ưu hiệu năng được áp dụng nhằm giữ 
 \hline
 \textbf{Bảng} & \textbf{Chỉ mục} & \textbf{Mục đích} \\
 \hline
-\texttt{elections} & \texttt{(status, startDate, endDate)} & Lọc bầu cử theo trạng thái + thời gian \\
+\pkg{elections} & \texttt{(status, startDate, endDate)} & Lọc bầu cử theo trạng thái + thời gian \\
 \hline
-\texttt{election\_voters} & \texttt{unique(electionId, voterId)} & Tra cứu O(1) + khử trùng \\
+\pkg{election_voters} & \texttt{unique(electionId, voterId)} & Tra cứu O(1) + khử trùng \\
 \hline
-\texttt{votes} & \texttt{unique(electionId, voterId)} & Chống bỏ phiếu hai lần \\
+\pkg{votes} & \texttt{unique(electionId, voterId)} & Chống bỏ phiếu hai lần \\
  & \texttt{unique(electionId, blindedCommitment)} & Chống nộp commitment trùng \\
  & \texttt{(electionId, createdAt)} & Lấy theo thứ tự cho cây Merkle \\
 \hline
-\texttt{revealed\_votes} & \texttt{unique(electionId, revealKey)} & Chống phát lại reveal \\
+\pkg{revealed_votes} & \texttt{unique(electionId, revealKey)} & Chống phát lại reveal \\
  & \texttt{(electionId, candidateId)} & Tổng hợp kết quả theo ứng viên \\
 \hline
 \end{tabularx}
 \end{table}
 
-\textbf{Truy vấn song song.} Mọi vị trí có thể chạy đồng thời được gói trong \texttt{Promise.all}. Tiêu biểu là luồng giải mù phiếu (\textit{reveal-vote}) gọi đồng thời ba nguồn dữ liệu độc lập (số phiếu reveal trong MongoDB, tổng số phiếu trong Coordinator, kiểm toán từ Fabric); độ trễ tổng bằng \texttt{max} của ba truy vấn thay vì tổng. Cách làm này giúp các trang xem kết quả công khai phản hồi nhanh ngay cả khi cuộc bầu cử có hàng vạn phiếu.
+\textbf{Truy vấn song song.} Mọi vị trí có thể chạy đồng thời được gói trong \pkg{Promise.all}. Tiêu biểu là luồng giải mù phiếu (\textit{reveal-vote}) gọi đồng thời ba nguồn dữ liệu độc lập (số phiếu reveal trong MongoDB, tổng số phiếu trong Coordinator, kiểm toán từ Fabric); độ trễ tổng bằng \pkg{max} của ba truy vấn thay vì tổng. Cách làm này giúp các trang xem kết quả công khai phản hồi nhanh ngay cả khi cuộc bầu cử có hàng vạn phiếu.
