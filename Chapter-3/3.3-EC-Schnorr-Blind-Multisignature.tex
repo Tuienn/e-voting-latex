@@ -47,7 +47,7 @@ Giao thức được chia thành sáu pha hoạt động tuần tự, trải dà
 
     \item \textbf{Pha 1 -- Cam kết:} khi bắt đầu phiên, mỗi nút ký sinh nonce ngẫu nhiên $k_i$ và điểm cam kết $R_i = k_i \cdot G$. Bộ điều phối tổng hợp $R = R_1 + R_2 + R_3$ rồi trả về máy khách.
 
-    \item \textbf{Pha 2 -- Làm mù (chỉ thực hiện trong trình duyệt):} cử tri sinh hai hệ số ngẫu nhiên $\alpha, \beta$, tính $C' = R + \alpha \cdot G + \beta \cdot P_{agg}$, hash thông điệp gắn định danh bầu cử $M = \text{SHA256}(\text{``ev-vote-v1''} \,\Vert\, \text{electionId} \,\Vert\, \text{candidateId})$, suy ra thử thách $h = \text{SHA256}(M \,\Vert\, C') \bmod n$ và gửi lên máy chủ giá trị $r = (h - \beta) \bmod n$.
+    \item \textbf{Pha 2 -- Làm mù (chỉ thực hiện trong trình duyệt):} cử tri sinh hai hệ số ngẫu nhiên $\alpha, \beta$, tính $C' = R + \alpha \cdot G + \beta \cdot P_{agg}$, hash thông điệp gắn định danh bầu cử và tập ứng viên được chọn $M = \text{SHA256}(\text{``ev-vote-v2''} \,\Vert\, \texttt{0x00} \,\Vert\, \text{electionId} \,\Vert\, \texttt{0x00} \,\Vert\, \text{payload})$, suy ra thử thách $h = \text{SHA256}(M \,\Vert\, C') \bmod n$ và gửi lên máy chủ giá trị $r = (h - \beta) \bmod n$.
 
     \item \textbf{Pha 3 -- Ký phần:} mỗi nút ký tính $s_i = (k_i - d_i \cdot r) \bmod n$ rồi \textbf{xóa $k_i$ khỏi bộ nhớ ngay lập tức} (one-time nonce). Hàm tương ứng trong mã nguồn được trình bày trong Hình~\ref{fig:ec-schnorr-sign}.
 
@@ -57,6 +57,15 @@ Giao thức được chia thành sáu pha hoạt động tuần tự, trải dà
 \end{itemize}
 
 Pha kiểm tra chữ ký (\textit{verify}) thực hiện theo phương trình Schnorr chuẩn: $C_{check} = s' \cdot G + h \cdot P_{agg}$, sau đó tính lại $h_{check} = \text{SHA256}(M \,\Vert\, C_{check}) \bmod n$ và so sánh với $h$. Phép kiểm tra thành công khi và chỉ khi $(h, s')$ được sinh ra đúng theo giao thức trên với khóa $P_{agg}$ tương ứng.
+
+Mỗi lá phiếu cho phép cử tri chọn từ một đến \pkg{maxSelectableCandidates} ứng viên. Để chữ ký vẫn xác thực được bất kể thứ tự lựa chọn, thông điệp $M$ không gắn trực tiếp từng \pkg{candidateId} mà gắn một chuỗi \textit{canonical}: $\textit{payload} = \texttt{JSON.stringify}(\text{canonical}(\textit{candidateIds}))$ với $\text{canonical}(ids) = [\,\text{...new Set}(ids)\,].\text{sort}()$ — khử trùng rồi sắp xếp theo từ điển. Nhờ quy ước này, máy khách (lúc ký) và dịch vụ \pkg{reveal-vote} (lúc xác thực) luôn dựng lại cùng một chuỗi byte thông qua hàm \pkg{buildVoteMessage} trong Hình~\ref{fig:build-vote-message}; chỉ cần lệch một byte thì phép kiểm tra $h_{check} = h$ sẽ thất bại.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth, keepaspectratio]{Figures/code/build-vote-message-canonical.png}
+    \caption{Hàm \pkg{buildVoteMessage} dựng thông điệp $M$ từ \pkg{electionId} và tập \pkg{candidateIds} đã canonical hóa}
+    \label{fig:build-vote-message}
+\end{figure}
 
 \begin{figure}[H]
     \centering
@@ -70,11 +79,11 @@ Pha kiểm tra chữ ký (\textit{verify}) thực hiện theo phương trình Sc
 Lược đồ ký mù tập thể EC-Schnorr triển khai trong hệ thống cung cấp ba tính chất bảo mật cốt lõi:
 
 \begin{itemize}
-    \item \textbf{Tính mù (\textit{Blindness}):} máy chủ chỉ thấy giá trị \textit{thử thách đã làm mù} $r$ và \textit{cam kết đã làm mù} dưới dạng băm $\text{SHA256}(C')$. Không tồn tại cách thức tính toán hiệu quả để phục hồi \pkg{candidateId} hay cặp $(\alpha, \beta)$ từ các giá trị này.
+    \item \textbf{Tính mù (\textit{Blindness}):} máy chủ chỉ thấy giá trị \textit{thử thách đã làm mù} $r$ và \textit{cam kết đã làm mù} dưới dạng băm $\text{SHA256}(C')$. Không tồn tại cách thức tính toán hiệu quả để phục hồi tập \pkg{candidateIds} hay cặp $(\alpha, \beta)$ từ các giá trị này.
 
     \item \textbf{Tính không liên kết (\textit{Unlinkability}):} do $r = (h - \beta) \bmod n$ phụ thuộc vào $\beta$ được sinh ngẫu nhiên ở mỗi lần bỏ phiếu, hai phiếu cùng nội dung cũng sinh ra hai giá trị $r$ khác nhau. Máy chủ không có khả năng liên kết một $r$ trong pha ký với một phiếu được công bố trong pha giải mù sau này.
 
-    \item \textbf{Chống tấn công phát lại liên bầu cử (\textit{Cross-election replay prevention}):} thông điệp $M$ được gắn định danh bầu cử qua \textit{domain separator} \textit{``ev-vote-v1''} kết hợp \pkg{electionId}. Một chữ ký hợp lệ trong bầu cử $A$ khi xác thực trong bầu cử $B$ sẽ thu được $h_{check} \neq h$ vì thông điệp $M$ khác.
+    \item \textbf{Chống tấn công phát lại liên bầu cử (\textit{Cross-election replay prevention}):} thông điệp $M$ được gắn định danh bầu cử qua \textit{domain separator} \textit{``ev-vote-v2''} kết hợp \pkg{electionId} và tập \pkg{candidateIds} canonical. Một chữ ký hợp lệ trong bầu cử $A$ khi xác thực trong bầu cử $B$ sẽ thu được $h_{check} \neq h$ vì thông điệp $M$ khác.
 \end{itemize}
 
 Toàn bộ thư viện \pkg{ec-schnorr} của hệ thống được hiện thực dựa trên \pkg{@noble/curves} (\pkg{secp256k1}) và \pkg{@noble/hashes} (SHA-256) — các thư viện cài đặt theo thời gian hằng (\textit{constant-time}), không phụ thuộc native binding và chạy được trên cả Node.js lẫn trình duyệt, qua đó cho phép cử tri tự kiểm chứng chữ ký bằng cùng một mã nguồn ngay tại máy của mình.

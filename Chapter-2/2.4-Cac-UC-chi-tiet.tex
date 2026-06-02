@@ -383,7 +383,7 @@ Chức năng \textit{quản lý trạng thái tài khoản} cho phép quản tr�
 
 \subsubsection{Tạo cuộc bầu cử}
 
-Chức năng \textit{tạo cuộc bầu cử} là điểm khởi đầu của vòng đời một cuộc bầu cử. Quản trị viên cần chỉ định tên duy nhất và danh sách ứng viên ban đầu; cuộc bầu cử được khởi tạo ở trạng thái \textit{PENDING} và sẽ chỉ trở nên khả dụng cho cử tri sau khi được điều hành chuyển sang trạng thái \textit{ACTIVE}.
+Chức năng \textit{tạo cuộc bầu cử} là điểm khởi đầu của vòng đời một cuộc bầu cử. Quản trị viên cần chỉ định tên duy nhất, danh sách ứng viên ban đầu và số ứng viên tối đa mỗi cử tri được chọn trên một lá phiếu (\pkg{maxSelectableCandidates}, mặc định bằng $1$); cuộc bầu cử được khởi tạo ở trạng thái \textit{PENDING} và sẽ chỉ trở nên khả dụng cho cử tri sau khi được điều hành chuyển sang trạng thái \textit{ACTIVE}.
 
 \begin{figure}[H]
     \centering
@@ -416,17 +416,18 @@ Chức năng \textit{tạo cuộc bầu cử} là điểm khởi đầu của v�
         \item Đã đăng nhập với vai trò Quản trị viên.
         \item Tên cuộc bầu cử dự kiến tạo chưa tồn tại trong hệ thống.
         \item Danh sách định danh ứng viên đầu vào đều thuộc vai trò Ứng viên và đang ở trạng thái kích hoạt.
+        \item Số ứng viên tối đa được chọn nằm trong khoảng từ $1$ đến số lượng ứng viên trong danh sách.
     \end{itemize} \\
     \hline
-    Điều kiện sau & Một cuộc bầu cử mới được tạo trong cơ sở dữ liệu Coordinator với trạng thái khởi tạo và danh sách ứng viên ban đầu. \\
+    Điều kiện sau & Một cuộc bầu cử mới được tạo trong cơ sở dữ liệu Coordinator với trạng thái khởi tạo, danh sách ứng viên ban đầu và số ứng viên tối đa được chọn mỗi lá phiếu. \\
     \hline
     Luồng sự kiện chính &
     \begin{enumerate}
-        \item Quản trị viên gửi yêu cầu tạo cuộc bầu cử tới BFF Gateway kèm tên và danh sách định danh ứng viên.
+        \item Quản trị viên gửi yêu cầu tạo cuộc bầu cử tới BFF Gateway kèm tên, danh sách định danh ứng viên và số ứng viên tối đa được chọn mỗi lá phiếu.
         \item BFF Gateway xác thực và chuyển tiếp yêu cầu tới Coordinator Service.
         \item Coordinator Service gửi yêu cầu xác minh danh sách ứng viên tới Identity Service.
         \item Identity Service trả về danh sách ứng viên hợp lệ tương ứng.
-        \item Coordinator Service kiểm tra ràng buộc tên duy nhất, sau đó lưu bản ghi cuộc bầu cử với trạng thái khởi tạo.
+        \item Coordinator Service kiểm tra ràng buộc tên duy nhất và tính hợp lệ của số ứng viên tối đa được chọn, sau đó lưu bản ghi cuộc bầu cử với trạng thái khởi tạo.
         \item Quản trị viên nhận kết quả cuộc bầu cử đã được tạo.
     \end{enumerate} \\
     \hline
@@ -434,6 +435,7 @@ Chức năng \textit{tạo cuộc bầu cử} là điểm khởi đầu của v�
     \begin{itemize}
         \item \textbf{4a. Có định danh không thuộc vai trò Ứng viên hoặc đã bị vô hiệu hóa:} Coordinator Service từ chối tạo cuộc bầu cử.
         \item \textbf{5a. Tên cuộc bầu cử đã tồn tại:} Coordinator Service trả về lỗi vi phạm ràng buộc duy nhất.
+        \item \textbf{5b. Số ứng viên tối đa được chọn không hợp lệ:} Coordinator Service từ chối tạo cuộc bầu cử và trả về thông báo lỗi.
     \end{itemize} \\
     \hline
 \end{longtable}
@@ -977,7 +979,7 @@ Chức năng \textit{bỏ phiếu} là quy trình cốt lõi của hệ thống,
     \begin{enumerate}
         \item Cử tri gửi yêu cầu khởi tạo phiên bỏ phiếu tới BFF Gateway kèm định danh cuộc bầu cử.
         \item Coordinator Service kiểm tra điều kiện, gửi yêu cầu sinh cam kết song song tới ba Signing Node và tổng hợp thành cam kết tập thể; phiên được lưu trong Redis kèm thời gian sống ngắn.
-        \item Cử tri nhận cam kết tập thể và khóa công khai tập thể, sau đó thực hiện làm mù phiếu phía trình duyệt (sinh các hệ số mù bí mật, tính cam kết mù và thách thức mù).
+        \item Cử tri nhận cam kết tập thể và khóa công khai tập thể, chọn từ một đến \pkg{maxSelectableCandidates} ứng viên, sau đó thực hiện làm mù phiếu phía trình duyệt (sinh các hệ số mù bí mật, tính cam kết mù và thách thức mù gắn với tập ứng viên đã chọn).
         \item Cử tri gửi thách thức mù tới BFF Gateway để yêu cầu ký phiếu mù.
         \item Coordinator Service kiểm tra phiên còn hợp lệ, gửi yêu cầu ký từng phần song song tới ba Signing Node; mỗi node ghi nhận một bản ghi đã ký vào cơ sở dữ liệu riêng và xóa nonce ngay sau khi ký.
         \item Coordinator Service tổng hợp các chữ ký từng phần thành chữ ký tổng và trả về cho cử tri; cử tri thực hiện giải mù phía trình duyệt để thu được chữ ký EC-Schnorr cuối cùng.
@@ -998,7 +1000,7 @@ Chức năng \textit{bỏ phiếu} là quy trình cốt lõi của hệ thống,
 
 \subsubsection{Tiết lộ phiếu sau khi cuộc bầu cử đóng}
 
-Chức năng \textit{tiết lộ phiếu} là bước cuối của quy trình bỏ phiếu mù: sau khi cuộc bầu cử đóng, cử tri công khai chữ ký EC-Schnorr đã giải mù cho lựa chọn ứng viên của mình thông qua một điểm cuối công khai không yêu cầu xác thực. Vì máy chủ không biết người gửi là ai, điểm tin cậy duy nhất là tính hợp lệ của chữ ký EC-Schnorr đối với khóa công khai tập thể của cuộc bầu cử.
+Chức năng \textit{tiết lộ phiếu} là bước cuối của quy trình bỏ phiếu mù: sau khi cuộc bầu cử đóng, cử tri công khai chữ ký EC-Schnorr đã giải mù cho tập ứng viên mình đã chọn thông qua một điểm cuối công khai không yêu cầu xác thực. Vì máy chủ không biết người gửi là ai, điểm tin cậy duy nhất là tính hợp lệ của chữ ký EC-Schnorr đối với khóa công khai tập thể của cuộc bầu cử.
 
 \begin{figure}[H]
     \centering
@@ -1034,15 +1036,15 @@ Chức năng \textit{tiết lộ phiếu} là bước cuối của quy trình b�
     \hline
     Điều kiện sau &
     \begin{itemize}
-        \item Một bản ghi phiếu tiết lộ gồm định danh cuộc bầu cử, định danh ứng viên, khóa giải mù và chữ ký được ghi lên blockchain và lưu vào cơ sở dữ liệu Reveal-Vote.
+        \item Một bản ghi phiếu tiết lộ gồm định danh cuộc bầu cử, danh sách định danh ứng viên, khóa giải mù và chữ ký được ghi lên blockchain và lưu vào cơ sở dữ liệu Reveal-Vote.
         \item Nếu tổng số phiếu đã tiết lộ đạt tổng số phiếu đã nộp, cuộc bầu cử được tự động chuyển sang trạng thái hoàn tất và các khóa của ba Signing Node được dọn dẹp.
     \end{itemize} \\
     \hline
     Luồng sự kiện chính &
     \begin{enumerate}
-        \item Khách gửi yêu cầu tiết lộ phiếu tới Reveal-Vote qua điểm cuối HTTP công khai (không kèm token), gồm định danh ứng viên và chữ ký EC-Schnorr.
+        \item Khách gửi yêu cầu tiết lộ phiếu tới Reveal-Vote qua điểm cuối HTTP công khai (không kèm token), gồm danh sách định danh ứng viên đã chọn và chữ ký EC-Schnorr.
         \item Reveal-Vote yêu cầu Coordinator Service trả về thông tin cuộc bầu cử để xác nhận trạng thái đóng và lấy khóa công khai tập thể.
-        \item Reveal-Vote xác minh chữ ký EC-Schnorr với khóa công khai tập thể và sinh khóa giải mù từ hai thành phần chữ ký.
+        \item Reveal-Vote canonical hóa danh sách ứng viên, kiểm tra mọi ứng viên được chọn đều thuộc cuộc bầu cử và số lượng không vượt quá \pkg{maxSelectableCandidates}, sau đó xác minh chữ ký EC-Schnorr với khóa công khai tập thể và sinh khóa giải mù từ hai thành phần chữ ký.
         \item Reveal-Vote gửi yêu cầu ghi phiếu tiết lộ lên Mạng Blockchain qua Chainlaunch, sau đó lưu bản ghi phiếu tiết lộ và tham chiếu giao dịch vào cơ sở dữ liệu.
         \item Reveal-Vote so sánh tổng số phiếu đã tiết lộ với tổng số phiếu đã nộp do Coordinator Service cung cấp.
         \item Nếu hai con số trùng nhau, Reveal-Vote yêu cầu Coordinator Service chuyển trạng thái cuộc bầu cử sang hoàn tất; Coordinator Service phát thông điệp dọn dẹp khóa cho các Signing Node.
@@ -1051,9 +1053,115 @@ Chức năng \textit{tiết lộ phiếu} là bước cuối của quy trình b�
     \hline
     Luồng sự kiện thay thế &
     \begin{itemize}
-        \item \textbf{3a. Chữ ký EC-Schnorr không hợp lệ:} Reveal-Vote từ chối tiết lộ.
+        \item \textbf{3a. Danh sách ứng viên không hợp lệ (vượt quá số tối đa cho phép hoặc chứa ứng viên không thuộc cuộc bầu cử):} Reveal-Vote từ chối tiết lộ.
+        \item \textbf{3b. Chữ ký EC-Schnorr không hợp lệ:} Reveal-Vote từ chối tiết lộ.
         \item \textbf{4a. Khóa giải mù đã tồn tại trong cơ sở dữ liệu hoặc trên blockchain:} yêu cầu bị từ chối nhằm chống tấn công lặp.
         \item \textbf{4b. Mạng Blockchain phản hồi lỗi:} Reveal-Vote hủy lưu bản ghi và trả về lỗi.
+    \end{itemize} \\
+    \hline
+\end{longtable}
+
+\subsubsection{Sao lưu khóa bí mật phiếu}
+
+Khóa bí mật phiếu (gồm các hệ số làm mù và hai thành phần chữ ký) được lưu cục bộ trong kho lưu trữ an toàn trên thiết bị của cử tri; mất thiết bị đồng nghĩa mất khả năng tiết lộ và xác minh phiếu về sau. Chức năng \textit{sao lưu khóa bí mật phiếu} cho phép cử tri sao lưu các khóa này lên máy chủ theo mô hình \textit{zero-knowledge}: dữ liệu được mã hóa hoàn toàn phía thiết bị bằng khóa dẫn từ một mã PIN, máy chủ không bao giờ nắm được mã PIN hay nội dung khóa. Hình~\ref{fig:uc-quan-ly-khoa-bi-mat} mô tả hai chức năng sao lưu và khôi phục khóa, đều được cử tri thao tác sau khi đăng nhập.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Diagrams/Usecase/QuanLyKhoaBiMat.pdf}
+    \caption{Biểu đồ Use Case chức năng quản lý khóa bí mật phiếu}
+    \label{fig:uc-quan-ly-khoa-bi-mat}
+\end{figure}
+
+\begin{longtable}{|p{0.22\textwidth}|p{0.72\textwidth}|}
+    \caption{Đặc tả Use Case ``Sao lưu khóa bí mật phiếu''}
+    \label{tab:uc-sao-luu-khoa} \\
+    \hline
+    \textbf{Thuộc tính} & \textbf{Nội dung} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Thuộc tính} & \textbf{Nội dung} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \endlastfoot
+    Tên chức năng & Sao lưu khóa bí mật phiếu lên máy chủ theo mô hình zero-knowledge. \\
+    \hline
+    Tác nhân & Cử tri. \\
+    \hline
+    Điều kiện trước &
+    \begin{itemize}
+        \item Đã đăng nhập với vai trò Cử tri.
+        \item Thiết bị có ít nhất một khóa bí mật phiếu trong kho lưu trữ an toàn.
+        \item Cử tri đặt một mã PIN dùng để dẫn khóa mã hóa.
+    \end{itemize} \\
+    \hline
+    Điều kiện sau & Một bản sao lưu đã mã hóa được lưu trên máy chủ (ghi đè bản cũ nếu có); máy chủ không nắm được mã PIN lẫn nội dung khóa. \\
+    \hline
+    Luồng sự kiện chính &
+    \begin{enumerate}
+        \item Cử tri chọn chức năng sao lưu khóa trên ứng dụng di động và nhập mã PIN.
+        \item Ứng dụng đọc danh sách khóa bí mật phiếu từ kho lưu trữ an toàn cục bộ.
+        \item Ứng dụng dẫn khóa từ mã PIN bằng PBKDF2-SHA256 và mã hóa danh sách bằng AES-256-GCM, tạo thành một gói dữ liệu (envelope) mã hóa.
+        \item Ứng dụng gửi gói envelope kèm access token tới BFF Gateway; BFF Gateway xác thực rồi chuyển tiếp tới Identity Service.
+        \item Identity Service bọc thêm một lớp bảo vệ at-rest rồi ghi hoặc cập nhật bản sao lưu theo định danh cử tri.
+        \item Cử tri nhận thông báo sao lưu thành công.
+    \end{enumerate} \\
+    \hline
+    Luồng sự kiện thay thế &
+    \begin{itemize}
+        \item \textbf{2a. Thiết bị chưa có khóa bí mật nào:} ứng dụng thông báo không có dữ liệu để sao lưu và dừng quy trình.
+    \end{itemize} \\
+    \hline
+\end{longtable}
+
+\subsubsection{Khôi phục khóa bí mật phiếu}
+
+Chức năng \textit{khôi phục khóa bí mật phiếu} cho phép cử tri lấy lại các khóa đã sao lưu khi chuyển sang thiết bị mới hoặc cài lại ứng dụng. Quá trình giải mã diễn ra hoàn toàn phía thiết bị bằng mã PIN, do đó mã PIN sai sẽ làm bước xác thực của AES-256-GCM thất bại ngay tại máy khách.
+
+\begin{longtable}{|p{0.22\textwidth}|p{0.72\textwidth}|}
+    \caption{Đặc tả Use Case ``Khôi phục khóa bí mật phiếu''}
+    \label{tab:uc-khoi-phuc-khoa} \\
+    \hline
+    \textbf{Thuộc tính} & \textbf{Nội dung} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Thuộc tính} & \textbf{Nội dung} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \endlastfoot
+    Tên chức năng & Khôi phục khóa bí mật phiếu từ bản sao lưu trên máy chủ. \\
+    \hline
+    Tác nhân & Cử tri. \\
+    \hline
+    Điều kiện trước &
+    \begin{itemize}
+        \item Đã đăng nhập với vai trò Cử tri.
+        \item Tồn tại một bản sao lưu khóa bí mật phiếu trên máy chủ.
+        \item Cử tri nhập đúng mã PIN đã dùng khi sao lưu.
+    \end{itemize} \\
+    \hline
+    Điều kiện sau & Khóa bí mật phiếu được giải mã và ghi vào kho lưu trữ an toàn của thiết bị. \\
+    \hline
+    Luồng sự kiện chính &
+    \begin{enumerate}
+        \item Cử tri chọn chức năng khôi phục khóa trên ứng dụng di động và nhập mã PIN.
+        \item Ứng dụng gửi yêu cầu tải bản sao lưu kèm access token; BFF Gateway xác thực rồi chuyển tiếp tới Identity Service.
+        \item Identity Service truy vấn bản sao lưu theo định danh cử tri, gỡ lớp bảo vệ at-rest và trả về gói envelope do máy khách tạo.
+        \item Ứng dụng dẫn khóa từ mã PIN và giải mã gói envelope bằng AES-256-GCM.
+        \item Ứng dụng ghi khóa bí mật phiếu vào kho lưu trữ an toàn và thông báo khôi phục thành công.
+    \end{enumerate} \\
+    \hline
+    Luồng sự kiện thay thế &
+    \begin{itemize}
+        \item \textbf{3a. Chưa có bản sao lưu trên máy chủ:} Identity Service thông báo không tìm thấy dữ liệu để khôi phục.
+        \item \textbf{4a. Mã PIN không đúng:} bước xác thực AES-256-GCM thất bại, ứng dụng thông báo ``Mã PIN không đúng''.
     \end{itemize} \\
     \hline
 \end{longtable}

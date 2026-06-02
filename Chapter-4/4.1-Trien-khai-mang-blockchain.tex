@@ -1,0 +1,117 @@
+\subsection{Triển khai mạng blockchain}
+
+Phần này trình bày quy trình triển khai hạ tầng mạng Hyperledger Fabric phục vụ hệ thống bỏ phiếu điện tử, sử dụng nền tảng ChainLaunch để tự động hóa và quản trị toàn bộ vòng đời các nút mạng.
+
+\subsubsection{Thiết kế kiến trúc mạng}
+
+Hệ thống bầu cử điện tử yêu cầu mức độ sẵn sàng cao và khả năng chống lỗi tốt. Mạng blockchain được xây dựng trên nền tảng Hyperledger Fabric với định danh tổ chức \pkg{org1msp} và kênh truyền thông \pkg{votechannel}. Hạ tầng phân rã gồm 5 nút cốt lõi:
+
+\begin{itemize}
+    \item \textbf{Thành phần đồng thuận (Ordering Service):} Gồm 3 nút Orderer cấu hình theo thuật toán Raft (\pkg{orderer0-org1msp}, \pkg{orderer1-org1msp}, \pkg{orderer2-org1msp}) lần lượt trên cổng 9000, 9100 và 9200, đảm bảo tính toàn vẹn dữ liệu và phân tách khối giao dịch theo mô hình chịu lỗi (fault-tolerant).
+
+    \item \textbf{Thành phần lưu trữ và xác thực (Peer Nodes):} Gồm 2 nút Peer (\pkg{peer0-org1msp} trên cổng 7000 và \pkg{peer1-org1msp} trên cổng 7100) đóng vai trò lưu trữ bản sao sổ cái (Ledger) và thực thi hợp đồng thông minh.
+\end{itemize}
+
+Bộ công cụ giao diện dòng lệnh ChainLaunch CLI được cài đặt qua trình quản lý gói \pkg{npm}:
+
+\begin{verbatim}
+npm install -g @chainlaunch/cli
+\end{verbatim}
+
+\subsubsection{Khởi tạo các nút mạng}
+
+Toàn bộ thao tác khởi tạo tài nguyên mạng được thực hiện tuần tự thông qua ChainLaunch CLI, đảm bảo tính minh bạch và ghi vết đầy đủ vòng đời từng nút. Đầu tiên, cụm đồng thuận gồm 3 nút Orderer độc lập được kích hoạt nhằm loại bỏ điểm lỗi duy nhất (Single Point of Failure):
+
+\begin{verbatim}
+chainlaunch node create --name "orderer0-org1msp" \
+  --type "FABRIC_ORDERER" --mspid "org1msp" --port 9000
+
+chainlaunch node create --name "orderer1-org1msp" \
+  --type "FABRIC_ORDERER" --mspid "org1msp" --port 9100
+
+chainlaunch node create --name "orderer2-org1msp" \
+  --type "FABRIC_ORDERER" --mspid "org1msp" --port 9200
+\end{verbatim}
+
+Tiếp theo, 2 nút Peer được khởi tạo, chịu trách nhiệm nhận đề xuất giao dịch bầu chọn từ phía người dùng:
+
+\begin{verbatim}
+chainlaunch node create --name "peer0-org1msp" \
+  --type "FABRIC_PEER" --mspid "org1msp" --port 7000
+
+chainlaunch node create --name "peer1-org1msp" \
+  --type "FABRIC_PEER" --mspid "org1msp" --port 7100
+\end{verbatim}
+
+\subsubsection{Thiết lập kênh truyền thông}
+
+Kênh \pkg{votechannel} đóng vai trò là không gian mạng riêng tư, cô lập dữ liệu bầu chọn giữa các thực thể tham gia. Quá trình tạo lập bắt đầu bằng việc liên kết cụm Orderer:
+
+\begin{verbatim}
+chainlaunch network create --name "votechannel" \
+  --platform "fabric" \
+  --orderers "orderer0-org1msp,orderer1-org1msp,orderer2-org1msp"
+\end{verbatim}
+
+Sau khi trục định tuyến được xác lập, các Peer gửi yêu cầu tham gia (Join) để đồng bộ hóa trạng thái cấu hình ban đầu:
+
+\begin{verbatim}
+chainlaunch network join-node \
+  --network-id "net-xyz123" --node "peer0-org1msp"
+
+chainlaunch network join-node \
+  --network-id "net-xyz123" --node "peer1-org1msp"
+\end{verbatim}
+
+\subsubsection{Triển khai hợp đồng thông minh}
+
+Mã nguồn xử lý logic bầu chọn được phát triển bằng ngôn ngữ \textbf{Go} và đóng gói thành Docker Image lưu trữ tại \pkg{tuienn/votecc:latest}. Quy trình triển khai gồm 3 bước:
+
+Bước 1 -- Khai báo siêu dữ liệu để tạo sự đồng thuận về phiên bản giữa các nút:
+
+\begin{verbatim}
+chainlaunch chaincode define --network-id "net-xyz123" \
+  --name "votecc" --version "1.0" --sequence 1 \
+  --image "docker.io/tuienn/votecc:latest" --init-required true
+\end{verbatim}
+
+Bước 2 -- Kéo Container Image từ Docker Hub về các nút xác thực:
+
+\begin{verbatim}
+chainlaunch chaincode deploy --network-id "net-xyz123" \
+  --name "votecc" --peers "peer0-org1msp,peer1-org1msp"
+\end{verbatim}
+
+Bước 3 -- Thực hiện giao dịch khởi tạo để thiết lập trạng thái gốc của sổ cái:
+
+\begin{verbatim}
+chainlaunch chaincode invoke --network-id "net-xyz123" \
+  --name "votecc" --fcn "InitLedger" --args "[]"
+\end{verbatim}
+
+\subsubsection{Cấp phát định danh cho ứng dụng client}
+
+Kiến trúc an ninh của Hyperledger Fabric dựa trên hạ tầng khóa công khai (PKI). Để ứng dụng E-voting Client có quyền tương tác hợp pháp với blockchain, một thực thể định danh mới cần được cấp phát bởi Cơ quan chứng nhận (Certificate Authority -- CA). Quy trình gồm 2 giai đoạn:
+
+Giai đoạn 1 -- Đăng ký: khai báo sự tồn tại của tài khoản \pkg{e-voting-client} vào cơ sở dữ liệu định danh nội bộ:
+
+\begin{verbatim}
+fabric-ca-client register \
+  --url https://localhost:7054 \
+  --id.name "e-voting-client" \
+  --id.secret "ClientSecret123" \
+  --id.type "client" \
+  --id.affiliation "org1" \
+  --tls.certfiles $FABRIC_CA_CLIENT_HOME/tls-root-cert.pem
+\end{verbatim}
+
+Giai đoạn 2 -- Phát hành chứng chỉ: sử dụng mã bí mật vừa được cấp để yêu cầu CA ký phát hành chứng chỉ số X.509:
+
+\begin{verbatim}
+fabric-ca-client enroll \
+  --url https://e-voting-client:ClientSecret123@localhost:7054 \
+  --mspdir $FABRIC_CA_CLIENT_HOME/e-voting-client/msp \
+  --tls.certfiles $FABRIC_CA_CLIENT_HOME/tls-root-cert.pem
+\end{verbatim}
+
+Sau khi hoàn tất, hệ thống sinh ra cặp tệp mật mã tại \pkg{\$FABRIC\_CA\_CLIENT\_HOME/e-voting-client/msp}: \pkg{signcerts/cert.pem} làm định danh công khai và \pkg{keystore/} chứa khóa bí mật dùng để ký số giao dịch bầu chọn. Các tệp này được nạp trực tiếp vào Connection Profile của ứng dụng client để hoàn thiện luồng tương tác với blockchain.

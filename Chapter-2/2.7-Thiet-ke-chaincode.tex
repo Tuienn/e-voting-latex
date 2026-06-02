@@ -202,7 +202,7 @@ Là hàm thuộc loại \textit{query}, trả về đối tượng \pkg{AuditCou
 
 \subsubsection{Hàm RevealVoteCompact}
 
-Là hàm thuộc loại \textit{invoke}, đóng vai trò trung tâm trong giai đoạn kiểm phiếu. Chaincode kiểm tra nút gốc Merkle đã được cố định, đối chiếu \pkg{revealKey} chưa từng xuất hiện trong tập \pkg{usedReveal} (chống phát lại trên chuỗi), sau đó lưu khóa giải mù kèm tham chiếu ứng viên, tăng bộ đếm \pkg{tally} cho ứng viên đó và tăng \pkg{RevealCount} trong đối tượng thống kê.
+Là hàm thuộc loại \textit{invoke}, đóng vai trò trung tâm trong giai đoạn kiểm phiếu. Chaincode kiểm tra nút gốc Merkle đã được cố định, đối chiếu \pkg{revealKey} chưa từng xuất hiện trong tập \pkg{usedReveal} (chống phát lại trên chuỗi), sau đó lưu khóa giải mù kèm danh sách ứng viên được chọn, tăng bộ đếm \pkg{tally} cho \textit{mỗi} ứng viên trong danh sách và tăng \pkg{RevealCount} đúng một lần cho mỗi lá phiếu (không phụ thuộc vào số ứng viên được chọn).
 
 \begin{fitlongtable}{|p{0.26\textwidth}|p{0.13\textwidth}|p{0.47\textwidth}|}
     \caption{Tham số của hàm \pkg{RevealVoteCompact}}
@@ -220,14 +220,14 @@ Là hàm thuộc loại \textit{invoke}, đóng vai trò trung tâm trong giai �
     \hline
     \endlastfoot
     electionID        & string & Định danh cuộc bầu cử. \\ \hline
-    candidateID       & string & Định danh ứng viên được cử tri chọn. \\ \hline
+    candidateIdsJson  & string & Mảng JSON canonical (khử trùng và sắp xếp) các định danh ứng viên được cử tri chọn. \\ \hline
     revealKey         & string & Vân tay chữ ký $\mathrm{SHA256}(h \mathbin{\|} s')$ hex 64 ký tự. \\ \hline
     revealPayloadHash & string & Băm cam kết tải trọng giải mù, phục vụ kiểm toán về sau. \\ \hline
 \end{fitlongtable}
 
 \subsubsection{Hàm GetTally}
 
-Là hàm thuộc loại \textit{query}, duyệt toàn bộ khóa thuộc không gian tên \pkg{tally} của một cuộc bầu cử và trả về đối tượng \pkg{TallyView} dưới dạng ánh xạ từ định danh ứng viên sang số phiếu. Đây là nguồn dữ liệu cốt lõi để công khai kết quả bầu cử.
+Là hàm thuộc loại \textit{query}, duyệt toàn bộ khóa thuộc không gian tên \pkg{tally} của một cuộc bầu cử và trả về đối tượng \pkg{TallyView} dưới dạng ánh xạ từ định danh ứng viên sang số phiếu. Đây là nguồn dữ liệu cốt lõi để công khai kết quả bầu cử. Khi mỗi lá phiếu có thể chọn nhiều ứng viên, tổng số lượt chọn (tổng các giá trị \pkg{tally}) có thể lớn hơn số lá phiếu đã giải mù.
 
 \begin{fitlongtable}{|p{0.20\textwidth}|p{0.13\textwidth}|p{0.53\textwidth}|}
     \caption{Tham số của hàm \pkg{GetTally}}
@@ -272,7 +272,7 @@ Là hàm thuộc loại \textit{query}, cho phép tra cứu một khóa giải m
 
 \subsubsection{Hàm ComputeRevealPayloadHash}
 
-Là hàm tiện ích thuộc loại \textit{query}, cho phép tính lại giá trị \pkg{revealPayloadHash} từ bộ ba $(\texttt{candidateId}, h, s')$, qua đó cho phép bên thứ ba kiểm tra giá trị băm được lưu trên chain có khớp với dữ liệu thực hay không.
+Là hàm tiện ích thuộc loại \textit{query}, cho phép tính lại giá trị \pkg{revealPayloadHash} từ bộ ba $(\texttt{candidateIdsJson}, h, s')$, qua đó cho phép bên thứ ba kiểm tra giá trị băm được lưu trên chain có khớp với dữ liệu thực hay không.
 
 \begin{fitlongtable}{|p{0.20\textwidth}|p{0.13\textwidth}|p{0.53\textwidth}|}
     \caption{Tham số của hàm \pkg{ComputeRevealPayloadHash}}
@@ -289,7 +289,7 @@ Là hàm tiện ích thuộc loại \textit{query}, cho phép tính lại giá t
     \endfoot
     \hline
     \endlastfoot
-    candidateID & string & Định danh ứng viên. \\ \hline
+    candidateIdsJson & string & Mảng JSON canonical các định danh ứng viên được chọn. \\ \hline
     h           & string & Thành phần $h$ của chữ ký Schnorr (hex 64 ký tự). \\ \hline
     sPrime      & string & Thành phần $s'$ đã giải mù của chữ ký Schnorr (hex 64 ký tự). \\ \hline
 \end{fitlongtable}
@@ -301,5 +301,5 @@ Mặc dù chaincode không lưu trạng thái vòng đời tường minh, các r
 \begin{itemize}
     \item \textbf{Pha nhận phiếu:} hàm \pkg{SubmitVote} có thể được gọi nhiều lần. Sau mỗi lần thành công, bộ đếm \pkg{TotalVoteCount} trong \pkg{Stats} được tăng lên.
     \item \textbf{Pha đóng cuộc bầu cử:} hàm \pkg{CommitMerkleRoot} được gọi đúng một lần. Chaincode đối chiếu \pkg{voteCount} truyền vào với \pkg{TotalVoteCount} và đặt cờ \pkg{committed = true}; sau pha này, mọi lời gọi \pkg{SubmitVote} đều bị từ chối.
-    \item \textbf{Pha kiểm phiếu:} hàm \pkg{RevealVoteCompact} có thể được gọi nhiều lần với điều kiện tiên quyết \pkg{committed = true}. Mỗi lần thành công sẽ cập nhật \pkg{tally} của ứng viên tương ứng và tăng \pkg{RevealCount}; kết quả cuối cùng được công khai qua hàm \pkg{GetTally}.
+    \item \textbf{Pha kiểm phiếu:} hàm \pkg{RevealVoteCompact} có thể được gọi nhiều lần với điều kiện tiên quyết \pkg{committed = true}. Mỗi lần thành công sẽ cập nhật \pkg{tally} cho mỗi ứng viên được chọn và tăng \pkg{RevealCount} đúng một lần cho mỗi lá phiếu; kết quả cuối cùng được công khai qua hàm \pkg{GetTally}.
 \end{itemize}
