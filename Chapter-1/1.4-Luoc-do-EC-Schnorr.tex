@@ -4,7 +4,7 @@ Trên nền tảng toán học của mật mã đường cong elliptic được 
 
 \subsubsection{Giới thiệu lược đồ Schnorr}
 
-Lược đồ chữ ký số Schnorr được Claus-Peter Schnorr đề xuất vào năm 1989 và công bố chính thức trong công trình ``\textit{Efficient Signature Generation by Smart Cards}'' năm 1991. Lược đồ này được xây dựng dựa trên độ khó của \textit{bài toán logarit rời rạc} (Discrete Logarithm Problem -- DLP) trên nhóm con cyclic của nhóm nhân $\mathbb{Z}_p^*$ và được thiết kế từ một giao thức nhận dạng tương tác (Schnorr identification protocol) bằng cách áp dụng \textit{phép biến đổi Fiat-Shamir} để chuyển thành lược đồ chữ ký số phi tương tác. So với các lược đồ chữ ký số ra đời cùng thời như ElGamal hay DSA, lược đồ Schnorr nổi bật ở cấu trúc tinh gọn, độ dài chữ ký ngắn và đặc biệt là tính an toàn đã được chứng minh chặt chẽ trong mô hình ROM dưới giả thiết bài toán DLP là khó.
+Lược đồ chữ ký số Schnorr được Claus-Peter Schnorr đề xuất vào năm 1989 và công bố chính thức trong công trình \textit{``Efficient Signature Generation by Smart Cards''} năm 1991. Lược đồ này được xây dựng dựa trên độ khó của \textit{bài toán logarit rời rạc} (Discrete Logarithm Problem -- DLP) trên nhóm con cyclic của nhóm nhân $\mathbb{Z}_p^*$ và được thiết kế từ một giao thức nhận dạng tương tác (Schnorr identification protocol) bằng cách áp dụng \textit{phép biến đổi Fiat-Shamir} để chuyển thành lược đồ chữ ký số phi tương tác. So với các lược đồ chữ ký số ra đời cùng thời như ElGamal hay DSA, lược đồ Schnorr nổi bật ở cấu trúc tinh gọn, độ dài chữ ký ngắn và đặc biệt là tính an toàn đã được chứng minh chặt chẽ trong mô hình ROM dưới giả thiết bài toán DLP là khó.
 
 Lược đồ Schnorr cổ điển sử dụng bộ tham số miền $(p, q, g)$, trong đó $p$ là số nguyên tố lớn thỏa mãn $(p-1)$ chia hết cho $q$, $q$ là số nguyên tố lớn ngẫu nhiên và $g$ là phần tử sinh của nhóm con cấp $q$ trong $\mathbb{Z}_p^*$, được tính bằng $g = h^{(p-1)/q} \bmod p$ với $h \in (1, p-1)$ bất kỳ và yêu cầu $g \neq 1$. Người ký chọn khóa bí mật $d \in \mathbb{Z}_q^*$ và công bố khóa công khai $\rho = g^d \bmod p$. Quá trình ký một thông điệp $M$ bao gồm: chọn ngẫu nhiên giá trị $k$ với $1 < k < q$, tính $c = g^k \bmod p$, sau đó tính các thành phần chữ ký $r = H(M, c) \bmod q$ và $s = (k - r d) \bmod q$. Chữ ký số trên thông điệp $M$ là cặp $(r, s)$. Quá trình xác thực được thực hiện bằng cách tính $c' = g^s \cdot \rho^r \bmod p$, $r' = H(M, c')$ và kiểm tra điều kiện $r' = r$.
 
@@ -19,8 +19,8 @@ Cụ thể, \textit{bộ tham số miền} của lược đồ EC-Schnorr đư�
 \begin{itemize}
     \item $E$ là đường cong elliptic xác định trên trường hữu hạn $\mathbb{F}_p$, trong đó $p$ là số nguyên tố lớn tạo trường nền của đường cong;
     \item $q$ là số nguyên tố lớn, là cấp của nhóm con cyclic được lựa chọn trên đường cong $E$;
-    \item $G \in E(\mathbb{F}_p)$ là điểm gốc có cấp $q$, $G \neq \mathcal{O}$, với toạ độ $(x_G, y_G)$ thoả mãn $q \times G \equiv \mathcal{O} \pmod{p}$;
-    \item $H: \{0,1\}^* \rightarrow \mathbb{Z}_q$ là một hàm băm mật mã, được mô hình hoá là một tiên tri ngẫu nhiên trong quá trình chứng minh an toàn;
+    \item $G \in E(\mathbb{F}_p)$ là điểm gốc có cấp $q$, $G \neq \mathcal{O}$, với tọa độ $(x_G, y_G)$ thỏa mãn $q \times G \equiv \mathcal{O} \pmod{p}$;
+    \item $H: \{0,1\}^* \rightarrow \mathbb{Z}_q$ là một hàm băm mật mã, được mô hình hóa là một tiên tri ngẫu nhiên trong quá trình chứng minh an toàn;
     \item $M$ là thông điệp cần ký, có thể là chuỗi bit có độ dài tùy ý.
 \end{itemize}
 
@@ -31,7 +31,7 @@ Lược đồ EC-Schnorr bao gồm ba thuật toán cơ bản: thuật toán sin
 Thuật toán sinh khóa $\textsf{Gen}$ tạo ra cặp khóa bí mật và khóa công khai cho người ký với các bước thực hiện như sau:
 
 \begin{enumerate}
-    \item Chọn ngẫu nhiên số nguyên $d$ thoả mãn $1 < d < q$. Số nguyên $d$ chính là \textit{khóa bí mật} của người sử dụng;
+    \item Chọn ngẫu nhiên số nguyên $d$ thỏa mãn $1 < d < q$. Số nguyên $d$ chính là \textit{khóa bí mật} của người sử dụng;
     \item Tính điểm khóa công khai $P$ bằng phép nhân điểm với khóa bí mật:
     \begin{equation}
         P = d \times G \bmod p
@@ -47,7 +47,7 @@ Theo độ khó của bài toán ECDLP, biết khóa công khai $P$ và điểm 
 Để tạo chữ ký số trên thông điệp $M$ bằng khóa bí mật $d$, người ký thực hiện thuật toán $\textsf{Sig}$ qua các bước sau:
 
 \begin{enumerate}
-    \item Chọn ngẫu nhiên số nguyên $k$ thoả mãn $1 < k < q$. Giá trị $k$ phải hoàn toàn ngẫu nhiên, được giữ bí mật và \textit{không được tái sử dụng} cho hai lần ký khác nhau;
+    \item Chọn ngẫu nhiên số nguyên $k$ thỏa mãn $1 < k < q$. Giá trị $k$ phải hoàn toàn ngẫu nhiên, được giữ bí mật và \textit{không được tái sử dụng} cho hai lần ký khác nhau;
     \item Tính điểm cam kết $C$ trên đường cong:
     \begin{equation}
         C = k \times G \bmod p
@@ -75,7 +75,7 @@ Do kích thước của cả hai thành phần $r$ và $s$ đều giới hạn t
 Để xác minh tính hợp lệ của chữ ký $(r, s)$ trên thông điệp $M$ với khóa công khai $P$, người xác minh thực hiện thuật toán $\textsf{Ver}$ như sau:
 
 \begin{enumerate}
-    \item Kiểm tra điều kiện cú pháp: $r, s \in \mathbb{Z}_q$ và $r, s \neq 0$. Nếu một trong các điều kiện này không thoả mãn, kết luận chữ ký không hợp lệ;
+    \item Kiểm tra điều kiện cú pháp: $r, s \in \mathbb{Z}_q$ và $r, s \neq 0$. Nếu một trong các điều kiện này không thỏa mãn, kết luận chữ ký không hợp lệ;
     \item Tính điểm cam kết khôi phục $C'$ trên đường cong:
     \begin{equation}
         C' = s \times G + r \times P \bmod p
@@ -110,7 +110,7 @@ Như vậy điểm $C' = C$, suy ra $x_{C'} = x_C$, và do đó:
     r' = H(M, x_{C'}) \bmod q = H(M, x_C) \bmod q = r
     \label{eq:ec-schnorr-r-equal}
 \end{equation}
-Điều kiện $r' = r$ luôn thoả mãn nên chữ ký hợp lệ luôn được thuật toán xác minh chấp nhận. Tính đúng đắn của lược đồ EC-Schnorr đã được chứng minh. $\hfill \blacksquare$
+Điều kiện $r' = r$ luôn thỏa mãn nên chữ ký hợp lệ luôn được thuật toán xác minh chấp nhận. Tính đúng đắn của lược đồ EC-Schnorr đã được chứng minh.
 
 \subsubsection{Tính an toàn của lược đồ}
 

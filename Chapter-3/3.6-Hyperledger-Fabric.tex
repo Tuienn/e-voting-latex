@@ -2,7 +2,7 @@
 
 \subsubsection{Lý do lựa chọn Hyperledger Fabric}
 
-Hệ thống bầu cử yêu cầu hai đặc tính trái ngược với blockchain công khai: \textbf{xác minh danh tính} của từng nút và \textbf{tính chung quyết xác định} (\textit{deterministic finality}). Một mạng công khai như Ethereum không thỏa mãn cả hai — bất kỳ ai cũng có thể trở thành nút, và các khối có thể bị thay thế tạm thời bởi nhánh dài hơn (hiện tượng \textit{fork}). Hyperledger Fabric khắc phục cả hai điểm yếu này bằng kiến trúc được cấp phép (\textit{permissioned}) và cơ chế đồng thuận xác định Raft. Bảng~\ref{tab:ethereum-vs-fabric} so sánh các tiêu chí then chốt.
+Hệ thống bầu cử yêu cầu hai đặc tính trái ngược với blockchain công khai: \textbf{xác minh danh tính} của từng node và \textbf{tính chung quyết xác định} (\textit{deterministic finality}). Một mạng công khai như Ethereum không thỏa mãn cả hai — bất kỳ ai cũng có thể trở thành node, và các khối có thể bị thay thế tạm thời bởi nhánh dài hơn (hiện tượng \textit{fork}). Hyperledger Fabric khắc phục cả hai điểm yếu này bằng kiến trúc được cấp phép (\textit{permissioned}) và cơ chế đồng thuận xác định Raft. Bảng~\ref{tab:ethereum-vs-fabric} so sánh các tiêu chí then chốt.
 
 \begin{table}[H]
 \centering
@@ -14,7 +14,7 @@ Hệ thống bầu cử yêu cầu hai đặc tính trái ngược với blockch
 \hline
 Quyền tham gia & Mở -- ai cũng được & Được cấp phép (\textit{permissioned}) \\
 \hline
-Danh tính nút & Ẩn danh & Chứng chỉ X.509 do CA cấp \\
+Danh tính node & Ẩn danh & Chứng chỉ X.509 do CA cấp \\
 \hline
 Thông lượng & 15--30 TPS (PoW) & 3000+ TPS (PBFT/Raft) \\
 \hline
@@ -31,7 +31,7 @@ Ngôn ngữ chaincode & Solidity (EVM) & Go, Java, Node.js \\
 
 \subsubsection{Thành phần cấp phép — MSP và X.509}
 
-Fabric quản lý danh tính qua \textbf{Membership Service Provider} (MSP). Mỗi tổ chức tham gia mạng có một MSP riêng, được cấp phát chứng chỉ X.509 cho ba vai trò chính: \textit{Admin} (quản trị channel), \textit{Peer} (nút xác nhận và lưu sổ cái), và \textit{Client} (ứng dụng gọi chaincode). Một root CA của Fabric quản lý các CA con của từng tổ chức và CA của orderer. Mọi giao dịch gửi lên mạng đều phải mang chữ ký X.509 của client; nút peer xác minh chữ ký trước khi thực thi chaincode — không có chứng chỉ hợp lệ, giao dịch bị từ chối ngay tại tầng mạng.
+Fabric quản lý danh tính qua \textbf{Membership Service Provider} (MSP). Mỗi tổ chức tham gia mạng có một MSP riêng, được cấp phát chứng chỉ X.509 cho ba vai trò chính: \textit{Admin} (quản trị channel), \textit{Peer} (node xác nhận và lưu sổ cái), và \textit{Client} (ứng dụng gọi chaincode). Một root CA của Fabric quản lý các CA con của từng tổ chức và CA của orderer. Mọi giao dịch gửi lên mạng đều phải mang chữ ký X.509 của client; node peer xác minh chữ ký trước khi thực thi chaincode — không có chứng chỉ hợp lệ, giao dịch bị từ chối ngay tại tầng mạng.
 
 \subsubsection{Cô lập theo channel và chính sách xác nhận}
 

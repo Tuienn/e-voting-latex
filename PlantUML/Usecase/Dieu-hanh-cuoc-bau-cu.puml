@@ -3,7 +3,7 @@ left to right direction
 skinparam packageStyle rectangle
 
 actor "Admin" as admin
-actor "Mạng Blockchain" as fabric
+actor "Mạng blockchain" as fabric
 
 usecase "Đăng nhập hệ thống" as UC_Login
 

@@ -11,7 +11,7 @@ Tầng HTTP là điểm tiếp xúc đầu tiên giữa cử tri và hệ thốn
     \label{fig:helmet-config}
 \end{figure}
 
-\textbf{CORS.} Tiêu đề \textit{Access-Control-Allow-Origin} chỉ chấp nhận các tên miền nằm trong biến môi trường \pkg{CORS_ORIGINS}. Phương thức được phép giới hạn ở \pkg{GET}, \pkg{POST}, \pkg{PUT}, \pkg{PATCH}, \pkg{DELETE}, \pkg{OPTIONS}, kèm \texttt{credentials: true} để cookie phiên hợp lệ cho các tên miền tin cậy. Cấu hình này ngăn các trang web bên ngoài gọi API qua \pkg{XMLHttpRequest} hay \pkg{fetch} và đảm nhận một phần vai trò chống CSRF.
+\textbf{CORS.} Tiêu đề \textit{Access-Control-Allow-Origin} chỉ chấp nhận các tên miền nằm trong biến môi trường \pkg{CORS\_ORIGINS}. Phương thức được phép giới hạn ở \pkg{GET}, \pkg{POST}, \pkg{PUT}, \pkg{PATCH}, \pkg{DELETE}, \pkg{OPTIONS}, kèm \texttt{credentials: true} để cookie phiên hợp lệ cho các tên miền tin cậy. Cấu hình này ngăn các trang web bên ngoài gọi API qua \pkg{XMLHttpRequest} hay \pkg{fetch} và đảm nhận một phần vai trò chống CSRF.
 
 \textbf{Rate Limiting.} \pkg{HttpThrottlerGuard} giới hạn 100 yêu cầu mỗi IP trong mỗi 60 giây. Đặc biệt, guard này chỉ áp dụng cho \textit{HTTP context} — trả về \pkg{true} ngay khi phát hiện ngữ cảnh là TCP — để giao tiếp nội bộ giữa các microservice không bị giới hạn.
 

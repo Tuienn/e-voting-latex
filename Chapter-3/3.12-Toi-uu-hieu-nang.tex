@@ -20,13 +20,13 @@ Một số kỹ thuật tối ưu hiệu năng được áp dụng nhằm giữ 
 \hline
 \pkg{elections} & \texttt{(status, startDate, endDate)} & Lọc bầu cử theo trạng thái + thời gian \\
 \hline
-\pkg{election_voters} & \texttt{unique(electionId, voterId)} & Tra cứu O(1) + khử trùng \\
+\pkg{election\_voters} & \texttt{unique(electionId, voterId)} & Tra cứu O(1) + loại bỏ phần tử trùng lặp \\
 \hline
 \pkg{votes} & \texttt{unique(electionId, voterId)} & Chống bỏ phiếu hai lần \\
  & \texttt{unique(electionId, blindedCommitment)} & Chống nộp commitment trùng \\
  & \texttt{(electionId, createdAt)} & Lấy theo thứ tự cho cây Merkle \\
 \hline
-\pkg{revealed_votes} & \texttt{unique(electionId, revealKey)} & Chống phát lại reveal \\
+\pkg{revealed\_votes} & \texttt{unique(electionId, revealKey)} & Chống phát lại reveal \\
  & \texttt{(electionId, candidateId)} & Tổng hợp kết quả theo ứng viên \\
 \hline
 \end{tabularx}

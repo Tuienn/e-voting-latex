@@ -2,7 +2,7 @@
 
 \subsubsection{Kiến trúc cặp token tách biệt}
 
-Hệ thống sử dụng \textbf{hai khóa bí mật JWT riêng biệt} cho hai loại token khác nhau: \pkg{JWT_ACCESS_SECRET} dùng để ký và xác thực \textit{access token}, còn \pkg{JWT_REFRESH_SECRET} chỉ tồn tại trong dịch vụ Identity và dùng để ký \textit{refresh token}. Việc tách biệt này đảm bảo lộ một secret không kéo theo lộ secret còn lại; đồng thời BFF chỉ cần giữ \pkg{JWT_ACCESS_SECRET} để xác thực cục bộ mà không có khả năng tự cấp refresh token mới.
+Hệ thống sử dụng \textbf{hai khóa bí mật JWT riêng biệt} cho hai loại token khác nhau: \pkg{JWT\_ACCESS\_SECRET} dùng để ký và xác thực \textit{access token}, còn \pkg{JWT\_REFRESH\_SECRET} chỉ tồn tại trong dịch vụ Identity và dùng để ký \textit{refresh token}. Việc tách biệt này đảm bảo lộ một secret không kéo theo lộ secret còn lại; đồng thời BFF chỉ cần giữ \pkg{JWT\_ACCESS\_SECRET} để xác thực cục bộ mà không có khả năng tự cấp refresh token mới.
 
 \begin{table}[H]
 \centering
@@ -32,11 +32,11 @@ Mỗi lần làm mới phiên, hệ thống thực hiện \textbf{xoay vòng ho�
     \label{fig:token-rotation}
 \end{figure}
 
-Quy trình bên trong gồm bốn bước tuần tự: (1) xác thực chữ ký refresh token bằng \pkg{JWT_REFRESH_SECRET}; (2) đối chiếu giá trị token người dùng gửi lên với giá trị đang lưu tại Redis — nếu khác nhau hoặc không tồn tại thì từ chối; (3) xóa entry Redis cũ; (4) sinh cặp token mới và ghi đè entry Redis. Bốn bước này được thực hiện đồng bộ trong một hàm để tránh khoảng cửa sổ tấn công giữa các bước.
+Quy trình bên trong gồm bốn bước tuần tự: (1) xác thực chữ ký refresh token bằng \pkg{JWT\_REFRESH\_SECRET}; (2) đối chiếu giá trị token người dùng gửi lên với giá trị đang lưu tại Redis — nếu khác nhau hoặc không tồn tại thì từ chối; (3) xóa entry Redis cũ; (4) sinh cặp token mới và ghi đè entry Redis. Bốn bước này được thực hiện đồng bộ trong một hàm để tránh khoảng cửa sổ tấn công giữa các bước.
 
 \subsubsection{Xác thực cục bộ tại BFF — bỏ qua vòng gọi lại Identity}
 
-BFF xác thực \pkg{accessToken} \textbf{cục bộ} bằng \pkg{JWT_ACCESS_SECRET} mà không cần gọi sang Identity service. Tiếp cận này loại bỏ một vòng gọi TCP cho mỗi yêu cầu — giảm độ trễ trung bình từ 5 đến 15 ms và tránh tải dồn lên dịch vụ Identity vốn phục vụ cả các thao tác đăng nhập, đăng ký, quản trị tài khoản. Quy trình kiểm tra trong \pkg{AuthenticatorGuard} được trình bày trong Hình~\ref{fig:auth-guard-jwt-verify}.
+BFF xác thực \pkg{accessToken} \textbf{cục bộ} bằng \pkg{JWT\_ACCESS\_SECRET} mà không cần gọi sang Identity service. Tiếp cận này loại bỏ một vòng gọi TCP cho mỗi yêu cầu — giảm độ trễ trung bình từ 5 đến 15 ms và tránh tải dồn lên dịch vụ Identity vốn phục vụ cả các thao tác đăng nhập, đăng ký, quản trị tài khoản. Quy trình kiểm tra trong \pkg{AuthenticatorGuard} được trình bày trong Hình~\ref{fig:auth-guard-jwt-verify}.
 
 \begin{figure}[H]
     \centering

@@ -27,7 +27,7 @@ Hỗ trợ tạo chữ ký mù & phức tạp & tự nhiên qua các hệ số l
 \end{tabularx}
 \end{table}
 
-Tính \textit{linearity} là yếu tố mang tính quyết định trong kiến trúc nhiều nút ký: ba nút ký độc lập, mỗi nút sinh chữ ký phần (\textit{partial signature}) của riêng mình, sau đó bộ điều phối chỉ cần cộng dồn các giá trị scalar — không cần một vòng giao tiếp bổ sung và không tạo ra ràng buộc lệ thuộc lẫn nhau giữa các nút.
+Tính \textit{linearity} là yếu tố mang tính quyết định trong kiến trúc nhiều node ký: ba node ký độc lập, mỗi node sinh chữ ký phần (\textit{partial signature}) của riêng mình, sau đó bộ điều phối chỉ cần cộng dồn các giá trị scalar — không cần một vòng giao tiếp bổ sung và không tạo ra ràng buộc lệ thuộc lẫn nhau giữa các node.
 
 \subsubsection{Giao thức ký mù tập thể}
 
@@ -40,16 +40,16 @@ G:      điểm sinh chuẩn
 SCALAR_BYTES = 32,  POINT_BYTES = 33 (compressed)
 \end{verbatim}
 
-Giao thức được chia thành sáu pha hoạt động tuần tự, trải dài trên ba thực thể là cử tri (trình duyệt), bộ điều phối (\textit{Coordinator}) và ba nút ký (\textit{Signing Nodes}):
+Giao thức được chia thành sáu pha hoạt động tuần tự, trải dài trên ba thực thể là cử tri (trình duyệt), bộ điều phối (\textit{Coordinator}) và ba node ký (\textit{Signing Nodes}):
 
 \begin{itemize}
-    \item \textbf{Pha 0 -- Sinh khóa:} mỗi nút ký $i$ sinh khóa bí mật $d_i \in [1, n-1]$ và công bố khóa công khai phần $P_i = d_i \cdot G$. Bộ điều phối tính khóa công khai tập thể $P_{agg} = P_1 + P_2 + P_3$.
+    \item \textbf{Pha 0 -- Sinh khóa:} mỗi node ký $i$ sinh khóa bí mật $d_i \in [1, n-1]$ và công bố khóa công khai phần $P_i = d_i \cdot G$. Bộ điều phối tính khóa công khai tập thể $P_{agg} = P_1 + P_2 + P_3$.
 
-    \item \textbf{Pha 1 -- Cam kết:} khi bắt đầu phiên, mỗi nút ký sinh nonce ngẫu nhiên $k_i$ và điểm cam kết $R_i = k_i \cdot G$. Bộ điều phối tổng hợp $R = R_1 + R_2 + R_3$ rồi trả về máy khách.
+    \item \textbf{Pha 1 -- Cam kết:} khi bắt đầu phiên, mỗi node ký sinh nonce ngẫu nhiên $k_i$ và điểm cam kết $R_i = k_i \cdot G$. Bộ điều phối tổng hợp $R = R_1 + R_2 + R_3$ rồi trả về máy khách.
 
     \item \textbf{Pha 2 -- Làm mù (chỉ thực hiện trong trình duyệt):} cử tri sinh hai hệ số ngẫu nhiên $\alpha, \beta$, tính $C' = R + \alpha \cdot G + \beta \cdot P_{agg}$, hash thông điệp gắn định danh bầu cử và tập ứng viên được chọn $M = \text{SHA256}(\text{``ev-vote-v2''} \,\Vert\, \texttt{0x00} \,\Vert\, \text{electionId} \,\Vert\, \texttt{0x00} \,\Vert\, \text{payload})$, suy ra thử thách $h = \text{SHA256}(M \,\Vert\, C') \bmod n$ và gửi lên máy chủ giá trị $r = (h - \beta) \bmod n$.
 
-    \item \textbf{Pha 3 -- Ký phần:} mỗi nút ký tính $s_i = (k_i - d_i \cdot r) \bmod n$ rồi \textbf{xóa $k_i$ khỏi bộ nhớ ngay lập tức} (one-time nonce). Hàm tương ứng trong mã nguồn được trình bày trong Hình~\ref{fig:ec-schnorr-sign}.
+    \item \textbf{Pha 3 -- Ký phần:} mỗi node ký tính $s_i = (k_i - d_i \cdot r) \bmod n$ rồi \textbf{xóa $k_i$ khỏi bộ nhớ ngay lập tức} (one-time nonce). Hàm tương ứng trong mã nguồn được trình bày trong Hình~\ref{fig:ec-schnorr-sign}.
 
     \item \textbf{Pha 4 -- Tổng hợp:} bộ điều phối tính $s = (s_1 + s_2 + s_3) \bmod n$ và trả về cho cử tri.
 
@@ -58,12 +58,12 @@ Giao thức được chia thành sáu pha hoạt động tuần tự, trải dà
 
 Pha kiểm tra chữ ký (\textit{verify}) thực hiện theo phương trình Schnorr chuẩn: $C_{check} = s' \cdot G + h \cdot P_{agg}$, sau đó tính lại $h_{check} = \text{SHA256}(M \,\Vert\, C_{check}) \bmod n$ và so sánh với $h$. Phép kiểm tra thành công khi và chỉ khi $(h, s')$ được sinh ra đúng theo giao thức trên với khóa $P_{agg}$ tương ứng.
 
-Mỗi lá phiếu cho phép cử tri chọn từ một đến \pkg{maxSelectableCandidates} ứng viên. Để chữ ký vẫn xác thực được bất kể thứ tự lựa chọn, thông điệp $M$ không gắn trực tiếp từng \pkg{candidateId} mà gắn một chuỗi \textit{canonical}: $\textit{payload} = \texttt{JSON.stringify}(\text{canonical}(\textit{candidateIds}))$ với $\text{canonical}(ids) = [\,\text{...new Set}(ids)\,].\text{sort}()$ — khử trùng rồi sắp xếp theo từ điển. Nhờ quy ước này, máy khách (lúc ký) và dịch vụ \pkg{reveal-vote} (lúc xác thực) luôn dựng lại cùng một chuỗi byte thông qua hàm \pkg{buildVoteMessage} trong Hình~\ref{fig:build-vote-message}; chỉ cần lệch một byte thì phép kiểm tra $h_{check} = h$ sẽ thất bại.
+Mỗi lá phiếu cho phép cử tri chọn từ một đến \pkg{maxSelectableCandidates} ứng viên. Để chữ ký vẫn xác thực được bất kể thứ tự lựa chọn, thông điệp $M$ không gắn trực tiếp từng \pkg{candidateId} mà gắn một chuỗi \textit{canonical}: $\textit{payload} = \texttt{JSON.stringify}(\text{canonical}(\textit{candidateIds}))$ với $\text{canonical}(ids) = [\,\text{...new Set}(ids)\,].\text{sort}()$ — loại bỏ phần tử trùng lặp rồi sắp xếp theo từ điển. Nhờ quy ước này, máy khách (lúc ký) và dịch vụ \pkg{reveal-vote} (lúc xác thực) luôn dựng lại cùng một chuỗi byte thông qua hàm \pkg{buildVoteMessage} trong Hình~\ref{fig:build-vote-message}; chỉ cần lệch một byte thì phép kiểm tra $h_{check} = h$ sẽ thất bại.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth, keepaspectratio]{Figures/code/build-vote-message-canonical.png}
-    \caption{Hàm \pkg{buildVoteMessage} dựng thông điệp $M$ từ \pkg{electionId} và tập \pkg{candidateIds} đã canonical hóa}
+    \caption{Hàm \pkg{buildVoteMessage} dựng thông điệp $M$ từ \pkg{electionId} và tập \pkg{candidateIds} đã chuẩn hóa (canonicalize)}
     \label{fig:build-vote-message}
 \end{figure}
 

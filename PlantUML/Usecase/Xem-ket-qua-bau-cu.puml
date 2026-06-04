@@ -3,7 +3,7 @@ left to right direction
 skinparam packageStyle rectangle
 
 actor "Khách (ẩn danh)" as guest
-actor "Mạng Blockchain" as fabric
+actor "Mạng blockchain" as fabric
 
 rectangle "Kết quả bầu cử" {
   usecase "Xem kết quả tổng hợp" as UC_Tally

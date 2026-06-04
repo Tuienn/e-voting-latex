@@ -2,7 +2,7 @@
 
 \subsubsection{Cấu trúc cây Merkle cam kết}
 
-Khi cuộc bầu cử kết thúc, toàn bộ tập hợp cam kết phiếu (\textit{blinded commitment}) được tổng hợp thành một cây Merkle có gốc duy nhất. Mỗi lá là giá trị băm SHA-256 của chuỗi hex commit; các nút trong được tính bằng cách băm cặp con đã được sắp xếp theo thứ tự byte; gốc cây sau cùng là một giá trị 32 byte tóm tắt toàn bộ phiếu bầu trong bầu cử. Cấu trúc tổng quát được minh họa trong Hình~\ref{fig:merkle-tree}.
+Khi cuộc bầu cử kết thúc, toàn bộ tập hợp cam kết phiếu (\textit{blinded commitment}) được tổng hợp thành một cây Merkle có gốc duy nhất. Mỗi lá là giá trị băm SHA-256 của chuỗi hex commit; các node trong được tính bằng cách băm cặp con đã được sắp xếp theo thứ tự byte; gốc cây sau cùng là một giá trị 32 byte tóm tắt toàn bộ phiếu bầu trong bầu cử. Cấu trúc tổng quát được minh họa trong Hình~\ref{fig:merkle-tree}.
 
 \begin{figure}[H]
     \centering
@@ -46,7 +46,7 @@ Sau khi \pkg{commitMerkleRoot} được ghi lên sổ cái Fabric, ba bất bi�
 
     \item \textbf{Bằng chứng thành viên (\textit{membership proof}):} bất kỳ phiếu nào trong cuộc bầu cử cũng có thể tự chứng minh thuộc về tập phiếu chính thức mà không cần tiết lộ các phiếu khác — một dạng \textit{zero-knowledge-like} thực tế nhờ Merkle proof.
 
-    \item \textbf{Đối chiếu chéo DB và chain:} giá trị \pkg{election.merkleRoot} lưu trong MongoDB được đối chiếu với \pkg{MerkleRootView.merkleRoot} đọc từ chain. Bất kỳ chênh lệch nào cũng đồng nghĩa backend đã tự ý thay đổi root sau khi commit — sự việc có thể bị bất kỳ bên kiểm toán nào phát hiện.
+    \item \textbf{Đối chiếu chéo DB và chain:} giá trị \pkg{election.merkleRoot} lưu trong MongoDB được đối chiếu với \pkg{MerkleRootView.merkleRoot} đọc từ blockchain. Bất kỳ chênh lệch nào cũng đồng nghĩa backend đã tự ý thay đổi root sau khi commit — sự việc có thể bị bất kỳ bên kiểm toán nào phát hiện.
 \end{itemize}
 
 \subsubsection{Độ phức tạp của bằng chứng Merkle}

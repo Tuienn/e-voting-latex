@@ -15,7 +15,7 @@ Hệ thống bỏ phiếu điện tử được thiết kế theo nguyên tắc 
 
     \item \textbf{Tầng 6 — Cam kết Merkle:} cây Merkle gom toàn bộ phiếu vào một giá trị gốc 32 byte, được ghi bất biến lên sổ cái Fabric khi đóng bầu cử.
 
-    \item \textbf{Tầng 7 — Sổ cái Hyperledger Fabric:} mạng riêng được cấp phép, có chứng chỉ X.509 cho mỗi nút, hỗ trợ chính sách xác nhận giao dịch (endorsement policy) và tính bất biến đảm bảo bởi liên kết băm khối liên tiếp.
+    \item \textbf{Tầng 7 — Sổ cái Hyperledger Fabric:} mạng riêng được cấp phép, có chứng chỉ X.509 cho mỗi node, hỗ trợ chính sách xác nhận giao dịch (endorsement policy) và tính bất biến đảm bảo bởi liên kết băm khối liên tiếp.
 \end{itemize}
 
 Sáu tính chất an toàn của một hệ thống bầu cử điện tử được đảm bảo đồng thời nhờ sự kết hợp giữa các tầng nêu trên, được tổng hợp trong Bảng~\ref{tab:tinh-chat-bau-cu}.
@@ -30,7 +30,7 @@ Sáu tính chất an toàn của một hệ thống bầu cử điện tử đư
 \hline
 Tính bí mật (\textit{ballot secrecy}) & Chữ ký mù: máy chủ không biết cử tri bỏ phiếu cho ứng viên nào \\
 \hline
-Tính duy nhất (\textit{one voter -- one vote}) & Phiên Redis kết hợp chỉ mục duy nhất trên MongoDB và bộ khử trùng tại nút ký \\
+Tính duy nhất (\textit{one voter -- one vote}) & Phiên Redis kết hợp chỉ mục duy nhất trên MongoDB và bộ loại bỏ phần tử trùng lặp tại node ký \\
 \hline
 Tính xác thực (\textit{vote authenticity}) & Kiểm tra chữ ký EC-Schnorr trong pha giải mù phiếu bầu \\
 \hline

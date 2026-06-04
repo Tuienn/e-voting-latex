@@ -24,13 +24,13 @@ Mỗi thao tác nghiệp vụ quan trọng của hệ thống đều phải ghi 
 Hai thao tác \pkg{SubmitVote} và đóng cuộc bầu cử áp dụng mô hình \textit{Write-DB-First}: ghi cơ sở dữ liệu ở một trạng thái trung gian \textbf{trước}, rồi mới gọi chuỗi khối, sau đó xác nhận lại cơ sở dữ liệu. Trình tự gồm bốn bước:
 
 \begin{itemize}
-    \item \textbf{Bước 1 --- Ghi trạng thái trung gian:} ghi bản ghi với trạng thái \pkg{Vote.status = PENDING_CHAIN} (đối với phiếu) hoặc \pkg{Election.status = CLOSING} (đối với đóng cuộc bầu cử), trường \pkg{blockchainRef} để trống. Vì cơ sở dữ liệu được ghi trước, ràng buộc duy nhất \pkg{(electionId, voterId)} chặn bỏ phiếu trùng ngay tại bước này — trước cả khi chạm tới chuỗi khối; riêng \pkg{CLOSING} còn đóng vai trò khóa chống đóng cuộc bầu cử đồng thời.
+    \item \textbf{Bước 1 --- Ghi trạng thái trung gian:} ghi bản ghi với trạng thái \pkg{Vote.status = PENDING\_CHAIN} (đối với phiếu) hoặc \pkg{Election.status = CLOSING} (đối với đóng cuộc bầu cử), trường \pkg{blockchainRef} để trống. Vì cơ sở dữ liệu được ghi trước, ràng buộc duy nhất \pkg{(electionId, voterId)} chặn bỏ phiếu trùng ngay tại bước này — trước cả khi chạm tới chuỗi khối; riêng \pkg{CLOSING} còn đóng vai trò khóa chống đóng cuộc bầu cử đồng thời.
 
     \item \textbf{Bước 2 --- Gọi chuỗi khối:} thực thi giao dịch \textit{invoke} tương ứng.
 
     \item \textbf{Bước 3 --- Chuỗi khối thành công:} xác nhận cơ sở dữ liệu, chuyển trạng thái sang \pkg{CONFIRMED} (hoặc \pkg{CLOSED}) và ghi \pkg{blockchainRef} bằng mã giao dịch trả về.
 
-    \item \textbf{Bước 4 --- Chuỗi khối báo lỗi:} truy vấn lại chuỗi khối (\pkg{GetVote} hoặc \pkg{GetMerkleRoot}) để phân định, vì chuỗi khối là \textbf{nguồn sự thật}: nếu dữ liệu \textit{đã} có trên chuỗi khối thì xác nhận cơ sở dữ liệu và phục hồi mã giao dịch từ kết quả truy vấn; nếu \textit{chưa} có thì hoàn tác cơ sở dữ liệu (xóa phiếu \pkg{PENDING_CHAIN} hoặc đưa cuộc bầu cử về \pkg{ACTIVE}) rồi ném lỗi để người dùng thử lại.
+    \item \textbf{Bước 4 --- Chuỗi khối báo lỗi:} truy vấn lại chuỗi khối (\pkg{GetVote} hoặc \pkg{GetMerkleRoot}) để phân định, vì chuỗi khối là \textbf{nguồn sự thật}: nếu dữ liệu \textit{đã} có trên chuỗi khối thì xác nhận cơ sở dữ liệu và phục hồi mã giao dịch từ kết quả truy vấn; nếu \textit{chưa} có thì hoàn tác cơ sở dữ liệu (xóa phiếu \pkg{PENDING\_CHAIN} hoặc đưa cuộc bầu cử về \pkg{ACTIVE}) rồi ném lỗi để người dùng thử lại.
 \end{itemize}
 
 Hình~\ref{fig:submit-vote-write-db-first} trình bày hiện thực của mô hình này trong thao tác nộp phiếu.
@@ -51,17 +51,17 @@ Thao tác \pkg{RevealVoteCompact} không đổi thứ tự ghi (vẫn chuỗi kh
 Hai giải pháp trên xử lý lỗi trong luồng đồng bộ của yêu cầu. Trường hợp tiến trình \textit{sập} giữa bước gọi chuỗi khối và bước xác nhận sẽ để lại bản ghi kẹt ở trạng thái trung gian. Một tiến trình đồng bộ nền (\textit{reconciler}) chạy theo lịch \pkg{@Cron} của \pkg{@nestjs/schedule} đảm nhiệm việc dọn dẹp: định kỳ quét các bản ghi kẹt \textbf{cũ hơn} một ngưỡng thời gian (tránh tranh chấp với yêu cầu đang chạy), có cờ chống chồng lấn chu kỳ:
 
 \begin{itemize}
-    \item Phiếu còn \pkg{PENDING_CHAIN}: truy vấn \pkg{GetVote} --- nếu có trên chuỗi khối thì chuyển \pkg{CONFIRMED}, nếu không thì xóa bản ghi.
+    \item Phiếu còn \pkg{PENDING\_CHAIN}: truy vấn \pkg{GetVote} --- nếu có trên chuỗi khối thì chuyển \pkg{CONFIRMED}, nếu không thì xóa bản ghi.
     \item Cuộc bầu cử còn \pkg{CLOSING}: truy vấn \pkg{GetMerkleRoot} --- nếu đã cố định thì chuyển \pkg{CLOSED} và phục hồi mã giao dịch, nếu không thì giữ nguyên chờ quản trị viên thử lại.
 \end{itemize}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth, keepaspectratio]{Figures/code/reconciler-pending-vote.png}
-    \caption{Tiến trình đồng bộ nền đối chiếu phiếu \pkg{PENDING_CHAIN} với chuỗi khối}
+    \caption{Tiến trình đồng bộ nền đối chiếu phiếu \pkg{PENDING\_CHAIN} với chuỗi khối}
     \label{fig:reconciler-pending-vote}
 \end{figure}
 
 \subsubsection{Hệ quả về bất biến đọc dữ liệu}
 
-Do chuỗi khối là nguồn sự thật, một phiếu chỉ được coi là hợp lệ khi đã \pkg{CONFIRMED}. Vì vậy mọi hàm đọc phiếu (đếm phiếu, dựng cây Merkle khi đóng, lọc danh sách phiếu) đều \textbf{mặc định lọc} \pkg{status = CONFIRMED} để khớp đúng tập phiếu thực sự có trên chuỗi khối. Hai ngoại lệ được giữ \textit{không phụ thuộc trạng thái} một cách có chủ đích: kiểm tra bỏ phiếu trùng khi khởi tạo phiên (phiếu \pkg{PENDING_CHAIN} vẫn phải tính là ``đã bỏ phiếu'' để giữ chỗ) và thao tác xác minh phiếu phục vụ điều tra (cần thấy cả phiếu \pkg{PENDING_CHAIN} để phát hiện lệch dữ liệu). Đây là mô hình \textit{nhất quán cuối} (\textit{eventual consistency}): trong khoảng chuỗi khối tạm thời không phản hồi, một phiếu có thể nằm ở \pkg{PENDING_CHAIN} cho tới khi tiến trình đồng bộ nền đưa nó về trạng thái cuối cùng.
+Do chuỗi khối là nguồn sự thật, một phiếu chỉ được coi là hợp lệ khi đã \pkg{CONFIRMED}. Vì vậy mọi hàm đọc phiếu (đếm phiếu, dựng cây Merkle khi đóng, lọc danh sách phiếu) đều \textbf{mặc định lọc} \pkg{status = CONFIRMED} để khớp đúng tập phiếu thực sự có trên chuỗi khối. Hai ngoại lệ được giữ \textit{không phụ thuộc trạng thái} một cách có chủ đích: kiểm tra bỏ phiếu trùng khi khởi tạo phiên (phiếu \pkg{PENDING\_CHAIN} vẫn phải tính là ``đã bỏ phiếu'' để giữ chỗ) và thao tác xác minh phiếu phục vụ điều tra (cần thấy cả phiếu \pkg{PENDING\_CHAIN} để phát hiện lệch dữ liệu). Đây là mô hình \textit{nhất quán cuối} (\textit{eventual consistency}): trong khoảng chuỗi khối tạm thời không phản hồi, một phiếu có thể nằm ở \pkg{PENDING\_CHAIN} cho tới khi tiến trình đồng bộ nền đưa nó về trạng thái cuối cùng.

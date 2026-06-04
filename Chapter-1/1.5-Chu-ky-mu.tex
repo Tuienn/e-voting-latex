@@ -1,6 +1,6 @@
 \subsection{Chữ ký mù}
 
-Trong các giao dịch điện tử hiện đại, bên cạnh yêu cầu xác thực nguồn gốc và toàn vẹn thông điệp, việc bảo vệ \textit{tính riêng tư} của người sử dụng ngày càng cấp thiết -- đặc biệt trong bỏ phiếu điện tử, thanh toán nặc danh hay tiền điện tử. Lược đồ chữ ký số thông thường không thoả mãn yêu cầu này, do người ký luôn biết rõ nội dung mình đã ký và có thể truy ngược danh tính người yêu cầu. Khái niệm \textit{chữ ký số mù} (blind signature) cho phép người ký ký lên một thông điệp mà không biết nội dung thực của thông điệp đó, là nền tảng để xây dựng lược đồ chữ ký mù tập thể trình bày trong mục tiếp theo.
+Trong các giao dịch điện tử hiện đại, bên cạnh yêu cầu xác thực nguồn gốc và toàn vẹn thông điệp, việc bảo vệ \textit{tính riêng tư} của người sử dụng ngày càng cấp thiết -- đặc biệt trong bỏ phiếu điện tử, thanh toán nặc danh hay tiền điện tử. Lược đồ chữ ký số thông thường không thỏa mãn yêu cầu này, do người ký luôn biết rõ nội dung mình đã ký và có thể truy ngược danh tính người yêu cầu. Khái niệm \textit{chữ ký số mù} (blind signature) cho phép người ký ký lên một thông điệp mà không biết nội dung thực của thông điệp đó, là nền tảng để xây dựng lược đồ chữ ký mù tập thể trình bày trong mục tiếp theo.
 
 \subsubsection{Khái niệm chữ ký mù}
 
@@ -10,7 +10,7 @@ Cơ chế này đặc biệt hữu ích trong các bài toán đòi hỏi nặc 
 
 \subsubsection{Mô hình tổng quát của chữ ký mù}
 
-Một lược đồ chữ ký số mù là sự kết hợp của hệ thống chữ ký số hai khóa với một hệ thống khóa công khai kiểu \textit{giao hoán}, gồm hai thực thể tham gia chính và bốn hàm cơ bản.
+Một lược đồ chữ ký số mù là sự kết hợp của hệ thống chữ ký số hai khóa với một hệ thống khóa công khai kiểu \textit{giao hóan}, gồm hai thực thể tham gia chính và bốn hàm cơ bản.
 
 Các thực thể tham gia:
 \begin{itemize}
@@ -20,8 +20,8 @@ Các thực thể tham gia:
 
 Các hàm cơ bản:
 \begin{itemize}
-    \item \textbf{Hàm ký $\textsf{Sig}$:} chỉ được biết bởi $B$; hàm nghịch đảo $\textsf{Sig}'$ được công bố công khai, thoả $\textsf{Sig}'(\textsf{Sig}(M)) = M$ và không cho phép tìm ra $\textsf{Sig}$. Cặp hàm này tương ứng với cặp khóa bí mật -- công khai của người ký.
-    \item \textbf{Hàm giao hoán $f$ và hàm nghịch đảo $f'$:} chỉ được biết bởi $A$, thoả mãn tính chất \textit{giao hoán} với hàm ký:
+    \item \textbf{Hàm ký $\textsf{Sig}$:} chỉ được biết bởi $B$; hàm nghịch đảo $\textsf{Sig}'$ được công bố công khai, thỏa $\textsf{Sig}'(\textsf{Sig}(M)) = M$ và không cho phép tìm ra $\textsf{Sig}$. Cặp hàm này tương ứng với cặp khóa bí mật -- công khai của người ký.
+    \item \textbf{Hàm giao hóan $f$ và hàm nghịch đảo $f'$:} chỉ được biết bởi $A$, thỏa mãn tính chất \textit{giao hóan} với hàm ký:
     \begin{equation}
         f'(\textsf{Sig}(f(M))) = \textsf{Sig}(M)
         \label{eq:blind-commutative}
@@ -29,11 +29,11 @@ Các hàm cơ bản:
     đồng thời $f(M)$ không tiết lộ bất kỳ thông tin nào về $M$. Hàm $f$ ``làm mù'' thông điệp trước khi gửi cho người ký, $f'$ ``giải mù'' chữ ký nhận được.
 \end{itemize}
 
-Tính chất giao hoán \eqref{eq:blind-commutative} là yếu tố cốt lõi của cơ chế chữ ký mù: tách rời quá trình ký (thực hiện trên dạng đã làm mù) khỏi quá trình thu chữ ký cuối cùng (thực hiện trên dạng đã giải mù), trong khi chữ ký cuối cùng vẫn hợp lệ trên thông điệp gốc.
+Tính chất giao hóan \eqref{eq:blind-commutative} là yếu tố cốt lõi của cơ chế chữ ký mù: tách rời quá trình ký (thực hiện trên dạng đã làm mù) khỏi quá trình thu chữ ký cuối cùng (thực hiện trên dạng đã giải mù), trong khi chữ ký cuối cùng vẫn hợp lệ trên thông điệp gốc.
 
 \subsubsection{Các thuộc tính an toàn}
 
-Chữ ký số mù kế thừa các thuộc tính an toàn của chữ ký số thông thường (toàn vẹn, xác thực, chống chối bỏ) và phải thoả mãn ba thuộc tính đặc trưng riêng:
+Chữ ký số mù kế thừa các thuộc tính an toàn của chữ ký số thông thường (toàn vẹn, xác thực, chống chối bỏ) và phải thỏa mãn ba thuộc tính đặc trưng riêng:
 
 \begin{itemize}
     \item \textbf{Tính mù (Blindness):} Người ký không thu được bất kỳ thông tin nào về nội dung thực của $M$ trong suốt quá trình ký. Hình thức, với mọi thuật toán đa thức của kẻ tấn công đóng vai trò người ký, xác suất phân biệt được hai phiên ký trên hai thông điệp $(M_0, M_1)$ và trả về đúng $b' \in \{0, 1\}$ là vô cùng nhỏ:
@@ -54,7 +54,7 @@ Ba thuộc tính trên là điều kiện cần và đủ để một lược đ
 
 Một lược đồ chữ ký mù được mô tả thông qua bốn pha chính: làm mù, ký số, giải mù và xác thực. Sơ đồ luồng cấu trúc được mô tả trong Hình~\ref{fig:luong-chu-ky-mu}.
 
-\begin{figure}[!h]
+\begin{figure}[htbp]
     \centering
     \begin{tikzpicture}[node distance=1.2cm and 2cm,
                        box/.style={draw, rounded corners=4pt, minimum width=2.4cm, minimum height=0.9cm, align=center, font=\small},
@@ -95,7 +95,7 @@ Một lược đồ chữ ký mù được mô tả thông qua bốn pha chính:
         \textsf{Sig}'(\sigma) \overset{?}{=} M
         \label{eq:blind-verify}
     \end{equation}
-    Nếu thoả mãn thì chấp nhận, ngược lại bị từ chối. Quy trình xác minh giống hệt lược đồ chữ ký số thông thường.
+    Nếu điều kiện trên được thỏa mãn, chữ ký được chấp nhận; ngược lại, chữ ký bị từ chối. Quy trình xác minh giống hệt lược đồ chữ ký số thông thường.
 \end{itemize}
 
 \subsubsection{Một số lược đồ chữ ký mù tiêu biểu}

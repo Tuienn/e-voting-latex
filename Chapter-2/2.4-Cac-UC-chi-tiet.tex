@@ -116,7 +116,7 @@ Chức năng \textit{xem thông tin tài khoản cá nhân} cho phép người d
 
 \subsubsection{Tạo tài khoản người dùng}
 
-Chức năng \textit{tạo tài khoản người dùng} cho phép quản trị viên cấp tài khoản cho cử tri và ứng viên trước khi cuộc bầu cử diễn ra. Hệ thống hỗ trợ hai chế độ là tạo đơn lẻ một tài khoản và tạo hàng loạt nhiều tài khoản cùng lúc, phù hợp cho các tổ chức cần nhập số lượng lớn cử tri.
+Chức năng \textit{tạo tài khoản người dùng} cho phép quản trị viên cấp tài khoản cho cử tri và ứng viên trước khi cuộc bầu cử diễn ra. Hệ thống hỗ trợ tạo đơn lẻ một tài khoản và tạo hàng loạt nhiều tài khoản, phù hợp cho các tổ chức cần nhập số lượng lớn cử tri.
 
 \begin{figure}[H]
     \centering
@@ -604,7 +604,7 @@ Chức năng \textit{quản lý ứng viên trong cuộc bầu cử} cho phép q
 
 \subsubsection{Quản lý cử tri trong cuộc bầu cử}
 
-Chức năng \textit{quản lý cử tri trong cuộc bầu cử} cho phép quản trị viên cập nhật danh sách cử tri hợp lệ của một cuộc bầu cử. Vì danh sách cử tri quyết định ai có thể tham gia bỏ phiếu, hệ thống chỉ cho phép sửa đổi khi cuộc bầu cử còn ở trạng thái khởi tạo và sử dụng giao dịch cơ sở dữ liệu để chống tình huống chạy đua giữa thao tác sửa danh sách và thao tác bắt đầu cuộc bầu cử.
+Chức năng \textit{quản lý cử tri trong cuộc bầu cử} cho phép quản trị viên cập nhật danh sách cử tri hợp lệ của một cuộc bầu cử. Vì danh sách cử tri quyết định ai có thể tham gia bỏ phiếu, hệ thống chỉ cho phép sửa đổi khi cuộc bầu cử còn ở trạng thái khởi tạo và sử dụng giao dịch cơ sở dữ liệu để chống xung đột giữa thao tác sửa danh sách và thao tác bắt đầu cuộc bầu cử.
 
 \begin{figure}[H]
     \centering
@@ -661,7 +661,7 @@ Chức năng \textit{quản lý cử tri trong cuộc bầu cử} cho phép qu�
 
 \subsubsection{Điều hành cuộc bầu cử}
 
-Chức năng \textit{điều hành cuộc bầu cử} gắn liền với hai cột mốc chính trong vòng đời cuộc bầu cử: \textbf{bắt đầu} (chuyển trạng thái sang mở và sinh khóa công khai tập thể EC-Schnorr cho cơ chế chữ ký mù) và \textbf{đóng} (chuyển trạng thái sang đóng, xây dựng cây Merkle của toàn bộ cam kết phiếu và cam kết gốc Merkle lên blockchain). Cả hai thao tác đều cần phối hợp giữa nhiều microservice và Mạng Blockchain Hyperledger Fabric.
+Chức năng \textit{điều hành cuộc bầu cử} gắn liền với hai cột mốc chính trong vòng đời cuộc bầu cử: \textbf{bắt đầu} (chuyển trạng thái sang mở và sinh khóa công khai tập thể EC-Schnorr cho cơ chế chữ ký mù) và \textbf{đóng} (chuyển trạng thái sang đóng, xây dựng cây Merkle của toàn bộ cam kết phiếu và cam kết gốc Merkle lên blockchain). Cả hai thao tác đều cần phối hợp giữa nhiều microservice và Mạng blockchain Hyperledger Fabric.
 
 \begin{figure}[H]
     \centering
@@ -687,7 +687,7 @@ Chức năng \textit{điều hành cuộc bầu cử} gắn liền với hai c�
     \endlastfoot
     Tên chức năng & Bắt đầu và đóng cuộc bầu cử. \\
     \hline
-    Tác nhân & Quản trị viên (chính); Mạng Blockchain (hệ thống ngoài). \\
+    Tác nhân & Quản trị viên (chính); Mạng blockchain (hệ thống ngoài). \\
     \hline
     Điều kiện trước &
     \begin{itemize}
@@ -708,7 +708,7 @@ Chức năng \textit{điều hành cuộc bầu cử} gắn liền với hai c�
         \item BFF Gateway xác thực và chuyển tiếp yêu cầu tới Coordinator Service.
         \item (Bắt đầu) Coordinator Service kiểm tra trạng thái và số lượng tối thiểu của ứng viên, cử tri, sau đó gửi yêu cầu sinh cặp khóa song song tới ba Signing Node; ba node sinh khóa riêng, mã hóa và lưu vào cơ sở dữ liệu riêng của mỗi node, rồi trả về khóa công khai từng phần.
         \item (Bắt đầu) Coordinator Service cộng các khóa công khai để tạo khóa công khai tập thể, cập nhật trạng thái cuộc bầu cử sang mở và lưu khóa công khai vào cơ sở dữ liệu.
-        \item (Đóng) Coordinator Service đọc toàn bộ cam kết phiếu, xây dựng cây Merkle và sinh gốc cây, sau đó gửi yêu cầu ghi gốc Merkle lên Mạng Blockchain qua Chainlaunch.
+        \item (Đóng) Coordinator Service đọc toàn bộ cam kết phiếu, xây dựng cây Merkle và sinh gốc cây, sau đó gửi yêu cầu ghi gốc Merkle lên Mạng blockchain qua Chainlaunch.
         \item (Đóng) Coordinator Service cập nhật trạng thái cuộc bầu cử sang đóng kèm gốc Merkle và tham chiếu giao dịch blockchain.
         \item Quản trị viên nhận xác nhận thao tác thành công.
     \end{enumerate} \\
@@ -717,7 +717,7 @@ Chức năng \textit{điều hành cuộc bầu cử} gắn liền với hai c�
     \begin{itemize}
         \item \textbf{3a. Không đủ số lượng ứng viên hoặc cử tri tối thiểu:} Coordinator Service từ chối bắt đầu cuộc bầu cử.
         \item \textbf{3b. Một Signing Node phản hồi lỗi khi sinh khóa:} Coordinator Service hủy thao tác và giữ cuộc bầu cử ở trạng thái khởi tạo.
-        \item \textbf{5a. Mạng Blockchain phản hồi lỗi hoặc số lượng phiếu không khớp:} Coordinator Service hủy chuyển trạng thái và giữ cuộc bầu cử ở trạng thái mở.
+        \item \textbf{5a. Mạng blockchain phản hồi lỗi hoặc số lượng phiếu không khớp:} Coordinator Service hủy chuyển trạng thái và giữ cuộc bầu cử ở trạng thái mở.
     \end{itemize} \\
     \hline
 \end{longtable}
@@ -964,7 +964,7 @@ Chức năng \textit{bỏ phiếu} là quy trình cốt lõi của hệ thống,
     \endlastfoot
     Tên chức năng & Bỏ phiếu mù theo cơ chế chữ ký mù tập thể EC-Schnorr. \\
     \hline
-    Tác nhân & Cử tri (chính); Mạng Blockchain (hệ thống ngoài). \\
+    Tác nhân & Cử tri (chính); Mạng blockchain (hệ thống ngoài). \\
     \hline
     Điều kiện trước &
     \begin{itemize}
@@ -979,12 +979,12 @@ Chức năng \textit{bỏ phiếu} là quy trình cốt lõi của hệ thống,
     \begin{enumerate}
         \item Cử tri gửi yêu cầu khởi tạo phiên bỏ phiếu tới BFF Gateway kèm định danh cuộc bầu cử.
         \item Coordinator Service kiểm tra điều kiện, gửi yêu cầu sinh cam kết song song tới ba Signing Node và tổng hợp thành cam kết tập thể; phiên được lưu trong Redis kèm thời gian sống ngắn.
-        \item Cử tri nhận cam kết tập thể và khóa công khai tập thể, chọn từ một đến \pkg{maxSelectableCandidates} ứng viên, sau đó thực hiện làm mù phiếu phía trình duyệt (sinh các hệ số mù bí mật, tính cam kết mù và thách thức mù gắn với tập ứng viên đã chọn).
+        \item Cử tri nhận cam kết tập thể và khóa công khai tập thể, chọn từ một đến \pkg{maxSelectableCandidates} ứng viên, sau đó thực hiện làm mù phiếu (sinh các hệ số mù bí mật, tính cam kết mù và thách thức mù gắn với tập ứng viên đã chọn).
         \item Cử tri gửi thách thức mù tới BFF Gateway để yêu cầu ký phiếu mù.
         \item Coordinator Service kiểm tra phiên còn hợp lệ, gửi yêu cầu ký từng phần song song tới ba Signing Node; mỗi node ghi nhận một bản ghi đã ký vào cơ sở dữ liệu riêng và xóa nonce ngay sau khi ký.
-        \item Coordinator Service tổng hợp các chữ ký từng phần thành chữ ký tổng và trả về cho cử tri; cử tri thực hiện giải mù phía trình duyệt để thu được chữ ký EC-Schnorr cuối cùng.
+        \item Coordinator Service tổng hợp các chữ ký từng phần thành chữ ký tổng và trả về cho cử tri; cử tri thực hiện giải mù để thu được chữ ký EC-Schnorr cuối cùng.
         \item Cử tri gửi cam kết phiếu mù cùng chữ ký tổng và định danh phiên tới BFF Gateway.
-        \item Coordinator Service xác minh phiên, gọi Mạng Blockchain qua Chainlaunch để ghi cam kết phiếu kèm định danh phiếu, sau đó lưu bản ghi phiếu cùng tham chiếu giao dịch vào cơ sở dữ liệu và đánh dấu phiên đã bỏ phiếu.
+        \item Coordinator Service xác minh phiên, gọi Mạng blockchain qua Chainlaunch để ghi cam kết phiếu kèm định danh phiếu, sau đó lưu bản ghi phiếu cùng tham chiếu giao dịch vào cơ sở dữ liệu và đánh dấu phiên đã bỏ phiếu.
         \item Cử tri nhận biên nhận gồm định danh phiếu, cam kết phiếu mù và tham chiếu giao dịch blockchain.
     \end{enumerate} \\
     \hline
@@ -993,7 +993,7 @@ Chức năng \textit{bỏ phiếu} là quy trình cốt lõi của hệ thống,
         \item \textbf{2a. Cử tri đã có bản ghi phiếu trong cuộc bầu cử:} Coordinator Service từ chối khởi tạo phiên.
         \item \textbf{2b. Khóa công khai tập thể từ các Signing Node không khớp với khóa lưu trong cuộc bầu cử:} Coordinator Service từ chối khởi tạo phiên nhằm chống tấn công lặp giữa các cuộc bầu cử.
         \item \textbf{5a. Một Signing Node phát hiện vi phạm ràng buộc duy nhất khi ghi bản ghi đã ký:} giao dịch nội bộ của node bị hủy và yêu cầu ký toàn bộ bị từ chối.
-        \item \textbf{8a. Mạng Blockchain phản hồi lỗi khi ghi phiếu:} Coordinator Service hủy lưu bản ghi phiếu và trả về lỗi cho cử tri.
+        \item \textbf{8a. Mạng blockchain phản hồi lỗi khi ghi phiếu:} Coordinator Service hủy lưu bản ghi phiếu và trả về lỗi cho cử tri.
     \end{itemize} \\
     \hline
 \end{longtable}
@@ -1026,7 +1026,7 @@ Chức năng \textit{tiết lộ phiếu} là bước cuối của quy trình b�
     \endlastfoot
     Tên chức năng & Tiết lộ phiếu sau khi cuộc bầu cử đóng. \\
     \hline
-    Tác nhân & Khách ẩn danh (do chính cử tri đại diện gửi mà không kèm phiên xác thực); Mạng Blockchain (hệ thống ngoài). \\
+    Tác nhân & Khách (do chính cử tri đại diện gửi mà không kèm phiên xác thực); Mạng blockchain (hệ thống ngoài). \\
     \hline
     Điều kiện trước &
     \begin{itemize}
@@ -1044,8 +1044,8 @@ Chức năng \textit{tiết lộ phiếu} là bước cuối của quy trình b�
     \begin{enumerate}
         \item Khách gửi yêu cầu tiết lộ phiếu tới Reveal-Vote qua điểm cuối HTTP công khai (không kèm token), gồm danh sách định danh ứng viên đã chọn và chữ ký EC-Schnorr.
         \item Reveal-Vote yêu cầu Coordinator Service trả về thông tin cuộc bầu cử để xác nhận trạng thái đóng và lấy khóa công khai tập thể.
-        \item Reveal-Vote canonical hóa danh sách ứng viên, kiểm tra mọi ứng viên được chọn đều thuộc cuộc bầu cử và số lượng không vượt quá \pkg{maxSelectableCandidates}, sau đó xác minh chữ ký EC-Schnorr với khóa công khai tập thể và sinh khóa giải mù từ hai thành phần chữ ký.
-        \item Reveal-Vote gửi yêu cầu ghi phiếu tiết lộ lên Mạng Blockchain qua Chainlaunch, sau đó lưu bản ghi phiếu tiết lộ và tham chiếu giao dịch vào cơ sở dữ liệu.
+        \item Reveal-Vote chuẩn hóa (canonicalize) danh sách ứng viên, kiểm tra mọi ứng viên được chọn đều thuộc cuộc bầu cử và số lượng không vượt quá \pkg{maxSelectableCandidates}, sau đó xác minh chữ ký EC-Schnorr với khóa công khai tập thể và sinh khóa giải mù từ hai thành phần chữ ký.
+        \item Reveal-Vote gửi yêu cầu ghi phiếu tiết lộ lên Mạng blockchain qua Chainlaunch, sau đó lưu bản ghi phiếu tiết lộ và tham chiếu giao dịch vào cơ sở dữ liệu.
         \item Reveal-Vote so sánh tổng số phiếu đã tiết lộ với tổng số phiếu đã nộp do Coordinator Service cung cấp.
         \item Nếu hai con số trùng nhau, Reveal-Vote yêu cầu Coordinator Service chuyển trạng thái cuộc bầu cử sang hoàn tất; Coordinator Service phát thông điệp dọn dẹp khóa cho các Signing Node.
         \item Khách nhận xác nhận tiết lộ thành công kèm cờ cho biết cuộc bầu cử đã hoàn tất hay chưa.
@@ -1056,14 +1056,14 @@ Chức năng \textit{tiết lộ phiếu} là bước cuối của quy trình b�
         \item \textbf{3a. Danh sách ứng viên không hợp lệ (vượt quá số tối đa cho phép hoặc chứa ứng viên không thuộc cuộc bầu cử):} Reveal-Vote từ chối tiết lộ.
         \item \textbf{3b. Chữ ký EC-Schnorr không hợp lệ:} Reveal-Vote từ chối tiết lộ.
         \item \textbf{4a. Khóa giải mù đã tồn tại trong cơ sở dữ liệu hoặc trên blockchain:} yêu cầu bị từ chối nhằm chống tấn công lặp.
-        \item \textbf{4b. Mạng Blockchain phản hồi lỗi:} Reveal-Vote hủy lưu bản ghi và trả về lỗi.
+        \item \textbf{4b. Mạng blockchain phản hồi lỗi:} Reveal-Vote hủy lưu bản ghi và trả về lỗi.
     \end{itemize} \\
     \hline
 \end{longtable}
 
 \subsubsection{Sao lưu khóa bí mật phiếu}
 
-Khóa bí mật phiếu (gồm các hệ số làm mù và hai thành phần chữ ký) được lưu cục bộ trong kho lưu trữ an toàn trên thiết bị của cử tri; mất thiết bị đồng nghĩa mất khả năng tiết lộ và xác minh phiếu về sau. Chức năng \textit{sao lưu khóa bí mật phiếu} cho phép cử tri sao lưu các khóa này lên máy chủ theo mô hình \textit{zero-knowledge}: dữ liệu được mã hóa hoàn toàn phía thiết bị bằng khóa dẫn từ một mã PIN, máy chủ không bao giờ nắm được mã PIN hay nội dung khóa. Hình~\ref{fig:uc-quan-ly-khoa-bi-mat} mô tả hai chức năng sao lưu và khôi phục khóa, đều được cử tri thao tác sau khi đăng nhập.
+Khóa bí mật phiếu (gồm các hệ số làm mù và hai thành phần chữ ký) được lưu cục bộ an toàn trên thiết bị của cử tri; việc mất thiết bị có thể dẫn đến mất khả năng tiết lộ và xác minh phiếu về sau nếu cử tri chưa sao lưu khóa. Chức năng \textit{sao lưu khóa bí mật phiếu} cho phép cử tri sao lưu các khóa này lên máy chủ theo mô hình \textit{zero-knowledge}: dữ liệu được mã hóa hoàn toàn phía thiết bị bằng khóa dẫn từ một mã PIN, máy chủ không bao giờ nắm được mã PIN hay nội dung khóa. Hình~\ref{fig:uc-quan-ly-khoa-bi-mat} mô tả hai chức năng sao lưu và khôi phục khóa, đều được cử tri thao tác sau khi đăng nhập.
 
 \begin{figure}[H]
     \centering
@@ -1095,7 +1095,7 @@ Khóa bí mật phiếu (gồm các hệ số làm mù và hai thành phần ch�
     \begin{itemize}
         \item Đã đăng nhập với vai trò Cử tri.
         \item Thiết bị có ít nhất một khóa bí mật phiếu trong kho lưu trữ an toàn.
-        \item Cử tri đặt một mã PIN dùng để dẫn khóa mã hóa.
+        \item Cử tri đặt một mã PIN dùng để dẫn xuất khóa mã hóa.
     \end{itemize} \\
     \hline
     Điều kiện sau & Một bản sao lưu đã mã hóa được lưu trên máy chủ (ghi đè bản cũ nếu có); máy chủ không nắm được mã PIN lẫn nội dung khóa. \\
@@ -1104,9 +1104,9 @@ Khóa bí mật phiếu (gồm các hệ số làm mù và hai thành phần ch�
     \begin{enumerate}
         \item Cử tri chọn chức năng sao lưu khóa trên ứng dụng di động và nhập mã PIN.
         \item Ứng dụng đọc danh sách khóa bí mật phiếu từ kho lưu trữ an toàn cục bộ.
-        \item Ứng dụng dẫn khóa từ mã PIN bằng PBKDF2-SHA256 và mã hóa danh sách bằng AES-256-GCM, tạo thành một gói dữ liệu (envelope) mã hóa.
+        \item Ứng dụng dẫn xuất khóa từ mã PIN bằng PBKDF2-SHA256 và mã hóa danh sách bằng AES-256-GCM, tạo thành một gói dữ liệu mã hóa (envelope).
         \item Ứng dụng gửi gói envelope kèm access token tới BFF Gateway; BFF Gateway xác thực rồi chuyển tiếp tới Identity Service.
-        \item Identity Service bọc thêm một lớp bảo vệ at-rest rồi ghi hoặc cập nhật bản sao lưu theo định danh cử tri.
+        \item Identity Service bọc thêm một lớp mã hóa dữ liệu khi lưu trữ (at-rest encryption) rồi ghi hoặc cập nhật bản sao lưu theo định danh cử tri.
         \item Cử tri nhận thông báo sao lưu thành công.
     \end{enumerate} \\
     \hline
@@ -1153,8 +1153,8 @@ Chức năng \textit{khôi phục khóa bí mật phiếu} cho phép cử tri l�
     \begin{enumerate}
         \item Cử tri chọn chức năng khôi phục khóa trên ứng dụng di động và nhập mã PIN.
         \item Ứng dụng gửi yêu cầu tải bản sao lưu kèm access token; BFF Gateway xác thực rồi chuyển tiếp tới Identity Service.
-        \item Identity Service truy vấn bản sao lưu theo định danh cử tri, gỡ lớp bảo vệ at-rest và trả về gói envelope do máy khách tạo.
-        \item Ứng dụng dẫn khóa từ mã PIN và giải mã gói envelope bằng AES-256-GCM.
+        \item Identity Service truy vấn bản sao lưu theo định danh cử tri, gỡ lớp mã hóa dữ liệu khi lưu trữ (at-rest encryption) và trả về gói envelope do máy khách tạo.
+        \item Ứng dụng dẫn xuất khóa từ mã PIN và giải mã gói envelope bằng AES-256-GCM.
         \item Ứng dụng ghi khóa bí mật phiếu vào kho lưu trữ an toàn và thông báo khôi phục thành công.
     \end{enumerate} \\
     \hline
@@ -1168,7 +1168,7 @@ Chức năng \textit{khôi phục khóa bí mật phiếu} cho phép cử tri l�
 
 \subsubsection{Xem danh sách cuộc bầu cử công khai}
 
-Chức năng \textit{xem danh sách cuộc bầu cử công khai} cho phép bất kỳ khách ẩn danh nào duyệt qua danh sách các cuộc bầu cử của tổ chức mà không cần đăng nhập. Đây là điểm khởi đầu cho mọi tương tác công khai khác như tiết lộ phiếu, xác minh phiếu, xem kết quả và kiểm toán.
+Chức năng \textit{xem danh sách cuộc bầu cử công khai} cho phép bất kỳ khách nào duyệt qua danh sách các cuộc bầu cử của tổ chức mà không cần đăng nhập. Đây là điểm khởi đầu cho mọi tương tác công khai khác như tiết lộ phiếu, xác minh phiếu, xem kết quả và kiểm toán.
 
 \begin{figure}[H]
     \centering
@@ -1194,7 +1194,7 @@ Chức năng \textit{xem danh sách cuộc bầu cử công khai} cho phép bấ
     \endlastfoot
     Tên chức năng & Xem danh sách cuộc bầu cử công khai. \\
     \hline
-    Tác nhân & Khách ẩn danh. \\
+    Tác nhân & Khách. \\
     \hline
     Điều kiện trước & Không có. \\
     \hline
@@ -1217,7 +1217,7 @@ Chức năng \textit{xem danh sách cuộc bầu cử công khai} cho phép bấ
 
 \subsubsection{Xác minh phiếu bầu}
 
-Chức năng \textit{xác minh phiếu bầu} cho phép bất kỳ khách ẩn danh nào dùng biên nhận để kiểm tra xem một phiếu cụ thể đã thực sự được ghi nhận vào cuộc bầu cử hay chưa. Quy trình xác minh diễn ra đa tầng: đối chiếu với cơ sở dữ liệu, đối chiếu với blockchain và (sau khi cuộc bầu cử đóng) kiểm tra bằng chứng Merkle giữa cả hai nguồn. Kết quả chỉ được coi là hợp lệ khi mọi tầng đều xác nhận khớp.
+Chức năng \textit{xác minh phiếu bầu} cho phép bất kỳ khách nào dùng biên nhận để kiểm tra xem một phiếu cụ thể đã thực sự được ghi nhận vào cuộc bầu cử hay chưa. Quy trình xác minh diễn ra đa tầng: đối chiếu với cơ sở dữ liệu, đối chiếu với blockchain và (sau khi cuộc bầu cử đóng) kiểm tra bằng chứng Merkle giữa cả hai nguồn. Kết quả chỉ được coi là hợp lệ khi mọi tầng đều xác nhận khớp.
 
 \begin{figure}[H]
     \centering
@@ -1243,7 +1243,7 @@ Chức năng \textit{xác minh phiếu bầu} cho phép bất kỳ khách ẩn d
     \endlastfoot
     Tên chức năng & Xác minh phiếu bầu đa tầng. \\
     \hline
-    Tác nhân & Khách ẩn danh; Mạng Blockchain (hệ thống ngoài). \\
+    Tác nhân & Khách; Mạng blockchain (hệ thống ngoài). \\
     \hline
     Điều kiện trước &
     \begin{itemize}
@@ -1257,7 +1257,7 @@ Chức năng \textit{xác minh phiếu bầu} cho phép bất kỳ khách ẩn d
     \begin{enumerate}
         \item Khách gửi yêu cầu xác minh phiếu tới BFF Gateway qua điểm cuối công khai kèm thông tin từ biên nhận.
         \item BFF Gateway chuyển tiếp yêu cầu tới Coordinator Service.
-        \item Coordinator Service kiểm tra cuộc bầu cử tồn tại, sau đó đối chiếu bản ghi phiếu trong cơ sở dữ liệu với biên nhận và truy vấn bản ghi phiếu trên Mạng Blockchain để kiểm tra tham chiếu giao dịch và cam kết.
+        \item Coordinator Service kiểm tra cuộc bầu cử tồn tại, sau đó đối chiếu bản ghi phiếu trong cơ sở dữ liệu với biên nhận và truy vấn bản ghi phiếu trên Mạng blockchain để kiểm tra tham chiếu giao dịch và cam kết.
         \item Nếu cuộc bầu cử đã đóng hoặc đã hoàn tất, Coordinator Service xây dựng bằng chứng Merkle từ tập cam kết phiếu, kiểm tra cục bộ tính hợp lệ của bằng chứng, đối chiếu gốc Merkle với gốc trên blockchain và yêu cầu blockchain xác minh bằng chứng.
         \item Coordinator Service tổng hợp kết quả xác minh ở từng tầng và trả về kết luận chỉ coi là hợp lệ khi mọi tầng đều khớp.
         \item Khách nhận kết quả xác minh chi tiết.
@@ -1300,7 +1300,7 @@ Chức năng \textit{xem kết quả bầu cử} công bố số phiếu đã đ
     \endlastfoot
     Tên chức năng & Xem kết quả tổng hợp số phiếu cho từng ứng viên. \\
     \hline
-    Tác nhân & Khách ẩn danh; Mạng Blockchain (hệ thống ngoài). \\
+    Tác nhân & Khách; Mạng blockchain (hệ thống ngoài). \\
     \hline
     Điều kiện trước & Cuộc bầu cử ở trạng thái đóng hoặc hoàn tất. \\
     \hline
@@ -1310,7 +1310,7 @@ Chức năng \textit{xem kết quả bầu cử} công bố số phiếu đã đ
     \begin{enumerate}
         \item Khách gửi yêu cầu xem kết quả tới Reveal-Vote qua điểm cuối HTTP công khai theo định danh cuộc bầu cử.
         \item Reveal-Vote yêu cầu Coordinator Service trả về thông tin cuộc bầu cử để kiểm tra trạng thái.
-        \item Reveal-Vote thực hiện song song ba thao tác: nhóm và đếm số phiếu đã tiết lộ theo ứng viên từ cơ sở dữ liệu; truy vấn kết quả kiểm phiếu từ Mạng Blockchain; lấy hồ sơ ứng viên từ Identity Service.
+        \item Reveal-Vote thực hiện song song ba thao tác: nhóm và đếm số phiếu đã tiết lộ theo ứng viên từ cơ sở dữ liệu; truy vấn kết quả kiểm phiếu từ Mạng blockchain; lấy hồ sơ ứng viên từ Identity Service.
         \item Reveal-Vote ghép tên ứng viên với hai con số đếm và đối chiếu tổng số phiếu giữa cơ sở dữ liệu và blockchain.
         \item Khách nhận kết quả chi tiết cho từng ứng viên.
     \end{enumerate} \\
@@ -1324,7 +1324,7 @@ Chức năng \textit{xem kết quả bầu cử} công bố số phiếu đã đ
 
 \subsubsection{Kiểm toán số phiếu}
 
-Chức năng \textit{kiểm toán số phiếu} cho phép bất kỳ khách ẩn danh nào lấy về bản đối chiếu các con số quan trọng của một cuộc bầu cử giữa cơ sở dữ liệu nội bộ và sổ cái blockchain. Kết quả gồm tổng số phiếu đã nộp, số phiếu đã tiết lộ và trạng thái cam kết gốc Merkle, nhờ đó mọi bên quan tâm có thể tự kiểm chứng tính nhất quán của hệ thống mà không cần truy cập sâu vào dữ liệu nghiệp vụ.
+Chức năng \textit{kiểm toán số phiếu} cho phép bất kỳ khách nào lấy về bản đối chiếu các con số quan trọng của một cuộc bầu cử giữa cơ sở dữ liệu nội bộ và sổ cái blockchain. Kết quả gồm tổng số phiếu đã nộp, số phiếu đã tiết lộ và trạng thái cam kết gốc Merkle, nhờ đó mọi bên quan tâm có thể tự kiểm chứng tính nhất quán của hệ thống mà không cần truy cập sâu vào dữ liệu nghiệp vụ.
 
 \begin{figure}[H]
     \centering
@@ -1350,7 +1350,7 @@ Chức năng \textit{kiểm toán số phiếu} cho phép bất kỳ khách ẩn
     \endlastfoot
     Tên chức năng & Kiểm toán số phiếu giữa cơ sở dữ liệu và blockchain. \\
     \hline
-    Tác nhân & Khách ẩn danh; Mạng Blockchain (hệ thống ngoài). \\
+    Tác nhân & Khách; Mạng blockchain (hệ thống ngoài). \\
     \hline
     Điều kiện trước & Cuộc bầu cử tồn tại trong hệ thống. \\
     \hline
@@ -1359,7 +1359,7 @@ Chức năng \textit{kiểm toán số phiếu} cho phép bất kỳ khách ẩn
     Luồng sự kiện chính &
     \begin{enumerate}
         \item Khách gửi yêu cầu kiểm toán tới Reveal-Vote qua điểm cuối HTTP công khai theo định danh cuộc bầu cử.
-        \item Reveal-Vote thực hiện song song ba thao tác: đếm số phiếu đã tiết lộ trong cơ sở dữ liệu của Reveal-Vote; yêu cầu Coordinator Service trả về tổng số phiếu đã nộp; truy vấn các chỉ số kiểm toán từ Mạng Blockchain gồm tổng số phiếu, số phiếu đã tiết lộ và trạng thái cam kết gốc Merkle.
+        \item Reveal-Vote thực hiện song song ba thao tác: đếm số phiếu đã tiết lộ trong cơ sở dữ liệu của Reveal-Vote; yêu cầu Coordinator Service trả về tổng số phiếu đã nộp; truy vấn các chỉ số kiểm toán từ Mạng blockchain gồm tổng số phiếu, số phiếu đã tiết lộ và trạng thái cam kết gốc Merkle.
         \item Reveal-Vote tổng hợp các con số và trạng thái, sau đó trả kết quả đối chiếu cho khách.
         \item Khách nhận bảng đối chiếu chi tiết.
     \end{enumerate} \\

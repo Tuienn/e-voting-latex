@@ -1,15 +1,15 @@
 \subsection{Triển khai mạng blockchain}
 
-Phần này trình bày quy trình triển khai hạ tầng mạng Hyperledger Fabric phục vụ hệ thống bỏ phiếu điện tử, sử dụng nền tảng ChainLaunch để tự động hóa và quản trị toàn bộ vòng đời các nút mạng.
+Phần này trình bày quy trình triển khai hạ tầng mạng Hyperledger Fabric phục vụ hệ thống bỏ phiếu điện tử, sử dụng nền tảng ChainLaunch để tự động hóa và quản trị toàn bộ vòng đời các node mạng.
 
 \subsubsection{Thiết kế kiến trúc mạng}
 
-Hệ thống bầu cử điện tử yêu cầu mức độ sẵn sàng cao và khả năng chống lỗi tốt. Mạng blockchain được xây dựng trên nền tảng Hyperledger Fabric với định danh tổ chức \pkg{org1msp} và kênh truyền thông \pkg{votechannel}. Hạ tầng phân rã gồm 5 nút cốt lõi:
+Hệ thống bầu cử điện tử yêu cầu mức độ sẵn sàng cao và khả năng chống lỗi tốt. Mạng blockchain được xây dựng trên nền tảng Hyperledger Fabric với định danh tổ chức \pkg{org1msp} và kênh truyền thông \pkg{votechannel}. Hạ tầng phân rã gồm 5 node cốt lõi:
 
 \begin{itemize}
-    \item \textbf{Thành phần đồng thuận (Ordering Service):} Gồm 3 nút Orderer cấu hình theo thuật toán Raft (\pkg{orderer0-org1msp}, \pkg{orderer1-org1msp}, \pkg{orderer2-org1msp}) lần lượt trên cổng 9000, 9100 và 9200, đảm bảo tính toàn vẹn dữ liệu và phân tách khối giao dịch theo mô hình chịu lỗi (fault-tolerant).
+    \item \textbf{Thành phần đồng thuận (Ordering Service):} Gồm 3 node Orderer cấu hình theo thuật toán Raft (\pkg{orderer0-org1msp}, \pkg{orderer1-org1msp}, \pkg{orderer2-org1msp}) lần lượt trên cổng 9000, 9100 và 9200, đảm bảo tính toàn vẹn dữ liệu và phân tách khối giao dịch theo mô hình chịu lỗi (fault-tolerant).
 
-    \item \textbf{Thành phần lưu trữ và xác thực (Peer Nodes):} Gồm 2 nút Peer (\pkg{peer0-org1msp} trên cổng 7000 và \pkg{peer1-org1msp} trên cổng 7100) đóng vai trò lưu trữ bản sao sổ cái (Ledger) và thực thi hợp đồng thông minh.
+    \item \textbf{Thành phần lưu trữ và xác thực (Peer Nodes):} Gồm 2 node Peer (\pkg{peer0-org1msp} trên cổng 7000 và \pkg{peer1-org1msp} trên cổng 7100) đóng vai trò lưu trữ bản sao sổ cái (Ledger) và thực thi hợp đồng thông minh.
 \end{itemize}
 
 Bộ công cụ giao diện dòng lệnh ChainLaunch CLI được cài đặt qua trình quản lý gói \pkg{npm}:
@@ -18,9 +18,9 @@ Bộ công cụ giao diện dòng lệnh ChainLaunch CLI được cài đặt qu
 npm install -g @chainlaunch/cli
 \end{verbatim}
 
-\subsubsection{Khởi tạo các nút mạng}
+\subsubsection{Khởi tạo các node mạng}
 
-Toàn bộ thao tác khởi tạo tài nguyên mạng được thực hiện tuần tự thông qua ChainLaunch CLI, đảm bảo tính minh bạch và ghi vết đầy đủ vòng đời từng nút. Đầu tiên, cụm đồng thuận gồm 3 nút Orderer độc lập được kích hoạt nhằm loại bỏ điểm lỗi duy nhất (Single Point of Failure):
+Toàn bộ thao tác khởi tạo tài nguyên mạng được thực hiện tuần tự thông qua ChainLaunch CLI, đảm bảo tính minh bạch và ghi vết đầy đủ vòng đời từng node. Đầu tiên, cụm đồng thuận gồm 3 node Orderer độc lập được kích hoạt nhằm loại bỏ điểm lỗi duy nhất (Single Point of Failure):
 
 \begin{verbatim}
 chainlaunch node create --name "orderer0-org1msp" \
@@ -33,7 +33,7 @@ chainlaunch node create --name "orderer2-org1msp" \
   --type "FABRIC_ORDERER" --mspid "org1msp" --port 9200
 \end{verbatim}
 
-Tiếp theo, 2 nút Peer được khởi tạo, chịu trách nhiệm nhận đề xuất giao dịch bầu chọn từ phía người dùng:
+Tiếp theo, 2 node Peer được khởi tạo, chịu trách nhiệm nhận đề xuất giao dịch bầu chọn từ phía người dùng:
 
 \begin{verbatim}
 chainlaunch node create --name "peer0-org1msp" \
@@ -67,7 +67,7 @@ chainlaunch network join-node \
 
 Mã nguồn xử lý logic bầu chọn được phát triển bằng ngôn ngữ \textbf{Go} và đóng gói thành Docker Image lưu trữ tại \pkg{tuienn/votecc:latest}. Quy trình triển khai gồm 3 bước:
 
-Bước 1 -- Khai báo siêu dữ liệu để tạo sự đồng thuận về phiên bản giữa các nút:
+Bước 1 -- Khai báo siêu dữ liệu để tạo sự đồng thuận về phiên bản giữa các node:
 
 \begin{verbatim}
 chainlaunch chaincode define --network-id "net-xyz123" \
@@ -75,7 +75,7 @@ chainlaunch chaincode define --network-id "net-xyz123" \
   --image "docker.io/tuienn/votecc:latest" --init-required true
 \end{verbatim}
 
-Bước 2 -- Kéo Container Image từ Docker Hub về các nút xác thực:
+Bước 2 -- Kéo Container Image từ Docker Hub về các node xác thực:
 
 \begin{verbatim}
 chainlaunch chaincode deploy --network-id "net-xyz123" \

@@ -115,7 +115,7 @@ Kiểm thử toàn vẹn xác minh hệ thống từ chối sáu lớp vi phạm
     \end{tabular}
 \end{table}
 
-Bốn kịch bản tấn công dựa trên chữ ký (giả mạo khi nộp, giả mạo khi tiết lộ, sai ứng viên, bỏ phiếu sau khi đóng) đều bị từ chối đúng như thiết kế. Hai kịch bản còn lại -- \textit{double-vote} và \textit{double-reveal} -- chưa được từ chối: đây là hệ quả của vấn đề nhất quán dual-write giữa cơ sở dữ liệu và sổ cái blockchain (DB ghi nhận trước khi nhận xác nhận từ chain), được xác định là hạn chế cần giải quyết trong phiên bản tiếp theo.
+Bốn kịch bản tấn công dựa trên chữ ký (giả mạo khi nộp, giả mạo khi tiết lộ, sai ứng viên, bỏ phiếu sau khi đóng) đều bị từ chối đúng như thiết kế. Hai kịch bản còn lại -- \textit{double-vote} và \textit{double-reveal} -- chưa được từ chối: đây là hệ quả của vấn đề nhất quán dual-write giữa cơ sở dữ liệu và sổ cái blockchain (DB ghi nhận trước khi nhận xác nhận từ blockchain), được xác định là hạn chế cần giải quyết trong phiên bản tiếp theo.
 
 \subsubsection{Thống kê sổ cái Hyperledger Fabric}
 
@@ -144,5 +144,5 @@ Một số nhận xét rút ra từ dữ liệu sổ cái:
 \begin{itemize}
     \item \textbf{Mô hình commit--reveal nhất quán:} Tỉ lệ giao dịch vote:reveal ≈ 1:1 ổn định qua mọi pha; mỗi cuộc bầu cử có đúng một giao dịch Merkle root duy nhất tại thời điểm đóng phiếu.
     \item \textbf{Hành vi batch của orderer:} Ở tải thấp (P1/P2/P4), phần lớn block chỉ chứa 1--2 giao dịch do block bị cắt theo BatchTimeout ≈ 2s trước khi đủ số lượng tối đa; ở tải cao (P3), 98\% block đóng đủ 5 giao dịch (MaxMessageCount ≈ 5), rút interval median từ 6{,}33s xuống còn 0{,}87s.
-    \item \textbf{Phase P5 ghi 397 tx thay vì 1.001:} Do delay dồn thời (2--30s) khiến 500 cử tri đổ vào khoảng 35s, gây timeout ở tầng HTTP -- chỉ 198 phiếu hoàn thành nộp và được ghi lên sổ cái; 302 yêu cầu bị từ chối tại tầng dịch vụ trước khi đến bước endorsement, không có giao dịch không hợp lệ nào lọt vào ledger.
+    \item \textbf{Phase P5 ghi 397 tx thay vì 1.001:} Do delay dồn thời (2--30s) khiến 500 cử tri đổ vào khoảng 35s, gây timeout ở tầng HTTP -- chỉ 198 phiếu hoàn thành nộp và được ghi lên sổ cái; 302 yêu cầu bị từ chối tại tầng dịch vụ trước khi đến bước endorsement, không có giao dịch không hợp lệ nào lọt vào sổ cái.
 \end{itemize}
