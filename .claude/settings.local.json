@@ -10,7 +10,12 @@
       "Bash(xelatex -interaction=nonstopmode main.tex)",
       "Bash(xelatex -interaction=nonstopmode -halt-on-error main.tex)",
       "Bash(rsvg-convert -f pdf -o Diagrams/Usecase/TongQuanHeThong.pdf /tmp/tq/TongQuanHeThong_UC.svg)",
-      "Bash(pdfinfo Diagrams/Usecase/TongQuanHeThong.pdf)"
+      "Bash(pdfinfo Diagrams/Usecase/TongQuanHeThong.pdf)",
+      "Bash(echo \"exit=$?\")",
+      "Read(//tmp/**)",
+      "Bash(echo \"pass1 exit=$?\")",
+      "Bash(echo \"pass2 exit=$?\")",
+      "Bash(echo \"build exit=$?\")"
     ]
   }
 }

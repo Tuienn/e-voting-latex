@@ -2,7 +2,7 @@
 
 Tầng sổ cái phân tán của hệ thống được hiện thực hóa bằng một chaincode Hyperledger Fabric viết bằng ngôn ngữ Go, mang tên \textit{VoteLedgerContract}. Chaincode chịu trách nhiệm ghi nhận \textbf{các sự kiện bất biến} của quy trình bỏ phiếu (nộp phiếu mù, đóng cuộc bầu cử, giải mù phiếu) và cung cấp các hàm truy vấn phục vụ \textbf{kiểm chứng độc lập}. Chaincode được triển khai theo mô hình \textit{external chaincode} — tách rời khỏi tiến trình của peer và lắng nghe trên cổng \pkg{9999} — nhằm thuận tiện cho việc nâng cấp và quan sát.
 
-Chaincode được thiết kế theo nguyên tắc tối giản: \textbf{không} lưu trữ vòng đời cuộc bầu cử (PENDING, ACTIVE, CLOSED), \textbf{không} quản lý người dùng và \textbf{không} thực thi xác thực danh tính. Toàn bộ trách nhiệm xác thực tài khoản, xác minh chữ ký EC-Schnorr và điều phối quy trình thuộc về các microservice off-chain; chaincode chỉ giữ vai trò là tầng \textit{chứng cứ} không thể chối bỏ. Các hàm được tổ chức thành ba nhóm hợp đồng tương ứng với ba nghiệp vụ cốt lõi: \textit{Vote Contract}, \textit{Merkle Contract} và \textit{Reveal Contract}.
+Chaincode được thiết kế theo nguyên tắc tối giản: không lưu trữ vòng đời cuộc bầu cử \pkg{(PENDING, ACTIVE, CLOSED)}, không quản lý người dùng và không thực thi xác thực danh tính. Toàn bộ trách nhiệm xác thực tài khoản, xác minh chữ ký EC-Schnorr và điều phối quy trình thuộc về các microservice off-chain; chaincode chỉ giữ vai trò là tầng \textit{chứng cứ} không thể chối bỏ. Các hàm được tổ chức thành ba nhóm hợp đồng tương ứng với ba nghiệp vụ cốt lõi: \textit{Vote Contract}, \textit{Merkle Contract} và \textit{Reveal Contract}.
 
 \subsubsection{Cấu trúc trạng thái trên sổ cái}
 
@@ -24,7 +24,7 @@ Toàn bộ trạng thái của chaincode được lưu vào \textit{World State}
     \hline
     \endlastfoot
     vote       & vote / electionId / voteId & Bản ghi phiếu bầu mù đã được nộp lên blockchain. \\ \hline
-    root       & root / electionId          & Node gốc Merkle của tập phiếu trong cuộc bầu cử. \\ \hline
+    root       & root / electionId          & Gốc Merkle của tập phiếu trong cuộc bầu cử. \\ \hline
     tally      & tally / electionId / candidateId & Bộ đếm số phiếu theo từng ứng viên. \\ \hline
     usedReveal & usedReveal / electionId / revealKey & Tập các khóa giải mù đã được sử dụng, phục vụ chống phát lại. \\ \hline
     stats      & stats / electionId         & Đối tượng thống kê tổng phiếu đã nộp và đã giải mù. \\ \hline
@@ -51,19 +51,19 @@ Chaincode cung cấp tổng cộng mười hàm chia thành hai loại theo bả
     \endlastfoot
     SubmitVote                & invoke & Vote    & Ghi nhận phiếu mù lên sổ cái. \\ \hline
     GetVote                   & query  & Vote    & Truy xuất bản ghi phiếu để xác minh. \\ \hline
-    CommitMerkleRoot          & invoke & Merkle  & Cố định node gốc Merkle khi đóng cuộc bầu cử. \\ \hline
-    GetMerkleRoot             & query  & Merkle  & Lấy node gốc Merkle đã được cố định. \\ \hline
+    CommitMerkleRoot          & invoke & Merkle  & Cố định gốc Merkle khi đóng cuộc bầu cử. \\ \hline
+    GetMerkleRoot             & query  & Merkle  & Lấy gốc Merkle đã được cố định. \\ \hline
     VerifyVoteReceipt         & query  & Merkle  & Kiểm tra phiếu có thuộc cây Merkle hay không. \\ \hline
     GetAuditCounts            & query  & Merkle  & Lấy thống kê tổng phiếu phục vụ kiểm toán. \\ \hline
     RevealVoteCompact         & invoke & Reveal  & Ghi nhận giải mù phiếu và cập nhật kết quả. \\ \hline
     GetTally                  & query  & Reveal  & Lấy kết quả kiểm phiếu theo ứng viên. \\ \hline
     GetUsedReveal             & query  & Reveal  & Tra cứu một khóa giải mù đã được dùng. \\ \hline
-    Compute\allowbreak Reveal\allowbreak Payload\allowbreak Hash  & query  & Reveal  & Tính lại băm tải trọng giải mù phục vụ kiểm toán. \\ \hline
+    Compute\allowbreak Reveal\allowbreak Payload\allowbreak Hash  & query  & Reveal  & Tính lại băm dữ liệu giải mù phục vụ kiểm toán. \\ \hline
 \end{fitlongtable}
 
 \subsubsection{Hàm SubmitVote}
 
-Hàm \pkg{SubmitVote} thuộc loại \textit{invoke}, được Coordinator Service gọi mỗi khi một cử tri nộp phiếu. Trước khi ghi nhận, chaincode kiểm tra cuộc bầu cử chưa cố định node gốc Merkle và \pkg{voteID} chưa tồn tại nhằm chặn trùng lặp; sau khi ghi thành công, bộ đếm \pkg{TotalVoteCount} trong đối tượng \pkg{Stats} được tăng lên một đơn vị.
+Hàm \pkg{SubmitVote} thuộc loại \textit{invoke}, được Coordinator Service gọi mỗi khi một cử tri nộp phiếu. Trước khi ghi nhận, chaincode kiểm tra cuộc bầu cử chưa cố định gốc Merkle và \pkg{voteID} chưa tồn tại nhằm chặn trùng lặp; sau khi ghi thành công, bộ đếm \pkg{TotalVoteCount} trong đối tượng \pkg{Stats} được tăng lên một đơn vị.
 
 \begin{fitlongtable}{|p{0.25\textwidth}|p{0.13\textwidth}|p{0.48\textwidth}|}
     \caption{Tham số của hàm SubmitVote}
@@ -110,7 +110,7 @@ Hàm \pkg{GetVote} thuộc loại \textit{query}, trả về bản ghi \pkg{Vote
 
 \subsubsection{Hàm CommitMerkleRoot}
 
-Hàm \pkg{CommitMerkleRoot} thuộc loại \textit{invoke}, được Coordinator Service gọi đúng một lần khi quản trị viên đóng cuộc bầu cử. Chaincode đối chiếu \pkg{voteCount} truyền vào với giá trị \pkg{TotalVoteCount} đã tích lũy trên blockchain nhằm phát hiện sai lệch giữa cơ sở dữ liệu off-chain và sổ cái; nếu khớp, node gốc Merkle được lưu lại kèm cờ \pkg{committed = true} và không thể bị ghi đè.
+Hàm \pkg{CommitMerkleRoot} thuộc loại \textit{invoke}, được Coordinator Service gọi đúng một lần khi quản trị viên đóng cuộc bầu cử. Chaincode đối chiếu \pkg{voteCount} truyền vào với giá trị \pkg{TotalVoteCount} đã tích lũy trên blockchain nhằm phát hiện sai lệch giữa cơ sở dữ liệu off-chain và sổ cái; nếu khớp, gốc Merkle được lưu lại kèm cờ \pkg{committed = true} và không thể bị ghi đè.
 
 \begin{fitlongtable}{|p{0.20\textwidth}|p{0.13\textwidth}|p{0.53\textwidth}|}
     \caption{Tham số của hàm CommitMerkleRoot}
@@ -128,7 +128,7 @@ Hàm \pkg{CommitMerkleRoot} thuộc loại \textit{invoke}, được Coordinator
     \hline
     \endlastfoot
     electionID   & string & Định danh cuộc bầu cử. \\ \hline
-    merkleRoot   & string & Node gốc Merkle, là chuỗi băm SHA-256 hex 64 ký tự. \\ \hline
+    merkleRoot   & string & Gốc Merkle, là chuỗi băm SHA-256 hex 64 ký tự. \\ \hline
     voteCountStr & string & Tổng số phiếu (giá trị \textit{uint64} biểu diễn dưới dạng chuỗi). \\ \hline
 \end{fitlongtable}
 
@@ -156,7 +156,7 @@ Hàm \pkg{GetMerkleRoot} thuộc loại \textit{query}, trả về đối tượ
 
 \subsubsection{Hàm VerifyVoteReceipt}
 
-Hàm \pkg{VerifyVoteReceipt} thuộc loại \textit{query}, đóng vai trò điểm tin cậy cuối cùng trong quy trình xác minh phiếu. Chaincode tự tính lại node gốc Merkle từ chiếc lá \pkg{leaf} sinh từ \pkg{blindedCommitment} cùng đường dẫn chứng minh do bên gọi cung cấp, sau đó so sánh với node gốc đã được cố định trên blockchain để khẳng định phiếu có thuộc cuộc bầu cử hay không.
+Hàm \pkg{VerifyVoteReceipt} thuộc loại \textit{query}, đóng vai trò điểm tin cậy cuối cùng trong quy trình xác minh phiếu. Chaincode tự tính lại gốc Merkle từ lá (leaf) sinh từ \pkg{blindedCommitment} cùng đường dẫn chứng minh do bên gọi cung cấp, sau đó so sánh với node gốc đã được cố định trên blockchain để khẳng định phiếu có thuộc cuộc bầu cử hay không.
 
 \begin{fitlongtable}{|p{0.23\textwidth}|p{0.13\textwidth}|p{0.50\textwidth}|}
     \caption{Tham số của hàm VerifyVoteReceipt}
@@ -180,7 +180,7 @@ Hàm \pkg{VerifyVoteReceipt} thuộc loại \textit{query}, đóng vai trò đi�
 
 \subsubsection{Hàm GetAuditCounts}
 
-Hàm \pkg{GetAuditCounts} thuộc loại \textit{query}, trả về đối tượng \pkg{AuditCountsView} chứa tổng số phiếu đã nộp, tổng số phiếu đã giải mù, cờ cho biết node gốc Merkle đã được cố định hay chưa và cờ so khớp hai giá trị này. Hàm phục vụ chức năng kiểm toán đối chiếu số liệu giữa cơ sở dữ liệu và chuỗi khối.
+Hàm \pkg{GetAuditCounts} thuộc loại \textit{query}, trả về đối tượng \pkg{AuditCountsView} chứa tổng số phiếu đã nộp, tổng số phiếu đã giải mù, cờ cho biết gốc Merkle đã được cố định hay chưa và cờ so khớp hai giá trị này. Hàm phục vụ chức năng kiểm toán đối chiếu số liệu giữa cơ sở dữ liệu và blockchain.
 
 \begin{fitlongtable}{|p{0.20\textwidth}|p{0.13\textwidth}|p{0.53\textwidth}|}
     \caption{Tham số của hàm GetAuditCounts}
@@ -202,7 +202,7 @@ Hàm \pkg{GetAuditCounts} thuộc loại \textit{query}, trả về đối tư�
 
 \subsubsection{Hàm RevealVoteCompact}
 
-Hàm \pkg{RevealVoteCompact} thuộc loại \textit{invoke}, đóng vai trò trung tâm trong giai đoạn kiểm phiếu. Chaincode kiểm tra node gốc Merkle đã được cố định, đối chiếu \pkg{revealKey} chưa từng xuất hiện trong tập \pkg{usedReveal} (chống phát lại trên chuỗi), sau đó lưu khóa giải mù kèm danh sách ứng viên được chọn, tăng bộ đếm \pkg{tally} cho \textit{mỗi} ứng viên trong danh sách và tăng \pkg{RevealCount} đúng một lần cho mỗi lá phiếu (không phụ thuộc vào số ứng viên được chọn).
+Hàm \pkg{RevealVoteCompact} thuộc loại \textit{invoke}, đóng vai trò trung tâm trong giai đoạn kiểm phiếu. Chaincode kiểm tra gốc Merkle đã được cố định, đối chiếu \pkg{revealKey} chưa từng xuất hiện trong tập \pkg{usedReveal} (chống phát lại trên chuỗi), sau đó lưu khóa giải mù kèm danh sách ứng viên được chọn, tăng bộ đếm \pkg{tally} cho mỗi ứng viên trong danh sách và tăng \pkg{RevealCount} đúng một lần cho mỗi lá phiếu (không phụ thuộc vào số ứng viên được chọn).
 
 \begin{fitlongtable}{|p{0.26\textwidth}|p{0.13\textwidth}|p{0.47\textwidth}|}
     \caption{Tham số của hàm RevealVoteCompact}
@@ -222,7 +222,7 @@ Hàm \pkg{RevealVoteCompact} thuộc loại \textit{invoke}, đóng vai trò tru
     electionID        & string & Định danh cuộc bầu cử. \\ \hline
     candidateIdsJson  & string & Mảng JSON canonical (loại bỏ phần tử trùng lặp và sắp xếp) các định danh ứng viên được cử tri chọn. \\ \hline
     revealKey         & string & Vân tay chữ ký $\mathrm{SHA256}(h \mathbin{\|} s')$ hex 64 ký tự. \\ \hline
-    revealPayloadHash & string & Băm cam kết tải trọng giải mù, phục vụ kiểm toán về sau. \\ \hline
+    revealPayloadHash & string & Băm cam kết dữ liệu giải mù, phục vụ kiểm toán về sau. \\ \hline
 \end{fitlongtable}
 
 \subsubsection{Hàm GetTally}
@@ -294,9 +294,9 @@ Hàm \pkg{ComputeRevealPayloadHash} là hàm tiện ích thuộc loại \textit{
     sPrime      & string & Thành phần $s'$ đã giải mù của chữ ký Schnorr (hex 64 ký tự). \\ \hline
 \end{fitlongtable}
 
-\subsubsection{Luồng trạng thái cuộc bầu cử trên chuỗi khối}
+\subsubsection{Luồng trạng thái cuộc bầu cử trên blockchain}
 
-Mặc dù chaincode không lưu trạng thái vòng đời tường minh, các ràng buộc trong từng hàm ngầm định một trình tự ba pha bắt buộc đối với một cuộc bầu cử trên chuỗi khối:
+Mặc dù chaincode không lưu trạng thái vòng đời tường minh, các ràng buộc trong từng hàm ngầm định một trình tự ba pha bắt buộc đối với một cuộc bầu cử trên blockchain:
 
 \begin{itemize}
     \item \textbf{Pha nhận phiếu:} hàm \pkg{SubmitVote} có thể được gọi nhiều lần. Sau mỗi lần thành công, bộ đếm \pkg{TotalVoteCount} trong \pkg{Stats} được tăng lên.

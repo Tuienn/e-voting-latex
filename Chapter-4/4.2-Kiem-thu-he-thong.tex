@@ -83,16 +83,16 @@ Ba pha đều hoàn thành không có lỗi. Bảng~\ref{tab:vote-substeps} phâ
         sign-in              &  75    &  89    & 116   & 280   \\
         start-session        &  22    &  26    &  43   & 100   \\
         sign (threshold)     &  15    &  19    &  26   &  68   \\
-        \textbf{submit (chain)} & \textbf{2\,088} & \textbf{2\,132} & \textbf{487} & \textbf{1\,352} \\
+        \textbf{submit (blockchain)} & \textbf{2\,088} & \textbf{2\,132} & \textbf{487} & \textbf{1\,352} \\
         \hline
     \end{tabular}
 \end{table}
 
-Ba bước đầu (sign-in, start-session, threshold sign) có độ trễ thấp và ổn định (15--116~ms). Toàn bộ \textbf{nút cổ chai} tập trung ở bước \textit{submit(chain)}: p50 = 2\,088~ms ở P1 so với 487~ms ở P3. Sự chênh lệch này phản ánh cơ chế batch của orderer -- ở tải thấp (P1/P2), block bị cắt sớm theo \textit{BatchTimeout} ≈ 2s trước khi đầy giao dịch; ở tải cao (P3), các giao dịch đến đủ nhanh để lấp đầy block trước khi hết timeout, rút thời gian chờ xuống đáng kể.
+Ba bước đầu (sign-in, start-session, threshold sign) có độ trễ thấp và ổn định (15--116~ms). Toàn bộ \textbf{nút cổ chai} tập trung ở bước \textit{submit (blockchain)}: p50 = 2\,088~ms ở P1 so với 487~ms ở P3. Sự chênh lệch này phản ánh cơ chế batch của orderer -- ở tải thấp (P1/P2), block bị cắt sớm theo \textit{BatchTimeout} khoảng 2s trước khi đầy giao dịch; ở tải cao (P3), các giao dịch đến đủ nhanh để lấp đầy block trước khi hết timeout, rút thời gian chờ xuống đáng kể.
 
 \subsubsection{Kết quả kiểm thử toàn vẹn}
 
-Kiểm thử toàn vẹn xác minh hệ thống từ chối sáu lớp vi phạm nghiêm trọng trong điều kiện vận hành thực. Bảng~\ref{tab:negative-tests} trình bày kết quả trên hai pha P4 (100 cử tri, tải trải đều) và P5 (500 cử tri, tải dồn thời).
+Kiểm thử toàn vẹn xác minh hệ thống từ chối sáu lớp vi phạm nghiêm trọng trong điều kiện vận hành thực. Bảng~\ref{tab:negative-tests} trình bày kết quả trên hai pha P4 (100 cử tri, tải phân bố đều theo thời gian) và P5 (500 cử tri, tải tập trung trong thời gian ngắn).
 
 \begin{table}[H]
     \centering
@@ -142,7 +142,7 @@ Bảng~\ref{tab:block-stats} tổng hợp chỉ số sổ cái qua năm pha ki�
 
 Một số nhận xét rút ra từ dữ liệu sổ cái:
 \begin{itemize}
-    \item \textbf{Mô hình commit--reveal nhất quán:} Tỉ lệ giao dịch vote:reveal ≈ 1:1 ổn định qua mọi pha; mỗi cuộc bầu cử có đúng một giao dịch Merkle root duy nhất tại thời điểm đóng phiếu.
-    \item \textbf{Hành vi batch của orderer:} Ở tải thấp (P1/P2/P4), phần lớn block chỉ chứa 1--2 giao dịch do block bị cắt theo BatchTimeout ≈ 2s trước khi đủ số lượng tối đa; ở tải cao (P3), 98\% block đóng đủ 5 giao dịch (MaxMessageCount ≈ 5), rút interval median từ 6{,}33s xuống còn 0{,}87s.
-    \item \textbf{Phase P5 ghi 397 tx thay vì 1.001:} Do delay dồn thời (2--30s) khiến 500 cử tri đổ vào khoảng 35s, gây timeout ở tầng HTTP -- chỉ 198 phiếu hoàn thành nộp và được ghi lên sổ cái; 302 yêu cầu bị từ chối tại tầng dịch vụ trước khi đến bước endorsement, không có giao dịch không hợp lệ nào lọt vào sổ cái.
+    \item \textbf{Mô hình commit--reveal nhất quán:} Tỉ lệ giao dịch vote:reveal $\approx$ 1:1 ổn định qua mọi pha; mỗi cuộc bầu cử có đúng một giao dịch gốc Merkle duy nhất tại thời điểm đóng phiếu.
+    \item \textbf{Hành vi batch của orderer:} Ở tải thấp (P1/P2/P4), phần lớn block chỉ chứa 1--2 giao dịch do block bị cắt theo BatchTimeout khoảng 2s trước khi đủ số lượng tối đa; ở tải cao (P3), 98\% block đóng đủ 5 giao dịch (MaxMessageCount $\approx$ 5), rút interval median từ 6{,}33s xuống còn 0{,}87s.
+    \item \textbf{Pha P5 ghi 397 tx thay vì 1.001:} Do đỗ trễ tập trung (2--30s) khiến 500 cử tri đổ vào khoảng 35s, gây timeout ở tầng HTTP -- chỉ 198 phiếu hoàn thành nộp và được ghi lên sổ cái; 302 yêu cầu bị từ chối tại tầng dịch vụ trước khi đến bước endorsement, không có giao dịch không hợp lệ nào lọt vào sổ cái.
 \end{itemize}

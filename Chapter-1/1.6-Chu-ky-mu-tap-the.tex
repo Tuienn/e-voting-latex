@@ -1,7 +1,7 @@
 \subsection{Chữ ký mù tập thể}
 \label{sec:chu-ky-mu-tap-the}
 
-Trong nhiều ứng dụng thực tế, một thông điệp cần được chứng thực đồng thời bởi nhiều thực thể trong một tổ chức -- chẳng hạn ban tổ chức bầu cử gồm nhiều thành viên cùng cấp phiếu cho cử tri. Lược đồ chữ ký số tập thể (multi-signature) đáp ứng nhu cầu nhiều người ký nhưng không bảo đảm tính riêng tư; ngược lại, chữ ký mù (mục 1.5) đảm bảo tính riêng tư nhưng chỉ có một người ký. \textit{Chữ ký mù tập thể} (blind multi-signature -- BMS) kết hợp cả hai: nhiều người ký cùng ký lên thông điệp đã làm mù mà vẫn giữ kín nội dung đối với mọi người ký. Đây là công cụ mật mã cốt lõi được sử dụng trong hệ thống bỏ phiếu điện tử dựa trên blockchain được đề xuất trong đồ án.
+Trong nhiều ứng dụng thực tế, một thông điệp cần được chứng thực đồng thời bởi nhiều thực thể trong một tổ chức -- chẳng hạn ban tổ chức bầu cử gồm nhiều thành viên cùng cấp phiếu cho cử tri. Lược đồ chữ ký số tập thể (multi-signature) đáp ứng nhu cầu nhiều người ký nhưng không bảo đảm tính riêng tư; ngược lại, chữ ký mù (mục \ref{sec:chu-ky-mu}) đảm bảo tính riêng tư nhưng chỉ có một người ký. \textit{Chữ ký mù tập thể} (blind multi-signature -- BMS) kết hợp cả hai: nhiều người ký cùng ký lên thông điệp đã làm mù mà vẫn giữ kín nội dung đối với mọi người ký. Đây là công cụ mật mã cốt lõi được sử dụng trong hệ thống bỏ phiếu điện tử dựa trên blockchain được đề xuất trong đồ án.
 
 \subsubsection{Khái niệm chữ ký mù tập thể}
 
@@ -11,7 +11,7 @@ Cách tiếp cận đơn giản nhất là mỗi người ký tự ký bằng l�
 
 \subsubsection{Mô hình tổng quát của chữ ký mù tập thể}
 
-Lược đồ chữ ký mù tập thể là sự tổng quát hóa của cả mô hình chữ ký mù (mục 1.5) và chữ ký tập thể, gồm bốn thuật toán chính:
+Lược đồ chữ ký mù tập thể là sự tổng quát hóa của cả mô hình chữ ký mù (mục \ref{sec:chu-ky-mu}) và chữ ký tập thể, gồm bốn thuật toán chính:
 
 \begin{itemize}
     \item \textbf{Sinh khóa (Gen):} mỗi thành viên $U_i$ sinh cặp khóa $(sk_i, pk_i)$. Từ tập khóa công khai riêng, hệ thống tính \textit{khóa công khai tập thể} $pk_{\mathbf{U}}$ làm khóa xác minh chung.
@@ -44,13 +44,13 @@ Quy trình gồm năm pha tuần tự:
     \item \textbf{Pha 1 -- Sinh khóa:} Mỗi $U_i$ độc lập sinh $d_i$ và tính $P_i$; khóa công khai tập thể $P$ được tổng hợp và công bố cùng danh sách thành viên.
     \item \textbf{Pha 2 -- Sinh cam kết tập thể:} Mỗi $U_i$ chọn $k_i$ ngẫu nhiên, tính điểm cam kết $C_i$; các $C_i$ được tổng hợp thành $C$ và gửi cho $A$.
     \item \textbf{Pha 3 -- Làm mù:} $A$ dùng các tham số làm mù bí mật $(\alpha, \beta)$ biến đổi $C$ thành $C'$, tính thử thách đã làm mù $e$ dựa trên $C'$ và $M$, gửi $e$ về tập thể.
-    \item \textbf{Pha 4 -- Ký tập thể:} Mỗi $U_i$ dùng $d_i$, $k_i$ và $e$ tính phần chữ ký riêng $s_i$; các $s_i$ được tổng hợp thành phần chữ ký tập thể đã làm mù $s'$.
-    \item \textbf{Pha 5 -- Giải mù và xác minh:} $A$ giải mù $s'$ thu được chữ ký $\sigma$ trên $M$; mọi thực thể có thể xác minh $(M, \sigma)$ bằng $P$.
+    \item \textbf{Pha 4 -- Ký tập thể:} Mỗi $U_i$ dùng $d_i$, $k_i$ và $e$ tính phần chữ ký riêng $s_i$; các $s_i$ được tổng hợp thành phần chữ ký tập thể đã làm mù $s''$.
+    \item \textbf{Pha 5 -- Giải mù và xác minh:} $A$ giải mù $s''$ thu được thành phần $s'$ của chữ ký; cặp $(r', s')$ tạo thành chữ ký $\sigma$ trên $M$, mọi thực thể có thể xác minh $(M, \sigma)$ bằng $P$.
 \end{itemize}
 
 \subsubsection{Lược đồ chữ ký mù tập thể dựa trên EC-Schnorr}
 
-Trên cơ sở EC-Schnorr (mục 1.4) và mô hình chữ ký mù (mục 1.5), lược đồ chữ ký mù tập thể dựa trên EC-Schnorr được xây dựng như sau. Bộ tham số miền gồm đường cong elliptic $E$ trên trường $\mathbb{F}_p$, điểm gốc $G$ cấp $q$, hàm băm $H: \{0,1\}^* \rightarrow \mathbb{Z}_q$, tập thể $n$ người ký $\mathbf{U}$ và người yêu cầu $A$.
+Trên cơ sở EC-Schnorr (mục \ref{sec:luoc-do-ec-schnorr}) và mô hình chữ ký mù (mục \ref{sec:chu-ky-mu}), lược đồ chữ ký mù tập thể dựa trên EC-Schnorr được xây dựng như sau. Bộ tham số miền gồm đường cong elliptic $E$ trên trường $\mathbb{F}_p$, điểm gốc $G$ cấp $q$, hàm băm $H: \{0,1\}^* \rightarrow \mathbb{Z}_q$, tập thể $n$ người ký $\mathbf{U}$ và người yêu cầu $A$.
 
 \begin{itemize}
     \item \textbf{Sinh khóa:} Mỗi $U_i$ chọn $d_i \in (1, q-1)$ ngẫu nhiên, tính $P_i = d_i \times G$. Khóa công khai tập thể:
@@ -121,8 +121,7 @@ Vì $e = r' - \beta \Rightarrow r' - e = \beta$, suy ra:
     C^* = C + \alpha \times G + \beta \times P = C'
     \label{eq:bms-proof-2}
 \end{equation}
-Do đó $x_{C^*} = x_{C'}$, dẫn đến $r^* = H(M, x_{C^*}) \bmod q = r'$. Điều kiện $r^* = r'$ luôn thỏa mãn, tính đúng đắn được chứng minh. $\hfill \blacksquare$
-
+Do đó $x_{C^*} = x_{C'}$, dẫn đến $r^* = H(M, x_{C^*}) \bmod q = r'$. Điều kiện $r^* = r'$ luôn thỏa mãn, tính đúng đắn được chứng minh.
 \subsubsection{Phân tích tính an toàn}
 
 Tính an toàn của lược đồ được đánh giá qua bốn khía cạnh:
@@ -141,4 +140,4 @@ Tính an toàn của lược đồ được đánh giá qua bốn khía cạnh:
     \item \textbf{An toàn của khóa bí mật:} khóa tập thể $D = \sum d_i$ không bao giờ được tính tường minh; khôi phục $D$ từ $P = D \times G$ tương đương ECDLP. Mỗi $k_i$ phải được sinh ngẫu nhiên, bí mật và không tái sử dụng -- nếu hai phần chữ ký $s_i$ trên hai thử thách $e$ khác nhau dùng cùng $k_i$ thì $d_i$ bị khôi phục ngay. Tập thể cần kênh truyền tin xác thực để chống tấn công \textit{rogue-key}.
 \end{itemize}
 
-Với các phân tích trên, lược đồ chữ ký mù tập thể dựa trên EC-Schnorr đáp ứng đầy đủ yêu cầu về tính mù, không thể giả mạo và không thể liên kết theo các định nghĩa trong mục 1.5.3, đồng thời kế thừa hiệu năng và kích thước chữ ký của EC-Schnorr. Kích thước chữ ký tập thể cố định bằng $2 \lceil \log_2 q \rceil$ bit -- không phụ thuộc số lượng người ký $n$ -- và xác minh chỉ cần một phép kiểm tra duy nhất bằng $P$. Các đặc tính này cho thấy lược đồ phù hợp với hệ thống bỏ phiếu điện tử dựa trên Hyperledger Fabric được đề xuất trong các chương tiếp theo.
+Với các phân tích trên, lược đồ chữ ký mù tập thể dựa trên EC-Schnorr đáp ứng đầy đủ yêu cầu về tính mù, không thể giả mạo và không thể liên kết theo các định nghĩa trong mục \ref{sec:thuoc-tinh-an-toan-chu-ky-mu}, đồng thời kế thừa hiệu năng và kích thước chữ ký của EC-Schnorr. Kích thước chữ ký tập thể cố định bằng $2 \lceil \log_2 q \rceil$ bit -- không phụ thuộc số lượng người ký $n$ -- và xác minh chỉ cần một phép kiểm tra duy nhất bằng $P$. Các đặc tính này cho thấy lược đồ phù hợp với hệ thống bỏ phiếu điện tử dựa trên Hyperledger Fabric được đề xuất trong các chương tiếp theo.

@@ -160,7 +160,7 @@ else Hợp lệ
   Redis --> Coordinator: Xác nhận cập nhật
   deactivate Redis
 
-  Coordinator --> BFF: Trả về biên nhận phiếu
+  Coordinator --> BFF: Trả về biên lai phiếu
   deactivate Coordinator
 
   BFF --> Voter: Thông báo bỏ phiếu thành công

@@ -1,4 +1,5 @@
 \subsection{Nền tảng Blockchain Hyperledger Fabric}
+\label{sec:hyperledger-fabric}
 
 \subsubsection{Giới thiệu Hyperledger Fabric}
 
@@ -17,24 +18,24 @@ So với các nền tảng blockchain phổ biến khác, Hyperledger Fabric có
 
     \item \textbf{Kiến trúc mô-đun (Modular Architecture):} Hyperledger Fabric được thiết kế theo hướng các thành phần có thể \textit{tích hợp linh hoạt} (pluggable), bao gồm cơ chế đồng thuận, hệ thống quản lý danh tính, cơ sở dữ liệu trạng thái và môi trường thực thi hợp đồng thông minh. Tính mô-đun này cho phép các tổ chức tùy biến nền tảng theo nhu cầu nghiệp vụ thay vì phải chấp nhận một mô hình cứng nhắc.
 
-    \item \textbf{Hiệu năng và khả năng mở rộng (High Performance and Scalability):} Quá trình thực thi hợp đồng thông minh được tách biệt khỏi quá trình đồng thuận, giúp các giao dịch được xử lý song song trên nhiều node và sau đó mới được sắp xếp theo thứ tự. Cách tiếp cận này giúp Hyperledger Fabric đạt được tốc độ xử lý hàng nghìn giao dịch mỗi giây với độ trễ chỉ ở mức vài trăm mili giây, vượt trội so với các blockchain công khai sử dụng cơ chế đào.
+    \item \textbf{Hiệu năng và khả năng mở rộng (High Performance and Scalability):} Quá trình thực thi hợp đồng thông minh được tách biệt khỏi quá trình đồng thuận, giúp các giao dịch được xử lý song song trên nhiều node và sau đó mới được sắp xếp theo thứ tự. Cách tiếp cận này giúp Hyperledger Fabric đạt được tốc độ xử lý hàng nghìn giao dịch mỗi giây với độ trễ chỉ ở mức vài trăm ms, vượt trội so với các blockchain công khai sử dụng cơ chế đào (mining).
 
     \item \textbf{Tính bảo mật và riêng tư cao (Confidentiality):} Hyperledger Fabric hỗ trợ chia sẻ dữ liệu có chọn lọc thông qua hai cơ chế chính: kênh giao tiếp riêng tư (Channels) và bộ dữ liệu riêng tư (Private Data Collections). Nhờ đó, các đối tác kinh doanh có thể giao dịch trên cùng một mạng nhưng vẫn đảm bảo bí mật dữ liệu của riêng mình đối với các bên không liên quan.
 
-    \item \textbf{Không yêu cầu tiền điện tử (No Native Cryptocurrency):} Khác với Bitcoin hay Ethereum, Hyperledger Fabric không phát hành đồng tiền số nội tại và không sử dụng cơ chế đào (mining). Việc xác thực giao dịch dựa trên chính sách phê duyệt được các tổ chức thống nhất từ trước, qua đó loại bỏ chi phí năng lượng khổng lồ và giúp hệ thống phù hợp với các quy định pháp lý ở nhiều quốc gia.
+    \item \textbf{Không yêu cầu tiền điện tử (No Native Cryptocurrency):} Khác với Bitcoin hay Ethereum, Hyperledger Fabric không phát hành đồng tiền số nội tại và không sử dụng cơ chế đào. Việc xác thực giao dịch dựa trên chính sách phê duyệt được các tổ chức thống nhất từ trước, qua đó loại bỏ chi phí năng lượng khổng lồ và giúp hệ thống phù hợp với các quy định pháp lý ở nhiều quốc gia.
 \end{itemize}
 
 \subsubsection{Kiến trúc tổng thể}
 
 Một trong những điểm khác biệt cơ bản nhất giữa Hyperledger Fabric với các blockchain truyền thống nằm ở mô hình kiến trúc xử lý giao dịch. Trong khi các nền tảng như Bitcoin hay Ethereum sử dụng mô hình \textit{Order -- Execute} -- tức là các giao dịch được sắp xếp trước rồi mới được thực thi tuần tự trên toàn bộ node mạng -- thì Hyperledger Fabric áp dụng mô hình \textit{Execute -- Order -- Validate} (Thực thi -- Sắp xếp -- Kiểm tra). Theo mô hình này, giao dịch trước tiên được thực thi mô phỏng tại một nhóm nhỏ các node có thẩm quyền, sau đó kết quả được gửi đến dịch vụ sắp xếp để xếp thứ tự, và cuối cùng các node trong mạng mới kiểm tra tính hợp lệ trước khi ghi vào sổ cái. Cách tiếp cận này giúp loại bỏ các giao dịch xung đột ngay từ giai đoạn thực thi, đồng thời cho phép xử lý song song nhiều giao dịch không liên quan.
 
-Một đặc điểm quan trọng khác trong kiến trúc của Hyperledger Fabric là \textbf{sự tách biệt vai trò} (Separation of Roles) giữa các loại node. Thay vì để mỗi node đảm nhiệm toàn bộ quy trình như trong các blockchain công khai, Hyperledger Fabric tách rời tầng đồng thuận (Ordering Service) khỏi tầng thực thi ứng dụng (Peers). Các node Peer tập trung vào việc thực thi hợp đồng thông minh, lưu trữ sổ cái và xác thực giao dịch, trong khi các node Orderer chỉ chịu trách nhiệm sắp xếp giao dịch và tạo khối. Sự chuyên môn hóa này giúp tối ưu hóa băng thông và tài nguyên tính toán, đồng thời cho phép mở rộng độc lập từng tầng tùy theo nhu cầu thực tế.
+Một đặc điểm quan trọng khác trong kiến trúc của Hyperledger Fabric là \textbf{sự tách biệt vai trò} (Separation of Roles) giữa các loại node. Thay vì để mỗi node đảm nhiệm toàn bộ quy trình như trong các blockchain công khai, Hyperledger Fabric tách rời tầng đồng thuận (Ordering Service) khỏi tầng thực thi ứng dụng (Peers). Các peer node tập trung vào việc thực thi hợp đồng thông minh, lưu trữ sổ cái và xác thực giao dịch, trong khi các node Orderer chỉ chịu trách nhiệm sắp xếp giao dịch và tạo khối. Sự chuyên môn hóa này giúp tối ưu hóa băng thông và tài nguyên tính toán, đồng thời cho phép mở rộng độc lập từng tầng tùy theo nhu cầu thực tế.
 
-Về \textbf{cơ chế đồng thuận}, Hyperledger Fabric không cố định một thuật toán duy nhất mà cung cấp khả năng đồng thuận đa tầng có thể thay thế linh họat (Pluggable Consensus). Trong các phiên bản phổ biến hiện nay, dịch vụ sắp xếp thường sử dụng giao thức Raft -- một thuật toán chịu lỗi do sự cố (Crash Fault Tolerant -- CFT) với mô hình lãnh đạo -- người theo. Bên cạnh đó, các phiên bản mới nhất đã bổ sung hỗ trợ các giải pháp chịu lỗi Byzantine (Byzantine Fault Tolerant -- BFT) để đáp ứng các kịch bản đa tổ chức không hoàn toàn tin cậy lẫn nhau, qua đó tăng tính linh hoạt và khả năng áp dụng cho nhiều mô hình quản trị khác nhau.
+Về \textbf{cơ chế đồng thuận}, Hyperledger Fabric không cố định một thuật toán duy nhất mà cung cấp khả năng đồng thuận đa tầng có thể thay thế linh hoạt (Pluggable Consensus). Trong các phiên bản phổ biến hiện nay, dịch vụ sắp xếp thường sử dụng giao thức Raft -- một thuật toán chịu lỗi do sự cố (Crash Fault Tolerant -- CFT) với mô hình một node chủ điều phối các node theo sau (leader-follower). Bên cạnh đó, các phiên bản mới nhất đã bổ sung hỗ trợ các giải pháp chịu lỗi Byzantine (Byzantine Fault Tolerant -- BFT) để đáp ứng các kịch bản đa tổ chức không hoàn toàn tin cậy lẫn nhau, qua đó tăng tính linh hoạt và khả năng áp dụng cho nhiều mô hình quản trị khác nhau.
 
 \subsubsection{Các thành phần chính}
 
-Hyperledger Fabric bao gồm nhiều thành phần được phối hợp chặt chẽ để cấu thành một mạng lưới hoàn chỉnh. Các thành phần cốt lõi bao gồm: node Peer, dịch vụ sắp xếp Orderer, cơ quan cấp chứng chỉ, kênh giao tiếp và sổ cái.
+Hyperledger Fabric bao gồm nhiều thành phần được phối hợp chặt chẽ để cấu thành một mạng lưới hoàn chỉnh. Các thành phần cốt lõi bao gồm: peer node, dịch vụ sắp xếp Orderer, cơ quan cấp chứng chỉ, kênh giao tiếp và sổ cái.
 
 \begin{itemize}
     \item \textbf{Peer (Node mạng):} Peer là thành phần cơ bản và trung tâm của mạng Hyperledger Fabric. Mỗi tổ chức tham gia mạng thường vận hành một hoặc nhiều Peer, trực tiếp lưu trữ bản sao của sổ cái và các chaincode đã được triển khai. Dựa trên vai trò trong từng giao dịch, Peer được phân thành hai nhóm chính: \textit{Endorsing Peer} (Node xác thực) chịu trách nhiệm tiếp nhận đề xuất giao dịch từ Client, thực thi mô phỏng chaincode trên trạng thái sổ cái hiện tại, ký số xác nhận kết quả và gửi phản hồi về cho Client; \textit{Committing Peer} (Node ghi nhận) nhận các khối giao dịch đã được sắp xếp từ Orderer, kiểm tra lại tính hợp lệ và cập nhật chính thức vào sổ cái cục bộ. Trong thực tế, một Peer có thể đồng thời đảm nhiệm cả hai vai trò trên tùy theo cấu hình của mạng.
@@ -101,7 +102,7 @@ Mô hình xử lý giao dịch theo kiểu \textit{Execute -- Order -- Validate}
 \textbf{Hạn chế:} Bên cạnh các ưu điểm, Hyperledger Fabric cũng tồn tại một số hạn chế cần được lưu ý khi triển khai:
 
 \begin{itemize}
-    \item Kiến trúc hệ thống tương đối phức tạp với nhiều thành phần phối hợp (Peer, Orderer, CA, MSP, Channel, chaincode, v.v.), đòi hỏi thời gian tìm hiểu và làm quen lớn đáng kể đối với các nhóm phát triển mới làm quen.
+    \item Kiến trúc hệ thống tương đối phức tạp với nhiều thành phần phối hợp (Peer, Orderer, CA, MSP, Channel, chaincode, v.v.), đòi hỏi thời gian tìm hiểu đáng kể đối với các nhóm phát triển mới làm quen.
 
     \item Quy trình thiết lập ban đầu và quản trị mạng lưới (Network Governance) giữa nhiều tổ chức đòi hỏi nhiều thời gian và công sức, từ việc thống nhất chính sách, cấp phát chứng chỉ, đến cấu hình kênh và phê duyệt chaincode.
 

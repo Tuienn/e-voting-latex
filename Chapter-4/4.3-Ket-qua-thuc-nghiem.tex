@@ -1,10 +1,10 @@
 \subsection{Kết quả thực nghiệm}
 
-Trên cơ sở kiến trúc và các tầng bảo mật đã trình bày ở Chương~2 và Chương~3, hệ thống bỏ phiếu điện tử được hiện thực hóa thành hai sản phẩm độc lập nhưng phối hợp chặt chẽ: một \textit{ứng dụng web quản trị} dành cho ban tổ chức cuộc bầu cử và một \textit{ứng dụng di động} dành cho cử tri. Mục này trình bày kết quả thực nghiệm dưới dạng các giao diện đại diện cho toàn bộ luồng nghiệp vụ chính của hệ thống, từ khâu khởi tạo cuộc bầu cử, phân phối quyền bỏ phiếu cho đến khâu kiểm phiếu, công bố kết quả và xác minh biên lai.
+Trên cơ sở kiến trúc và các tầng bảo mật đã trình bày ở Chương~2 và Chương~3, hệ thống bỏ phiếu điện tử được hiện thực hóa thành hai sản phẩm độc lập nhưng phối hợp chặt chẽ: một \textit{trình duyệt quản trị} dành cho ban tổ chức cuộc bầu cử và một \textit{ứng dụng di động} dành cho cử tri. Mục này trình bày kết quả thực nghiệm dưới dạng các giao diện đại diện cho toàn bộ luồng nghiệp vụ chính của hệ thống, từ khâu khởi tạo cuộc bầu cử, phân phối quyền bỏ phiếu cho đến khâu kiểm phiếu, công bố kết quả và xác minh biên lai.
 
 \subsubsection{Giao diện phía quản trị viên (E-voting Admin)}
 
-Ứng dụng web quản trị cung cấp các chức năng vận hành cốt lõi của một cuộc bầu cử: quản lý người dùng, khởi tạo và cấu hình cuộc bầu cử, theo dõi diễn biến bỏ phiếu thời gian thực và thực thi quy trình kiểm phiếu sau khi đóng phiếu. Giao diện được thiết kế đồng nhất theo ngôn ngữ \textit{Material Design} với bố cục dạng bảng điều khiển (dashboard) nhằm tối ưu cho thao tác nhập liệu và truy vấn dữ liệu khối lượng lớn.
+Trang quản trị cung cấp các chức năng vận hành cốt lõi của một cuộc bầu cử: quản lý người dùng, khởi tạo và cấu hình cuộc bầu cử, theo dõi diễn biến bỏ phiếu thời gian thực và thực thi quy trình kiểm phiếu sau khi đóng phiếu. Giao diện được thiết kế đồng nhất theo nguyên tắc thiết kế \textit{Material Design} với bố cục dạng bảng điều khiển (dashboard) nhằm tối ưu cho thao tác nhập liệu và truy vấn dữ liệu khối lượng lớn.
 
 Màn hình \textbf{Đăng nhập} là điểm vào duy nhất của hệ thống quản trị, yêu cầu xác thực bằng tài khoản nội bộ có gắn vai trò \textit{admin} hoặc \textit{auditor}. Phiên đăng nhập được bảo vệ bằng cơ chế JWT hai cặp khóa và lưu trữ tập trung trên Redis như đã trình bày trong Chương~3.
 
@@ -14,7 +14,7 @@ Màn hình \textbf{Đăng nhập} là điểm vào duy nhất của hệ thống
     \caption{Đăng nhập E-voting admin}
 \end{figure}
 
-Sau khi xác thực thành công, quản trị viên có thể truy cập \textbf{trang quản lý danh sách người dùng} để cấp quyền cử tri cho từng tài khoản, đồng bộ dữ liệu định danh và quản trị vai trò truy cập. Đây là tầng kiểm soát cử tri đầu tiên trước khi danh sách được khóa chốt cho một kỳ bầu cử cụ thể.
+Sau khi xác thực thành công, quản trị viên có thể truy cập \textbf{trang quản lý danh sách người dùng} để cấp quyền cử tri cho từng tài khoản, đồng bộ dữ liệu định danh và quản trị vai trò truy cập. Đây là tầng kiểm soát cử tri đầu tiên trước khi danh sách được chốt cho một kỳ bầu cử cụ thể.
 
 \begin{figure}[H]
     \centering
@@ -58,7 +58,7 @@ Sau khi cuộc bầu cử kết thúc, quản trị viên chuyển sang tab \tex
 
 Ứng dụng di động được phát triển trên nền tảng Expo cho phép cử tri thực hiện toàn bộ quy trình bỏ phiếu trên thiết bị cá nhân: từ đăng nhập, lựa chọn cuộc bầu cử, thực hiện bỏ phiếu cho đến lưu giữ biên lai và tự xác minh phiếu bầu sau khi kết quả được công bố. Giao diện được thiết kế theo nguyên tắc tối giản với màn hình tập trung vào một thao tác duy nhất tại mỗi thời điểm nhằm giảm rủi ro nhầm lẫn của cử tri.
 
-Màn hình \textbf{Đăng nhập} xác thực cử tri bằng tài khoản đã được quản trị viên cấp quyền ở phía web admin. Mỗi phiên đăng nhập thành công khởi tạo một cặp khóa cục bộ lưu trong vùng \textit{Secure Storage} của thiết bị, phục vụ ký mù phiếu bầu ở các bước sau.
+Màn hình \textbf{Đăng nhập} xác thực cử tri bằng tài khoản đã được quản trị viên cấp quyền ở phía trang quản trị. Mỗi phiên đăng nhập thành công khởi tạo một cặp khóa cục bộ lưu trong vùng \textit{Secure Storage} của thiết bị, phục vụ ký mù phiếu bầu ở các bước sau.
 
 \begin{figure}[H]
     \centering
@@ -74,7 +74,7 @@ Sau khi đăng nhập, cử tri được dẫn tới màn hình \textbf{Danh sá
     \caption{Danh sách cuộc bầu cử E-voting mobile}
 \end{figure}
 
-Lựa chọn một cuộc bầu cử đang mở phiếu sẽ đưa cử tri đến màn hình \textbf{Bầu cử} -- trung tâm của toàn bộ trải nghiệm. Tại đây, cử tri xem thông tin ứng viên, chọn một lựa chọn và xác nhận. Trong thao tác xác nhận, ứng dụng thực thi giao thức EC-Schnorr ký mù tập thể với máy chủ ký mà không tiết lộ lựa chọn của cử tri.
+Lựa chọn một cuộc bầu cử đang mở phiếu sẽ đưa cử tri đến màn hình \textbf{Bầu cử} -- trung tâm của toàn bộ trải nghiệm. Tại đây, cử tri xem danh sách ứng viên, chọn phương án hợp lý và xác nhận. Trong thao tác xác nhận, ứng dụng thực thi giao thức EC-Schnorr ký mù tập thể với máy chủ ký mà không tiết lộ lựa chọn của cử tri.
 
 \begin{figure}[H]
     \centering

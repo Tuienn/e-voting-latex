@@ -2,7 +2,7 @@
 
 \subsubsection{Cấu trúc cây Merkle cam kết}
 
-Khi cuộc bầu cử kết thúc, toàn bộ tập hợp cam kết phiếu (\textit{blinded commitment}) được tổng hợp thành một cây Merkle có gốc duy nhất. Mỗi lá là giá trị băm SHA-256 của chuỗi hex commit; các node trong được tính bằng cách băm cặp con đã được sắp xếp theo thứ tự byte; gốc cây sau cùng là một giá trị 32 byte tóm tắt toàn bộ phiếu bầu trong bầu cử. Cấu trúc tổng quát được minh họa trong Hình~\ref{fig:merkle-tree}.
+Khi cuộc bầu cử kết thúc, toàn bộ tập hợp cam kết phiếu (\textit{blinded commitment}) được tổng hợp thành một cây Merkle có gốc duy nhất. Mỗi lá là giá trị băm SHA-256 của chuỗi hex commit; các nút trong được tính bằng cách băm cặp con đã được sắp xếp theo thứ tự byte; gốc cây sau cùng là một giá trị 32 byte tóm tắt toàn bộ phiếu bầu trong bầu cử. Cấu trúc tổng quát được minh họa trong Hình~\ref{fig:merkle-tree}.
 
 \begin{figure}[H]
     \centering
@@ -24,7 +24,7 @@ Hệ thống dùng thư viện \pkg{merkletreejs} ở phía off-chain (Node.js) 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\textwidth, keepaspectratio]{Figures/code/merkle-tree-config.png}
-    \caption{Cấu hình \pkg{MerkleTree} của thư viện \pkg{merkletreejs} ở tầng off-chain}
+    \caption{Cấu hình \texttt{MerkleTree} của thư viện \texttt{merkletreejs} ở tầng off-chain}
     \label{fig:merkle-tree-config}
 \end{figure}
 
@@ -33,11 +33,11 @@ Tùy chọn \texttt{sortPairs: true} phải được phản chiếu nguyên vẹ
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\textwidth, keepaspectratio]{Figures/code/hash-sorted-pair-go.png}
-    \caption{Hàm \pkg{hashSortedPair} trong chaincode Go đồng bộ với off-chain}
+    \caption{Hàm \texttt{hashSortedPair} trong chaincode Go đồng bộ với off-chain}
     \label{fig:hash-sorted-pair-go}
 \end{figure}
 
-\subsubsection{Cam kết Merkle root đảm bảo gì}
+\subsubsection{Cam kết gốc Merkle đảm bảo gì}
 
 Sau khi \pkg{commitMerkleRoot} được ghi lên sổ cái Fabric, ba bất biến quan trọng được thiết lập:
 

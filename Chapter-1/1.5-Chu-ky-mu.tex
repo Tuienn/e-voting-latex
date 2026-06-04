@@ -1,4 +1,5 @@
 \subsection{Chữ ký mù}
+\label{sec:chu-ky-mu}
 
 Trong các giao dịch điện tử hiện đại, bên cạnh yêu cầu xác thực nguồn gốc và toàn vẹn thông điệp, việc bảo vệ \textit{tính riêng tư} của người sử dụng ngày càng cấp thiết -- đặc biệt trong bỏ phiếu điện tử, thanh toán nặc danh hay tiền điện tử. Lược đồ chữ ký số thông thường không thỏa mãn yêu cầu này, do người ký luôn biết rõ nội dung mình đã ký và có thể truy ngược danh tính người yêu cầu. Khái niệm \textit{chữ ký số mù} (blind signature) cho phép người ký ký lên một thông điệp mà không biết nội dung thực của thông điệp đó, là nền tảng để xây dựng lược đồ chữ ký mù tập thể trình bày trong mục tiếp theo.
 
@@ -10,7 +11,7 @@ Cơ chế này đặc biệt hữu ích trong các bài toán đòi hỏi nặc 
 
 \subsubsection{Mô hình tổng quát của chữ ký mù}
 
-Một lược đồ chữ ký số mù là sự kết hợp của hệ thống chữ ký số hai khóa với một hệ thống khóa công khai kiểu \textit{giao hóan}, gồm hai thực thể tham gia chính và bốn hàm cơ bản.
+Một lược đồ chữ ký số mù là sự kết hợp của hệ thống chữ ký số hai khóa với một hệ thống khóa công khai kết hợp với một cơ chế làm mù có tính giao hoán đối với hàm ký, gồm hai thực thể tham gia chính và bốn hàm cơ bản.
 
 Các thực thể tham gia:
 \begin{itemize}
@@ -21,7 +22,7 @@ Các thực thể tham gia:
 Các hàm cơ bản:
 \begin{itemize}
     \item \textbf{Hàm ký $\textsf{Sig}$:} chỉ được biết bởi $B$; hàm nghịch đảo $\textsf{Sig}'$ được công bố công khai, thỏa $\textsf{Sig}'(\textsf{Sig}(M)) = M$ và không cho phép tìm ra $\textsf{Sig}$. Cặp hàm này tương ứng với cặp khóa bí mật -- công khai của người ký.
-    \item \textbf{Hàm giao hóan $f$ và hàm nghịch đảo $f'$:} chỉ được biết bởi $A$, thỏa mãn tính chất \textit{giao hóan} với hàm ký:
+    \item \textbf{Hàm giao hoán $f$ và hàm nghịch đảo $f'$:} chỉ được biết bởi $A$, thỏa mãn tính chất \textit{giao hoán} với hàm ký:
     \begin{equation}
         f'(\textsf{Sig}(f(M))) = \textsf{Sig}(M)
         \label{eq:blind-commutative}
@@ -29,9 +30,10 @@ Các hàm cơ bản:
     đồng thời $f(M)$ không tiết lộ bất kỳ thông tin nào về $M$. Hàm $f$ ``làm mù'' thông điệp trước khi gửi cho người ký, $f'$ ``giải mù'' chữ ký nhận được.
 \end{itemize}
 
-Tính chất giao hóan \eqref{eq:blind-commutative} là yếu tố cốt lõi của cơ chế chữ ký mù: tách rời quá trình ký (thực hiện trên dạng đã làm mù) khỏi quá trình thu chữ ký cuối cùng (thực hiện trên dạng đã giải mù), trong khi chữ ký cuối cùng vẫn hợp lệ trên thông điệp gốc.
+Tính chất giao hoán \eqref{eq:blind-commutative} là yếu tố cốt lõi của cơ chế chữ ký mù: tách rời quá trình ký (thực hiện trên dạng đã làm mù) khỏi quá trình thu chữ ký cuối cùng (thực hiện trên dạng đã giải mù), trong khi chữ ký cuối cùng vẫn hợp lệ trên thông điệp gốc.
 
 \subsubsection{Các thuộc tính an toàn}
+\label{sec:thuoc-tinh-an-toan-chu-ky-mu}
 
 Chữ ký số mù kế thừa các thuộc tính an toàn của chữ ký số thông thường (toàn vẹn, xác thực, chống chối bỏ) và phải thỏa mãn ba thuộc tính đặc trưng riêng:
 

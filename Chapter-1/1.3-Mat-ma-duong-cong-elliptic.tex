@@ -1,4 +1,5 @@
 \subsection{Mật mã đường cong elliptic}
+\label{sec:mat-ma-duong-cong-elliptic}
 
 Mật mã học hiện đại là nền tảng lý thuyết cho mọi cơ chế xác thực, toàn vẹn và bảo mật trong các hệ thống bỏ phiếu điện tử. Mục này trước tiên trình bày cô đọng các nguyên thủy mật mã được sử dụng xuyên suốt đồ án -- hàm băm mật mã, chữ ký số, tiêu chuẩn an toàn EUF-CMA và mô hình tiên tri ngẫu nhiên (Random Oracle Model -- ROM) -- sau đó tập trung trình bày chi tiết \textbf{mật mã đường cong elliptic} (Elliptic Curve Cryptography -- ECC), khối kiến thức trọng tâm và là nền tảng toán học của các lược đồ chữ ký mù tập thể được đề xuất ở các mục tiếp theo.
 
@@ -16,7 +17,7 @@ nhận đầu vào là chuỗi bit có độ dài bất kỳ và sinh ra giá tr
 
     \item \textbf{Tính kháng tiền ảnh thứ hai (Second Preimage Resistance):} cho trước $M_1$, không tồn tại thuật toán hiệu quả tìm được $M_2 \neq M_1$ sao cho $H(M_1) = H(M_2)$.
 
-    \item \textbf{Tính kháng xung đột (Collision Resistance):} không tồn tại thuật toán hiệu quả tìm được hai thông điệp khác nhau $M_1 \neq M_2$ thỏa mãn $H(M_1) = H(M_2)$.
+    \item \textbf{Tính kháng va chạm (Collision Resistance):} không tồn tại thuật toán hiệu quả tìm được hai thông điệp khác nhau $M_1 \neq M_2$ thỏa mãn $H(M_1) = H(M_2)$.
 \end{itemize}
 
 Trong các lược đồ chữ ký số, hàm băm được sử dụng để rút gọn thông điệp về kích thước cố định trước khi ký, vừa nâng cao hiệu năng vừa loại trừ các tấn công khai thác cấu trúc thông điệp.
@@ -125,11 +126,11 @@ So với các hệ mật khóa công khai cổ điển như RSA hay ElGamal trê
 \begin{itemize}
     \item \textbf{Độ dài khóa ngắn hơn nhiều với cùng mức an toàn:} do không tồn tại thuật toán index-calculus dưới mũ cho ECDLP, độ dài khóa cần thiết để đạt cùng mức an toàn của ECC nhỏ hơn nhiều lần so với RSA. Theo khuyến nghị của NIST, khóa ECC $256$ bit cung cấp mức an toàn tương đương khóa RSA $3072$ bit, và khóa ECC $384$ bit tương đương khóa RSA $7680$ bit.
 
-    \item \textbf{Tốc độ tính toán nhanh và chi phí tài nguyên thấp:} do độ dài khóa và chữ ký ngắn hơn, các phép toán mật mã trên đường cong elliptic được thực hiện nhanh hơn, tiêu thụ ít bộ nhớ, ít băng thông truyền dẫn và ít năng lượng tiêu thụ hơn -- đặc biệt phù hợp với thiết bị di động, thẻ thông minh, cảm biến IoT và môi trường blockchain.
+    \item \textbf{Tốc độ tính toán nhanh và chi phí tài nguyên thấp:} do độ dài khóa và chữ ký ngắn hơn, các phép toán mật mã trên đường cong elliptic được thực hiện nhanh hơn, tiêu thụ ít bộ nhớ, ít băng thông truyền dẫn và ít năng lượng hơn -- đặc biệt phù hợp với thiết bị di động, thẻ thông minh, cảm biến IoT và môi trường blockchain.
 
     \item \textbf{Tính linh hoạt cao trong thiết kế:} trên cùng một trường hữu hạn $\mathbb{F}_p$, có thể xây dựng vô số đường cong elliptic khác nhau bằng cách thay đổi các tham số $a, b$, cho phép tùy chỉnh phù hợp với từng ứng dụng và mức an toàn yêu cầu.
 
     \item \textbf{Nền tảng cho các giao thức mật mã hiện đại:} ECC là cơ sở toán học của hàng loạt giao thức và chuẩn mật mã đang được sử dụng rộng rãi: ECDSA (FIPS 186-4), lược đồ EC-Schnorr, chuẩn GOST R34.10-2012, giao thức trao đổi khóa ECDH/ECDHE trong TLS, cũng như các lược đồ chữ ký mù và chữ ký mù tập thể -- chủ đề trọng tâm của các mục tiếp theo.
 \end{itemize}
 
-Với những ưu điểm nói trên, mật mã đường cong elliptic là lựa chọn phù hợp nhất cho việc triển khai các lược đồ chữ ký số trong hệ thống bỏ phiếu điện tử dựa trên công nghệ chuỗi khối được đề xuất trong đồ án, nơi yêu cầu đồng thời về mức an toàn cao, hiệu năng xử lý nhanh và chi phí giao dịch thấp trên môi trường blockchain.
+Với những ưu điểm nói trên, mật mã đường cong elliptic là lựa chọn phù hợp nhất cho việc triển khai các lược đồ chữ ký số trong hệ thống bỏ phiếu điện tử dựa trên công nghệ blockchain được đề xuất trong đồ án, nơi yêu cầu đồng thời về mức an toàn cao, hiệu năng xử lý nhanh và chi phí giao dịch thấp trên môi trường blockchain.

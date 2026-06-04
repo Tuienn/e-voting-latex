@@ -43,7 +43,7 @@ Việc chọn \pkg{BatchTimeout} là một bài toán đánh đổi: tăng giá 
 \end{tabularx}
 \end{table}
 
-Với hệ thống bầu cử, \texttt{BatchTimeout = 2s} là điểm cân bằng phù hợp: 100 cử tri bỏ phiếu đồng thời có thể được gom vào cùng một khối, độ trễ chung quyết mà mỗi cử tri quan sát thấy nằm trong khoảng 2--3 giây — đủ ngắn để giao diện ứng dụng cập nhật trạng thái phiếu mà không cần \textit{spinner} chờ dài, đồng thời đủ thông lượng để xử lý các đợt bỏ phiếu lớn.
+Với hệ thống bầu cử, \texttt{BatchTimeout = 2s} là điểm cân bằng phù hợp: 100 cử tri bỏ phiếu đồng thời có thể được gom vào cùng một khối, độ trễ chung quyết mà mỗi cử tri quan sát thấy nằm trong khoảng 2--3 giây — đủ ngắn để giao diện ứng dụng cập nhật trạng thái phiếu mà không cần duy trì trạng thái chờ lâu, đồng thời đủ thông lượng để xử lý các đợt bỏ phiếu lớn.
 
 \subsubsection{Phân biệt rõ giữa invoke và query}
 
@@ -64,7 +64,7 @@ Một tối ưu quan trọng ở tầng backend là \textbf{phân biệt nghiêm
 \end{tabularx}
 \end{table}
 
-Việc sử dụng \pkg{query} cho mọi thao tác đọc — tra cứu phiếu, kiểm tra Merkle root, tổng hợp kết quả — giúp tải đọc của hệ thống không bao giờ chạm đến tầng đồng thuận, do đó không cạnh tranh tài nguyên với tải ghi đang đợi đóng khối.
+Việc sử dụng \pkg{query} cho mọi thao tác đọc — tra cứu phiếu, kiểm tra gốc Merkle, tổng hợp kết quả — giúp tải đọc của hệ thống không bao giờ chạm đến tầng đồng thuận, do đó không xung đột tài nguyên với tải ghi đang đợi đóng khối.
 
 \subsubsection{Quản lý kết nối qua Chainlaunch}
 

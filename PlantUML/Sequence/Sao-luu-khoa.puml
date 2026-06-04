@@ -29,7 +29,7 @@ else Có khóa cần sao lưu
   BFF -> Identity: Chuyển tiếp yêu cầu lưu bản sao lưu
   activate Identity
 
-  Identity -> Identity: Bọc thêm lớp bảo vệ at-rest\nargon2id(BACKUP_SECRET, salt) + AES-256-GCM
+  Identity -> Identity: Áp dụng thêm lớp bảo vệ at-rest\nargon2id(BACKUP_SECRET, salt) + AES-256-GCM
   Identity -> DB: Ghi/cập nhật bản ghi VoteSecretBackup theo userId
   activate DB
   DB --> Identity: Xác nhận lưu thành công

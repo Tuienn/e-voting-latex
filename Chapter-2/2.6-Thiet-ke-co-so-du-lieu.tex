@@ -37,7 +37,7 @@ Bảng \pkg{users} lưu trữ toàn bộ tài khoản trong hệ thống, bao g�
 
 \subsubsection{Bảng {vote\_secret\_backups} (Identity Service)}
 
-Bảng \pkg{vote\_secret\_backups} lưu bản sao lưu khóa bí mật phiếu của cử tri theo mô hình \textit{zero-knowledge}. Dữ liệu được mã hóa hai lớp: lớp ngoài do máy khách (ứng dụng di động) dẫn xuất khóa từ mã PIN rồi mã hóa, lớp trong do Identity Service bọc thêm trước khi lưu trữ (\textit{at-rest encryption}). Máy chủ không bao giờ nhận mã PIN nên không thể giải lớp do máy khách tạo (xem mục Sao lưu và khôi phục khóa bí mật phiếu ở Chương 3).
+Bảng \pkg{vote\_secret\_backups} lưu bản sao lưu khóa bí mật phiếu của cử tri theo mô hình \textit{zero-knowledge}. Dữ liệu được mã hóa hai lớp: lớp ngoài do máy khách (ứng dụng di động) dẫn xuất khóa từ mã PIN rồi mã hóa, lớp trong do Identity Service áp dụng thêm trước khi lưu trữ (\textit{at-rest encryption}). Máy chủ không bao giờ nhận mã PIN nên không thể giải lớp do máy khách tạo (xem mục Sao lưu và khôi phục khóa bí mật phiếu ở Chương 3).
 
 \begin{fitlongtable}{|p{0.22\textwidth}|p{0.22\textwidth}|p{0.50\textwidth}|}
     \caption{Cấu trúc bảng {vote\_secret\_backups}}
@@ -92,7 +92,7 @@ Bảng \pkg{elections} là bảng trung tâm của nghiệp vụ bầu cử, lư
     candidateIds        & String[]  & Danh sách định danh của các ứng viên thuộc cuộc bầu cử, tham chiếu sang \pkg{users.id}. \\ \hline
     max\allowbreak Selectable\allowbreak Candidates & Int & Số ứng viên tối đa mỗi cử tri được chọn trên một lá phiếu; mặc định là $1$, hợp lệ khi $1 \le \textit{max} \le |\textit{candidateIds}|$. \\ \hline
     collective\allowbreak Public\allowbreak Key & String?   & Khóa công khai tập thể EC-Schnorr (điểm trên đường cong secp256k1, biểu diễn dưới dạng hex 66 ký tự), được sinh khi bắt đầu cuộc bầu cử. \\ \hline
-    merkleRoot          & String?   & Node gốc Merkle của tập phiếu mù, biểu diễn dưới dạng chuỗi băm SHA-256 hex 64 ký tự, được tính khi đóng cuộc bầu cử. \\ \hline
+    merkleRoot          & String?   & Gốc Merkle của tập phiếu mù, biểu diễn dưới dạng chuỗi băm SHA-256 hex 64 ký tự, được tính khi đóng cuộc bầu cử. \\ \hline
     blockchainRef       & String?   & Mã giao dịch Hyperledger Fabric của lệnh ghi nhận \pkg{CommitMerkleRoot}. \\ \hline
     startDate           & DateTime? & Thời điểm cuộc bầu cử chuyển sang trạng thái \pkg{ACTIVE}. \\ \hline
     endDate             & DateTime? & Thời điểm cuộc bầu cử chuyển sang trạng thái \pkg{COMPLETED}. \\ \hline
@@ -152,7 +152,7 @@ Bảng \pkg{votes} lưu các phiếu mù đã được ký tập thể và nộp
     electionId        & ObjectId & Định danh cuộc bầu cử, tham chiếu sang \pkg{elections.id}. \\ \hline
     voterId           & ObjectId & Định danh cử tri trong cuộc bầu cử, tham chiếu sang \pkg{election\_voters.id}, được sử dụng để chặn bỏ phiếu trùng. \\ \hline
     blinded\allowbreak Commitment & String   & Cam kết mù của phiếu, là chuỗi băm SHA-256 hex 64 ký tự của điểm cam kết $C'$. \\ \hline
-    status            & Enum (\textit{VoteStatus}) & Trạng thái ghi nhận của phiếu, nhận một trong hai giá trị \pkg{PENDING\_CHAIN} (đã ghi DB nhưng chưa xác nhận trên chuỗi khối) và \pkg{CONFIRMED} (đã có trên chuỗi khối). \\ \hline
+    status            & Enum (\textit{VoteStatus}) & Trạng thái ghi nhận của phiếu, nhận một trong hai giá trị \pkg{PENDING\_CHAIN} (đã ghi DB nhưng chưa xác nhận trên blockchain) và \pkg{CONFIRMED} (đã có trên blockchain). \\ \hline
     blockchain\allowbreak Ref     & String?  & Mã giao dịch Hyperledger Fabric của lệnh ghi nhận \pkg{SubmitVote}; để trống khi phiếu còn ở trạng thái \pkg{PENDING\_CHAIN}. \\ \hline
     createdAt         & DateTime & Thời điểm phiếu được nộp, sinh tự động. \\ \hline
     updatedAt         & DateTime & Thời điểm cập nhật gần nhất (khi xác nhận hoặc đồng bộ lại), sinh tự động. \\ \hline
@@ -190,7 +190,7 @@ Bảng \pkg{key\_pairs} thuộc cơ sở dữ liệu của mỗi node ký (\text
 
 \subsubsection{Bảng {signed\_voters} (Signing Node Service)}
 
-Bảng \pkg{signed\_voters} ghi nhận vĩnh viễn việc một node ký đã phát hành chữ ký mảnh cho cặp (cuộc bầu cử, cử tri) nhằm chặn tích lũy nhiều chữ ký trên cùng một danh tính cử tri, qua đó phòng tránh cử tri tiết lộ nhiều phiếu trong giai đoạn giải mù.
+Bảng \pkg{signed\_voters} ghi nhận vĩnh viễn việc một node ký đã phát hành chữ ký từng phần cho cặp (cuộc bầu cử, cử tri) nhằm chặn tích lũy nhiều chữ ký trên cùng một danh tính cử tri, qua đó phòng tránh cử tri tiết lộ nhiều phiếu trong giai đoạn giải mù.
 
 \begin{fitlongtable}{|p{0.22\textwidth}|p{0.22\textwidth}|p{0.50\textwidth}|}
     \caption{Cấu trúc bảng {signed\_voters}}
@@ -210,8 +210,8 @@ Bảng \pkg{signed\_voters} ghi nhận vĩnh viễn việc một node ký đã p
     id         & ObjectId & Khóa chính của bản ghi, sinh tự động. \\ \hline
     electionId & ObjectId & Định danh cuộc bầu cử, tham chiếu sang \pkg{elections.id}. \\ \hline
     voterId    & ObjectId & Định danh cử tri, tham chiếu sang \pkg{election\_voters.id}. \\ \hline
-    sessionId  & String   & Định danh phiên ký (chuỗi UUID v4) mà node đã tiêu thụ \textit{nonce} để phát hành chữ ký mảnh. \\ \hline
-    signedAt   & DateTime & Thời điểm node phát hành chữ ký mảnh, sinh tự động. \\ \hline
+    sessionId  & String   & Định danh phiên ký (chuỗi UUID v4) mà node đã tiêu thụ \textit{nonce} để phát hành chữ ký từng phần. \\ \hline
+    signedAt   & DateTime & Thời điểm node phát hành chữ ký từng phần, sinh tự động. \\ \hline
 \end{fitlongtable}
 
 \textbf{Ràng buộc và chỉ mục:} cặp \pkg{(electionId, voterId)} có ràng buộc duy nhất nhằm bảo đảm mỗi cử tri chỉ được node ký phục vụ đúng một lần cho mỗi cuộc bầu cử.

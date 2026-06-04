@@ -38,7 +38,7 @@ Reveal -> Reveal: Xác minh chữ ký EC-Schnorr với khóa công khai tập th
 alt Chữ ký không hợp lệ
   Reveal --> Voter: Từ chối tiết lộ phiếu
 else Chữ ký hợp lệ
-  Reveal -> Reveal: Tính khóa định danh phiếu tiết lộ và mã băm tải trọng
+  Reveal -> Reveal: Tính khóa định danh phiếu tiết lộ và mã băm
 
   Reveal -> Fabric: Gửi phiếu tiết lộ lên blockchain
   activate Fabric
@@ -75,7 +75,7 @@ else Chữ ký hợp lệ
     deactivate Coordinator
   end
 
-  Reveal --> Voter: Trả về biên nhận tiết lộ phiếu
+  Reveal --> Voter: Trả về biên lai tiết lộ phiếu
 end
 
 deactivate Reveal

@@ -13,12 +13,12 @@ Toàn bộ việc mã hóa diễn ra trên thiết bị, trước khi bất kỳ
     \label{fig:backup-derive-key}
 \end{figure}
 
-\subsubsection{Lớp mã hóa dữ liệu khi lưu trữ (at-rest encryption) phía máy chủ}
+\subsubsection{Lớp mã hóa dữ liệu khi lưu trữ (\textit{at-rest encryption}) phía máy chủ}
 
-Khi nhận được gói envelope, Identity Service bọc thêm \textbf{một lớp mã hóa thứ hai} trước khi ghi xuống MongoDB nhằm bảo vệ dữ liệu khi lưu trữ (\textit{at-rest encryption}). Lớp này dẫn xuất khóa bằng \pkg{argon2id} từ một bí mật phía máy chủ \pkg{BACKUP\_SECRET} kết hợp một salt ngẫu nhiên theo từng bản ghi, rồi mã hóa bằng \pkg{AES-256-GCM}. Như vậy, một bản sao lưu chịu hai lớp mã hóa độc lập: lớp ngoài chỉ giải được bằng mã PIN của cử tri, lớp trong chỉ giải được khi máy chủ nắm \pkg{BACKUP\_SECRET}. Kẻ tấn công đọc trộm cơ sở dữ liệu sẽ không thu được gì nếu thiếu cả hai bí mật này.
+Khi nhận được gói envelope, Identity Service áp dụng thêm \textbf{một lớp mã hóa thứ hai} trước khi ghi xuống MongoDB nhằm bảo vệ dữ liệu khi lưu trữ. Lớp này dẫn xuất khóa bằng \pkg{argon2id} từ một bí mật phía máy chủ \pkg{BACKUP\_SECRET} kết hợp một salt ngẫu nhiên theo từng bản ghi, rồi mã hóa bằng \pkg{AES-256-GCM}. Như vậy, một bản sao lưu chịu hai lớp mã hóa độc lập: lớp ngoài chỉ giải được bằng mã PIN của cử tri, lớp trong chỉ giải được khi máy chủ nắm \pkg{BACKUP\_SECRET}. Kẻ tấn công đọc trộm cơ sở dữ liệu sẽ không thu được gì nếu thiếu cả hai bí mật này.
 
 \subsubsection{Khôi phục và lưu ý vận hành}
 
-Khi khôi phục, Identity Service gỡ lớp mã hóa dữ liệu khi lưu trữ (at-rest encryption) và trả lại gói envelope nguyên bản do máy khách tạo; ứng dụng dẫn lại khóa từ mã PIN và giải mã. Nhờ \pkg{AES-256-GCM} là mã hóa có xác thực (\textit{authenticated encryption}), một mã PIN sai sẽ khiến bước kiểm tra thẻ xác thực thất bại ngay tại máy khách và ứng dụng báo lỗi ``Mã PIN không đúng'' — máy chủ không tham gia và cũng không học được bất kỳ thông tin nào về mã PIN.
+Khi khôi phục, Identity Service gỡ lớp mã hóa dữ liệu khi lưu trữ và trả lại gói envelope nguyên bản do máy khách tạo; ứng dụng dẫn lại khóa từ mã PIN và giải mã. Nhờ \pkg{AES-256-GCM} là mã hóa có xác thực (\textit{authenticated encryption}), một mã PIN sai sẽ khiến bước kiểm tra thẻ xác thực thất bại ngay tại máy khách và ứng dụng báo lỗi ``Mã PIN không đúng'' — máy chủ không tham gia và cũng không học được bất kỳ thông tin nào về mã PIN.
 
 Về vận hành, biến môi trường \pkg{BACKUP\_SECRET} của Identity Service phải được đặt bằng một giá trị mạnh trong môi trường sản xuất; giá trị mặc định dự phòng chỉ phục vụ phát triển cục bộ. Lý tưởng nhất, bí mật này nên được quản lý bởi một kho bí mật chuyên dụng thay vì lưu trong tệp cấu hình.
