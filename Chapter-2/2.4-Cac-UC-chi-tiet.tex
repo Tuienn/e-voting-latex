@@ -64,63 +64,13 @@ Chức năng \textit{xác thực người dùng} là nền tảng cho mọi tư�
     \hline
 \end{longtable}
 
-\subsubsection{Xem thông tin tài khoản cá nhân}
-
-Chức năng \textit{xem thông tin tài khoản cá nhân} cho phép người dùng đã đăng nhập xem hồ sơ của chính mình. Định danh người dùng được xác thực ở tầng BFF, nhằm bảo đảm rằng không một tài khoản nào có thể đọc hồ sơ của tài khoản khác thông qua chức năng này.
-
-\begin{figure}[H]
-    \centering
-    \makebox[\textwidth][c]{\includegraphics[width=0.91\textwidth, keepaspectratio]{Diagrams/Usecase/XemThongTinCaNhan.pdf}}
-    \caption{Biểu đồ Use Case ``Xem thông tin tài khoản cá nhân''}
-    \label{fig:uc-xem-thong-tin-ca-nhan}
-\end{figure}
-
-\begin{longtable}{|p{0.22\textwidth}|p{0.72\textwidth}|}
-    \caption{Đặc tả Use Case ``Xem thông tin tài khoản cá nhân''}
-    \label{tab:uc-xem-thong-tin-ca-nhan} \\
-    \hline
-    \textbf{Thuộc tính} & \textbf{Nội dung} \\
-    \hline
-    \endfirsthead
-    \hline
-    \textbf{Thuộc tính} & \textbf{Nội dung} \\
-    \hline
-    \endhead
-    \hline
-    \endfoot
-    \hline
-    \endlastfoot
-    Tên chức năng & Xem thông tin tài khoản cá nhân. \\
-    \hline
-    Tác nhân & Quản trị viên hoặc cử tri đã đăng nhập. \\
-    \hline
-    Điều kiện trước & Người dùng đang sở hữu access token còn hiệu lực. \\
-    \hline
-    Điều kiện sau & Hệ thống trả về hồ sơ của chính người dùng, không kèm trường mật khẩu. \\
-    \hline
-    Luồng sự kiện chính &
-    \begin{enumerate}
-        \item Người dùng gửi yêu cầu xem hồ sơ tới BFF Gateway kèm access token.
-        \item BFF Gateway xác thực token và lấy định danh người dùng.
-        \item BFF Gateway gửi yêu cầu truy vấn thông tin theo định danh tới Identity Service.
-        \item Identity Service truy vấn cơ sở dữ liệu, lược bỏ trường mật khẩu và trả về hồ sơ.
-        \item BFF Gateway trả kết quả về cho người dùng.
-    \end{enumerate} \\
-    \hline
-    Luồng sự kiện thay thế &
-    \begin{itemize}
-        \item 2a. Access token thiếu hoặc không hợp lệ: BFF Gateway từ chối yêu cầu ngay tại tầng xác thực, không chuyển tiếp tới Identity Service.
-    \end{itemize} \\
-    \hline
-\end{longtable}
-
 \subsubsection{Tạo tài khoản người dùng}
 
 Chức năng \textit{tạo tài khoản người dùng} cho phép quản trị viên cấp tài khoản cho cử tri và ứng viên trước khi cuộc bầu cử diễn ra. Hệ thống hỗ trợ tạo đơn lẻ một tài khoản và tạo hàng loạt nhiều tài khoản, phù hợp cho các tổ chức cần nhập số lượng lớn cử tri.
 
 \begin{figure}[H]
     \centering
-    \makebox[\textwidth][c]{\includegraphics[width=0.91\textwidth, keepaspectratio]{Diagrams/Usecase/TaoDanhSachNguoiDung.pdf}}
+    \makebox[\textwidth][c]{\includegraphics[width=0.7\textwidth, keepaspectratio]{Diagrams/Usecase/TaoDanhSachNguoiDung.pdf}}
     \caption{Biểu đồ Use Case ``Tạo tài khoản người dùng''}
     \label{fig:uc-tao-danh-sach-nguoi-dung}
 \end{figure}
@@ -176,7 +126,7 @@ Chức năng \textit{tìm kiếm người dùng} hỗ trợ quản trị viên �
 
 \begin{figure}[H]
     \centering
-    \makebox[\textwidth][c]{\includegraphics[width=0.91\textwidth, keepaspectratio]{Diagrams/Usecase/TimKiemNguoiDung.pdf}}
+    \makebox[\textwidth][c]{\includegraphics[width=0.7\textwidth, keepaspectratio]{Diagrams/Usecase/TimKiemNguoiDung.pdf}}
     \caption{Biểu đồ Use Case ``Tìm kiếm người dùng''}
     \label{fig:uc-tim-kiem-nguoi-dung}
 \end{figure}
@@ -220,69 +170,13 @@ Chức năng \textit{tìm kiếm người dùng} hỗ trợ quản trị viên �
     \hline
 \end{longtable}
 
-\subsubsection{Cập nhật thông tin người dùng}
-
-Chức năng \textit{cập nhật thông tin người dùng} cho phép quản trị viên sửa đổi các trường thông tin cơ bản của một tài khoản như email, tên hiển thị và vai trò. Hệ thống bảo đảm ràng buộc duy nhất của email và ghi nhận thời điểm sửa đổi sau mỗi lần cập nhật.
-
-\begin{figure}[H]
-    \centering
-    \makebox[\textwidth][c]{\includegraphics[width=0.91\textwidth, keepaspectratio]{Diagrams/Usecase/CapNhatNguoiDung.pdf}}
-    \caption{Biểu đồ Use Case ``Cập nhật thông tin người dùng''}
-    \label{fig:uc-cap-nhat-nguoi-dung}
-\end{figure}
-
-\begin{longtable}{|p{0.22\textwidth}|p{0.72\textwidth}|}
-    \caption{Đặc tả Use Case ``Cập nhật thông tin người dùng''}
-    \label{tab:uc-cap-nhat-nguoi-dung} \\
-    \hline
-    \textbf{Thuộc tính} & \textbf{Nội dung} \\
-    \hline
-    \endfirsthead
-    \hline
-    \textbf{Thuộc tính} & \textbf{Nội dung} \\
-    \hline
-    \endhead
-    \hline
-    \endfoot
-    \hline
-    \endlastfoot
-    Tên chức năng & Cập nhật hồ sơ tài khoản người dùng. \\
-    \hline
-    Tác nhân & Quản trị viên. \\
-    \hline
-    Điều kiện trước &
-    \begin{itemize}
-        \item Đã đăng nhập với vai trò quản trị viên.
-        \item Tài khoản cần cập nhật tồn tại trong cơ sở dữ liệu.
-    \end{itemize} \\
-    \hline
-    Điều kiện sau & Hồ sơ tài khoản được cập nhật với dữ liệu mới và thời điểm sửa đổi được ghi nhận. \\
-    \hline
-    Luồng sự kiện chính &
-    \begin{enumerate}
-        \item Quản trị viên gửi yêu cầu cập nhật kèm các trường thay đổi tới BFF Gateway.
-        \item BFF Gateway chuyển tiếp yêu cầu tới Identity Service.
-        \item Identity Service kiểm tra tính hợp lệ của các trường và ràng buộc duy nhất của email.
-        \item Identity Service cập nhật bản ghi và trả về hồ sơ mới.
-        \item Quản trị viên nhận xác nhận cập nhật thành công.
-    \end{enumerate} \\
-    \hline
-    Luồng sự kiện thay thế &
-    \begin{itemize}
-        \item 1a. Dữ liệu đầu vào không hợp lệ: BFF Gateway từ chối yêu cầu, không gọi tới Identity Service.
-        \item 3a. Email mới trùng với tài khoản khác: Identity Service từ chối cập nhật.
-        \item 3b. Tài khoản không tồn tại: Identity Service trả về lỗi không tìm thấy.
-    \end{itemize} \\
-    \hline
-\end{longtable}
-
 \subsubsection{Quản lý trạng thái tài khoản}
 
 Chức năng \textit{quản lý trạng thái tài khoản} cho phép quản trị viên kích hoạt hoặc vô hiệu hóa một tài khoản nhằm kiểm soát quyền truy cập của người dùng. Tài khoản đã bị vô hiệu hóa không thể đăng nhập và không thể tham gia bỏ phiếu kể cả khi đã thuộc danh sách cử tri của một cuộc bầu cử.
 
 \begin{figure}[H]
     \centering
-    \makebox[\textwidth][c]{\includegraphics[width=0.91\textwidth, keepaspectratio]{Diagrams/Usecase/QuanLyTrangThaiTaiKhoan.pdf}}
+    \makebox[\textwidth][c]{\includegraphics[width=0.7\textwidth, keepaspectratio]{Diagrams/Usecase/QuanLyTrangThaiTaiKhoan.pdf}}
     \caption{Biểu đồ Use Case ``Quản lý trạng thái tài khoản''}
     \label{fig:uc-quan-ly-trang-thai-tai-khoan}
 \end{figure}
@@ -397,7 +291,7 @@ Chức năng \textit{tìm kiếm cuộc bầu cử} cho phép quản trị viên
 
 \begin{figure}[H]
     \centering
-    \makebox[\textwidth][c]{\includegraphics[width=0.91\textwidth, keepaspectratio]{Diagrams/Usecase/TimKiemCuocBauCu.pdf}}
+    \makebox[\textwidth][c]{\includegraphics[width=0.7\textwidth, keepaspectratio]{Diagrams/Usecase/TimKiemCuocBauCu.pdf}}
     \caption{Biểu đồ Use Case ``Tìm kiếm cuộc bầu cử''}
     \label{fig:uc-tim-kiem-cuoc-bau-cu}
 \end{figure}
@@ -975,7 +869,7 @@ Khóa bí mật phiếu (gồm các hệ số làm mù và hai thành phần ch�
 
 \begin{figure}[H]
     \centering
-    \makebox[\textwidth][c]{\includegraphics[width=0.91\textwidth, keepaspectratio]{Diagrams/Usecase/QuanLyKhoaBiMat.pdf}}
+    \makebox[\textwidth][c]{\includegraphics[width=0.7\textwidth, keepaspectratio]{Diagrams/Usecase/QuanLyKhoaBiMat.pdf}}
     \caption{Biểu đồ Use Case ``Sao lưu khóa bí mật phiếu''}
     \label{fig:uc-quan-ly-khoa-bi-mat}
 \end{figure}

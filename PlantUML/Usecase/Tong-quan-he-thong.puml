@@ -13,17 +13,15 @@ admin --|> user
 voter --|> user
 
 together {
-  rectangle "Xác thực và hồ sơ cá nhân" {
+  rectangle "Xác thực" {
     usecase "Đăng nhập hệ thống" as UC_SignIn
     usecase "Làm mới phiên đăng nhập" as UC_Refresh
     usecase "Đăng xuất hệ thống" as UC_SignOut
-    usecase "Xem hồ sơ cá nhân" as UC_Profile
   }
 
   rectangle "Quản lý người dùng (Admin)" {
     usecase "Tạo tài khoản người dùng" as UC_CreateUser
     usecase "Tìm kiếm người dùng" as UC_SearchUser
-    usecase "Cập nhật thông tin người dùng" as UC_UpdateUser
     usecase "Quản lý trạng thái tài khoản" as UC_StatusUser
   }
 }
@@ -56,11 +54,9 @@ together {
 user --> UC_SignIn
 user --> UC_Refresh
 user --> UC_SignOut
-user --> UC_Profile
 
 admin --> UC_CreateUser
 admin --> UC_SearchUser
-admin --> UC_UpdateUser
 admin --> UC_StatusUser
 
 admin --> UC_CreateElec
