@@ -8,7 +8,7 @@ Chức năng \textit{xác thực người dùng} là nền tảng cho mọi tư�
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{Diagrams/Usecase/XacThucNguoiDung.pdf}
+    \makebox[\textwidth][c]{\includegraphics[width=0.91\textwidth, keepaspectratio]{Diagrams/Usecase/XacThucNguoiDung.pdf}}
     \caption{Biểu đồ Use Case ``Xác thực người dùng''}
     \label{fig:uc-xac-thuc-nguoi-dung}
 \end{figure}
@@ -70,7 +70,7 @@ Chức năng \textit{xem thông tin tài khoản cá nhân} cho phép người d
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{Diagrams/Usecase/XemThongTinCaNhan.pdf}
+    \makebox[\textwidth][c]{\includegraphics[width=0.91\textwidth, keepaspectratio]{Diagrams/Usecase/XemThongTinCaNhan.pdf}}
     \caption{Biểu đồ Use Case ``Xem thông tin tài khoản cá nhân''}
     \label{fig:uc-xem-thong-tin-ca-nhan}
 \end{figure}
@@ -120,7 +120,7 @@ Chức năng \textit{tạo tài khoản người dùng} cho phép quản trị v
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{Diagrams/Usecase/TaoDanhSachNguoiDung.pdf}
+    \makebox[\textwidth][c]{\includegraphics[width=0.91\textwidth, keepaspectratio]{Diagrams/Usecase/TaoDanhSachNguoiDung.pdf}}
     \caption{Biểu đồ Use Case ``Tạo tài khoản người dùng''}
     \label{fig:uc-tao-danh-sach-nguoi-dung}
 \end{figure}
@@ -176,7 +176,7 @@ Chức năng \textit{tìm kiếm người dùng} hỗ trợ quản trị viên �
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{Diagrams/Usecase/TimKiemNguoiDung.pdf}
+    \makebox[\textwidth][c]{\includegraphics[width=0.91\textwidth, keepaspectratio]{Diagrams/Usecase/TimKiemNguoiDung.pdf}}
     \caption{Biểu đồ Use Case ``Tìm kiếm người dùng''}
     \label{fig:uc-tim-kiem-nguoi-dung}
 \end{figure}
@@ -226,7 +226,7 @@ Chức năng \textit{cập nhật thông tin người dùng} cho phép quản tr
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{Diagrams/Usecase/CapNhatNguoiDung.pdf}
+    \makebox[\textwidth][c]{\includegraphics[width=0.91\textwidth, keepaspectratio]{Diagrams/Usecase/CapNhatNguoiDung.pdf}}
     \caption{Biểu đồ Use Case ``Cập nhật thông tin người dùng''}
     \label{fig:uc-cap-nhat-nguoi-dung}
 \end{figure}
@@ -282,7 +282,7 @@ Chức năng \textit{quản lý trạng thái tài khoản} cho phép quản tr�
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{Diagrams/Usecase/QuanLyTrangThaiTaiKhoan.pdf}
+    \makebox[\textwidth][c]{\includegraphics[width=0.91\textwidth, keepaspectratio]{Diagrams/Usecase/QuanLyTrangThaiTaiKhoan.pdf}}
     \caption{Biểu đồ Use Case ``Quản lý trạng thái tài khoản''}
     \label{fig:uc-quan-ly-trang-thai-tai-khoan}
 \end{figure}
@@ -333,11 +333,11 @@ Chức năng \textit{quản lý trạng thái tài khoản} cho phép quản tr�
 
 \subsubsection{Tạo cuộc bầu cử}
 
-Chức năng \textit{tạo cuộc bầu cử} là điểm khởi đầu của vòng đời một cuộc bầu cử. Quản trị viên cần chỉ định tên duy nhất, danh sách ứng viên ban đầu và số ứng viên tối đa mỗi cử tri được chọn trên một lá phiếu (mặc định bằng $1$); cuộc bầu cử được khởi tạo ở trạng thái chờ và sẽ chỉ trở nên khả dụng cho cử tri sau khi được điều hành chuyển sang trạng thái hoạt động.
+Chức năng \textit{tạo cuộc bầu cử} là điểm khởi đầu của vòng đời một cuộc bầu cử. Quản trị viên cần chỉ định tên duy nhất, danh sách ứng viên ban đầu và số ứng viên tối đa mỗi cử tri được chọn trên một lá phiếu (mặc định bằng $1$); cuộc bầu cử được khởi tạo ở trạng thái PENDING và sẽ chỉ trở nên khả dụng cho cử tri sau khi được điều hành chuyển sang trạng thái ACTIVE.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{Diagrams/Usecase/TaoCuocBauCu.pdf}
+    \makebox[\textwidth][c]{\includegraphics[width=0.91\textwidth, keepaspectratio]{Diagrams/Usecase/TaoCuocBauCu.pdf}}
     \caption{Biểu đồ Use Case ``Tạo cuộc bầu cử''}
     \label{fig:uc-tao-cuoc-bau-cu}
 \end{figure}
@@ -369,7 +369,7 @@ Chức năng \textit{tạo cuộc bầu cử} là điểm khởi đầu của v�
         \item Số ứng viên tối đa được chọn nằm trong khoảng từ $1$ đến số lượng ứng viên trong danh sách.
     \end{itemize} \\
     \hline
-    Điều kiện sau & Một cuộc bầu cử mới được tạo trong cơ sở dữ liệu Coordinator với trạng thái chờ, danh sách ứng viên ban đầu và số ứng viên tối đa được chọn mỗi lá phiếu. \\
+    Điều kiện sau & Một cuộc bầu cử mới được tạo trong cơ sở dữ liệu Coordinator với trạng thái PENDING, danh sách ứng viên ban đầu và số ứng viên tối đa được chọn mỗi lá phiếu. \\
     \hline
     Luồng sự kiện chính &
     \begin{enumerate}
@@ -377,7 +377,7 @@ Chức năng \textit{tạo cuộc bầu cử} là điểm khởi đầu của v�
         \item BFF Gateway chuyển tiếp yêu cầu tới Coordinator Service.
         \item Coordinator Service gửi yêu cầu xác minh danh sách ứng viên tới Identity Service.
         \item Identity Service trả về danh sách ứng viên hợp lệ tương ứng.
-        \item Coordinator Service kiểm tra ràng buộc tên duy nhất và tính hợp lệ của số ứng viên tối đa được chọn, sau đó lưu bản ghi cuộc bầu cử với trạng thái chờ.
+        \item Coordinator Service kiểm tra ràng buộc tên duy nhất và tính hợp lệ của số ứng viên tối đa được chọn, sau đó lưu bản ghi cuộc bầu cử với trạng thái PENDING.
         \item Quản trị viên nhận kết quả cuộc bầu cử đã được tạo.
     \end{enumerate} \\
     \hline
@@ -397,7 +397,7 @@ Chức năng \textit{tìm kiếm cuộc bầu cử} cho phép quản trị viên
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{Diagrams/Usecase/TimKiemCuocBauCu.pdf}
+    \makebox[\textwidth][c]{\includegraphics[width=0.91\textwidth, keepaspectratio]{Diagrams/Usecase/TimKiemCuocBauCu.pdf}}
     \caption{Biểu đồ Use Case ``Tìm kiếm cuộc bầu cử''}
     \label{fig:uc-tim-kiem-cuoc-bau-cu}
 \end{figure}
@@ -447,7 +447,7 @@ Chức năng \textit{xem chi tiết cuộc bầu cử} trả về toàn bộ th�
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{Diagrams/Usecase/XemChiTietCuocBauCu.pdf}
+    \makebox[\textwidth][c]{\includegraphics[width=0.91\textwidth, keepaspectratio]{Diagrams/Usecase/XemChiTietCuocBauCu.pdf}}
     \caption{Biểu đồ Use Case ``Xem chi tiết cuộc bầu cử''}
     \label{fig:uc-xem-chi-tiet-cuoc-bau-cu}
 \end{figure}
@@ -499,11 +499,11 @@ Chức năng \textit{xem chi tiết cuộc bầu cử} trả về toàn bộ th�
 
 \subsubsection{Quản lý ứng viên trong cuộc bầu cử}
 
-Chức năng \textit{quản lý ứng viên trong cuộc bầu cử} cho phép quản trị viên thêm hoặc xóa ứng viên khỏi danh sách của một cuộc bầu cử cụ thể. Để tránh thay đổi cấu trúc cuộc bầu cử sau khi cử tri đã bắt đầu bỏ phiếu, chức năng này chỉ áp dụng cho cuộc bầu cử đang ở trạng thái chờ.
+Chức năng \textit{quản lý ứng viên trong cuộc bầu cử} cho phép quản trị viên thêm hoặc xóa ứng viên khỏi danh sách của một cuộc bầu cử cụ thể. Để tránh thay đổi cấu trúc cuộc bầu cử sau khi cử tri đã bắt đầu bỏ phiếu, chức năng này chỉ áp dụng cho cuộc bầu cử đang ở trạng thái PENDING.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{Diagrams/Usecase/QuanLyUngVienTrongBauCu.pdf}
+    \makebox[\textwidth][c]{\includegraphics[width=0.91\textwidth, keepaspectratio]{Diagrams/Usecase/QuanLyUngVienTrongBauCu.pdf}}
     \caption{Biểu đồ Use Case ``Quản lý ứng viên trong cuộc bầu cử''}
     \label{fig:uc-quan-ly-ung-vien-trong-bau-cu}
 \end{figure}
@@ -523,15 +523,15 @@ Chức năng \textit{quản lý ứng viên trong cuộc bầu cử} cho phép q
     \endfoot
     \hline
     \endlastfoot
-    Tên chức năng & Thêm hoặc xóa ứng viên trong cuộc bầu cử ở trạng thái chờ. \\
+    Tên chức năng & Thêm hoặc xóa ứng viên trong cuộc bầu cử ở trạng thái PENDING. \\
     \hline
     Tác nhân & Quản trị viên. \\
     \hline
     Điều kiện trước &
     \begin{itemize}
         \item Đã đăng nhập với vai trò quản trị viên.
-        \item Cuộc bầu cử ở trạng thái chờ.
-        \item Các định danh đầu vào đều thuộc vai trò Ứng viên và đang ở trạng thái kích hoạt.
+        \item Cuộc bầu cử ở trạng thái PENDING.
+        \item Các định danh đầu vào đều thuộc vai trò Ứng viên và đang ở trạng thái ACTIVE.
     \end{itemize} \\
     \hline
     Điều kiện sau & Danh sách định danh ứng viên của cuộc bầu cử được cập nhật. \\
@@ -540,9 +540,9 @@ Chức năng \textit{quản lý ứng viên trong cuộc bầu cử} cho phép q
     \begin{enumerate}
         \item Quản trị viên gửi yêu cầu thêm hoặc xóa ứng viên kèm danh sách định danh tới BFF Gateway.
         \item BFF Gateway chuyển tiếp yêu cầu tới Coordinator Service.
-        \item Coordinator Service kiểm tra trạng thái cuộc bầu cử phải là khởi tạo.
+        \item Coordinator Service kiểm tra trạng thái cuộc bầu cử phải là PENDING.
         \item Coordinator Service xác minh danh sách định danh thông qua Identity Service.
-        \item Coordinator Service mở giao dịch cơ sở dữ liệu, xác nhận lại trạng thái chờ của cuộc bầu cử rồi thêm hoặc xóa các bản ghi.
+        \item Coordinator Service xác nhận lại trạng thái PENDING của cuộc bầu cử rồi thêm hoặc xóa các bản ghi.
         \item Coordinator Service trả về cuộc bầu cử sau cập nhật.
         \item Quản trị viên nhận cuộc bầu cử sau cập nhật.
     \end{enumerate} \\
@@ -550,7 +550,7 @@ Chức năng \textit{quản lý ứng viên trong cuộc bầu cử} cho phép q
     Luồng sự kiện thay thế &
     \begin{itemize}
         \item 1a. Dữ liệu đầu vào không hợp lệ: BFF Gateway từ chối yêu cầu, không gọi tới Coordinator Service.
-        \item 3a. Cuộc bầu cử không ở trạng thái chờ: Coordinator Service từ chối thao tác.
+        \item 3a. Cuộc bầu cử không ở trạng thái PENDING: Coordinator Service từ chối thao tác.
         \item 4a. Có định danh không hợp lệ trong danh sách đầu vào: Coordinator Service trả về số lượng định danh không hợp lệ.
     \end{itemize} \\
     \hline
@@ -558,11 +558,11 @@ Chức năng \textit{quản lý ứng viên trong cuộc bầu cử} cho phép q
 
 \subsubsection{Quản lý cử tri trong cuộc bầu cử}
 
-Chức năng \textit{quản lý cử tri trong cuộc bầu cử} cho phép quản trị viên cập nhật danh sách cử tri hợp lệ của một cuộc bầu cử. Vì danh sách cử tri quyết định ai có thể tham gia bỏ phiếu, hệ thống chỉ cho phép sửa đổi khi cuộc bầu cử còn ở trạng thái chờ.
+Chức năng \textit{quản lý cử tri trong cuộc bầu cử} cho phép quản trị viên cập nhật danh sách cử tri hợp lệ của một cuộc bầu cử. Vì danh sách cử tri quyết định ai có thể tham gia bỏ phiếu, hệ thống chỉ cho phép sửa đổi khi cuộc bầu cử còn ở trạng thái PENDING.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{Diagrams/Usecase/QuanLyCuTriTrongBauCu.pdf}
+    \makebox[\textwidth][c]{\includegraphics[width=0.91\textwidth, keepaspectratio]{Diagrams/Usecase/QuanLyCuTriTrongBauCu.pdf}}
     \caption{Biểu đồ Use Case ``Quản lý cử tri trong cuộc bầu cử''}
     \label{fig:uc-quan-ly-cu-tri-trong-bau-cu}
 \end{figure}
@@ -582,15 +582,15 @@ Chức năng \textit{quản lý cử tri trong cuộc bầu cử} cho phép qu�
     \endfoot
     \hline
     \endlastfoot
-    Tên chức năng & Thêm hoặc xóa cử tri trong cuộc bầu cử ở trạng thái chờ. \\
+    Tên chức năng & Thêm hoặc xóa cử tri trong cuộc bầu cử ở trạng thái PENDING. \\
     \hline
     Tác nhân & Quản trị viên. \\
     \hline
     Điều kiện trước &
     \begin{itemize}
         \item Đã đăng nhập với vai trò quản trị viên.
-        \item Cuộc bầu cử ở trạng thái chờ.
-        \item Các định danh đầu vào đều thuộc vai trò Cử tri và đang ở trạng thái kích hoạt.
+        \item Cuộc bầu cử ở trạng thái PENDING.
+        \item Các định danh đầu vào đều thuộc vai trò cử tri và đang ở trạng thái hoạt động.
     \end{itemize} \\
     \hline
     Điều kiện sau & Danh sách định danh cử tri của cuộc bầu cử được cập nhật. \\
@@ -600,7 +600,7 @@ Chức năng \textit{quản lý cử tri trong cuộc bầu cử} cho phép qu�
         \item Quản trị viên gửi yêu cầu thêm hoặc xóa cử tri kèm danh sách định danh tới BFF Gateway.
         \item BFF Gateway chuyển tiếp yêu cầu tới Coordinator Service.
         \item Coordinator Service xác minh danh sách định danh thông qua Identity Service.
-        \item Coordinator Service mở giao dịch cơ sở dữ liệu, xác nhận lại trạng thái chờ của cuộc bầu cử rồi thêm hoặc xóa các bản ghi.
+        \item Coordinator Service xác nhận lại trạng thái PENDING của cuộc bầu cử rồi thêm hoặc xóa các bản ghi.
         \item Coordinator Service trả về cuộc bầu cử sau cập nhật.
         \item Quản trị viên nhận xác nhận thao tác thành công.
     \end{enumerate} \\
@@ -608,7 +608,7 @@ Chức năng \textit{quản lý cử tri trong cuộc bầu cử} cho phép qu�
     Luồng sự kiện thay thế &
     \begin{itemize}
         \item 1a. Dữ liệu đầu vào không hợp lệ: BFF Gateway từ chối yêu cầu, không gọi tới Coordinator Service.
-        \item 3a. Có định danh không thuộc vai trò Cử tri hoặc đã vô hiệu hóa: Coordinator Service trả về số lượng định danh không hợp lệ.
+        \item 3a. Có định danh không thuộc vai trò cử tri hoặc đã vô hiệu hóa: Coordinator Service trả về số lượng định danh không hợp lệ.
         \item 4a. Trạng thái cuộc bầu cử thay đổi trong khi giao dịch đang mở: Coordinator Service khôi phục giao dịch và trả về lỗi xung đột.
     \end{itemize} \\
     \hline
@@ -616,11 +616,11 @@ Chức năng \textit{quản lý cử tri trong cuộc bầu cử} cho phép qu�
 
 \subsubsection{Điều hành cuộc bầu cử}
 
-Chức năng \textit{điều hành cuộc bầu cử} gắn liền với hai cột mốc chính trong vòng đời cuộc bầu cử: \textbf{bắt đầu} (chuyển trạng thái sang mở và sinh khóa công khai tập thể EC-Schnorr cho cơ chế chữ ký mù) và \textbf{đóng} (chuyển trạng thái sang đóng, xây dựng cây Merkle của toàn bộ cam kết phiếu và cam kết gốc Merkle lên blockchain). Cả hai thao tác đều cần phối hợp giữa nhiều service và mạng blockchain Hyperledger Fabric.
+Chức năng \textit{điều hành cuộc bầu cử} gắn liền với hai cột mốc chính trong vòng đời cuộc bầu cử: \textbf{bắt đầu} (chuyển sang trạng thái ACTIVE và sinh khóa công khai tập thể EC-Schnorr cho cơ chế chữ ký mù) và \textbf{đóng} (chuyển trạng thái sang CLOSED, xây dựng cây Merkle của toàn bộ cam kết phiếu và cam kết gốc Merkle lên blockchain). Cả hai thao tác đều cần phối hợp giữa nhiều service và mạng blockchain Hyperledger Fabric.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{Diagrams/Usecase/DieuHanhCuocBauCu.pdf}
+    \makebox[\textwidth][c]{\includegraphics[width=0.91\textwidth, keepaspectratio]{Diagrams/Usecase/DieuHanhCuocBauCu.pdf}}
     \caption{Biểu đồ Use Case ``Điều hành cuộc bầu cử''}
     \label{fig:uc-dieu-hanh-cuoc-bau-cu}
 \end{figure}
@@ -647,14 +647,14 @@ Chức năng \textit{điều hành cuộc bầu cử} gắn liền với hai c�
     Điều kiện trước &
     \begin{itemize}
         \item Đã đăng nhập với vai trò quản trị viên.
-        \item Khi bắt đầu: cuộc bầu cử ở trạng thái chờ, có tối thiểu hai ứng viên và ba cử tri.
-        \item Khi đóng: cuộc bầu cử đang ở trạng thái hoạt động.
+        \item Khi bắt đầu: cuộc bầu cử ở trạng thái PENDING, có tối thiểu hai ứng viên và ba cử tri.
+        \item Khi đóng: cuộc bầu cử đang ở trạng thái ACTIVE.
     \end{itemize} \\
     \hline
     Điều kiện sau &
     \begin{itemize}
-        \item Khi bắt đầu thành công: cuộc bầu cử chuyển sang trạng thái hoạt động và lưu khóa công khai tập thể EC-Schnorr.
-        \item Khi đóng thành công: cuộc bầu cử chuyển sang trạng thái đóng, gốc Merkle và tham chiếu giao dịch blockchain được ghi nhận.
+        \item Khi bắt đầu thành công: cuộc bầu cử chuyển sang trạng thái ACTIVE và lưu khóa công khai tập thể EC-Schnorr.
+        \item Khi đóng thành công: cuộc bầu cử chuyển từ trạng thái ACTIVE sang CLOSING và cuối cùng là CLOSED; gốc Merkle và tham chiếu giao dịch blockchain được ghi nhận. Tự động phục hồi nếu tiến trình gặp sự cố ở trạng thái CLOSING.
     \end{itemize} \\
     \hline
     Luồng sự kiện chính &
@@ -662,17 +662,17 @@ Chức năng \textit{điều hành cuộc bầu cử} gắn liền với hai c�
         \item Quản trị viên gửi yêu cầu bắt đầu hoặc đóng cuộc bầu cử tới BFF Gateway theo định danh.
         \item BFF Gateway chuyển tiếp yêu cầu tới Coordinator Service.
         \item (Bắt đầu) Coordinator Service kiểm tra trạng thái và số lượng tối thiểu của ứng viên, cử tri, sau đó gửi yêu cầu sinh cặp khóa song song tới ba Signing Node; ba node sinh khóa riêng, mã hóa và lưu vào cơ sở dữ liệu riêng của mỗi node, rồi trả về khóa công khai từng phần.
-        \item (Bắt đầu) Coordinator Service cộng các khóa công khai để tạo khóa công khai tập thể, cập nhật trạng thái cuộc bầu cử sang mở và lưu khóa công khai vào cơ sở dữ liệu.
-        \item (Đóng) Coordinator Service đọc toàn bộ cam kết phiếu, xây dựng cây Merkle, sau đó gửi yêu cầu ghi gốc Merkle lên Mạng blockchain qua Chainlaunch.
-        \item (Đóng) Coordinator Service cập nhật trạng thái cuộc bầu cử sang đóng kèm gốc Merkle và tham chiếu giao dịch blockchain.
+        \item (Bắt đầu) Coordinator Service cộng các khóa công khai để tạo khóa công khai tập thể, cập nhật trạng thái cuộc bầu cử sang ACTIVE và lưu khóa công khai vào cơ sở dữ liệu.
+        \item (Đóng) Coordinator Service đọc toàn bộ cam kết phiếu đã xác nhận, xây dựng cây Merkle; ghi trạng thái trung gian CLOSING kèm gốc Merkle vào cơ sở dữ liệu trước, sau đó gửi yêu cầu cam kết gốc Merkle lên Mạng blockchain qua Chainlaunch.
+        \item (Đóng) Chainlaunch ghi nhận gốc Merkle lên sổ cái và trả về mã giao dịch; Coordinator Service cập nhật trạng thái cuộc bầu cử từ CLOSING sang CLOSED kèm tham chiếu giao dịch blockchain được xác nhận.
         \item Quản trị viên nhận xác nhận thao tác thành công.
     \end{enumerate} \\
     \hline
     Luồng sự kiện thay thế &
     \begin{itemize}
         \item 3a. Không đủ số lượng ứng viên hoặc cử tri tối thiểu: Coordinator Service từ chối bắt đầu cuộc bầu cử.
-        \item 3b. Một Signing Node phản hồi lỗi khi sinh khóa: Coordinator Service hủy thao tác và giữ cuộc bầu cử ở trạng thái chờ.
-        \item 5a. Mạng blockchain phản hồi lỗi hoặc số lượng phiếu không khớp: Coordinator Service hủy chuyển trạng thái và giữ cuộc bầu cử ở trạng thái hoạt động.
+        \item 3b. Một Signing Node phản hồi lỗi khi sinh khóa: Coordinator Service hủy thao tác và giữ cuộc bầu cử ở trạng thái PENDING.
+        \item 5a. Chainlaunch phản hồi lỗi khi cam kết gốc Merkle: Coordinator Service truy vấn \pkg{GetMerkleRoot} trên blockchain để phân định. Nếu gốc Merkle đã được cam kết, hệ thống phục hồi trạng thái CLOSED kèm tham chiếu giao dịch và gốc Merkle từ blockchain. Nếu chưa cam kết, hệ thống khôi phục trạng thái ACTIVE và đặt lại giá trị của gốc Merkle.
     \end{itemize} \\
     \hline
 \end{longtable}
@@ -683,7 +683,7 @@ Chức năng \textit{xem danh sách phiếu} cho phép quản trị viên giám 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{Diagrams/Usecase/XemDanhSachPhieu.pdf}
+    \makebox[\textwidth][c]{\includegraphics[width=0.91\textwidth, keepaspectratio]{Diagrams/Usecase/XemDanhSachPhieu.pdf}}
     \caption{Biểu đồ Use Case ``Xem danh sách phiếu trong cuộc bầu cử''}
     \label{fig:uc-xem-danh-sach-phieu}
 \end{figure}
@@ -726,72 +726,19 @@ Chức năng \textit{xem danh sách phiếu} cho phép quản trị viên giám 
     \hline
     Luồng sự kiện thay thế &
     \begin{itemize}
+        \item 1a. Dữ liệu đầu vào không hợp lệ: BFF Gateway từ chối yêu cầu, không gọi tới Coordinator Service.
         \item 3a. Cuộc bầu cử không tồn tại: Coordinator Service trả về lỗi không tìm thấy.
-    \end{itemize} \\
-    \hline
-\end{longtable}
-
-\subsubsection{Xem cuộc bầu cử theo cử tri hoặc ứng viên}
-
-Chức năng \textit{xem cuộc bầu cử theo cử tri hoặc ứng viên} cho phép quản trị viên truy ngược lịch sử tham gia của một người dùng cụ thể, hỗ trợ các tình huống đối soát hoặc giải đáp thắc mắc của người dùng. Tùy theo vai trò được chỉ định, hệ thống lọc các cuộc bầu cử mà người dùng được mời với tư cách cử tri hoặc với tư cách ứng viên.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{Diagrams/Usecase/XemBauCuTheoCuTriUngVien.pdf}
-    \caption{Biểu đồ Use Case ``Xem cuộc bầu cử theo cử tri hoặc ứng viên''}
-    \label{fig:uc-xem-bau-cu-theo-cu-tri-ung-vien}
-\end{figure}
-
-\begin{longtable}{|p{0.22\textwidth}|p{0.72\textwidth}|}
-    \caption{Đặc tả Use Case ``Xem cuộc bầu cử theo cử tri hoặc ứng viên''}
-    \label{tab:uc-xem-bau-cu-theo-cu-tri-ung-vien} \\
-    \hline
-    \textbf{Thuộc tính} & \textbf{Nội dung} \\
-    \hline
-    \endfirsthead
-    \hline
-    \textbf{Thuộc tính} & \textbf{Nội dung} \\
-    \hline
-    \endhead
-    \hline
-    \endfoot
-    \hline
-    \endlastfoot
-    Tên chức năng & Xem danh sách cuộc bầu cử của một cử tri hoặc một ứng viên. \\
-    \hline
-    Tác nhân & Quản trị viên. \\
-    \hline
-    Điều kiện trước &
-    \begin{itemize}
-        \item Đã đăng nhập với vai trò quản trị viên.
-        \item Định danh người dùng đầu vào tồn tại trong cơ sở dữ liệu.
-    \end{itemize} \\
-    \hline
-    Điều kiện sau & Hệ thống trả về danh sách các cuộc bầu cử mà người dùng tham gia theo vai trò tương ứng. \\
-    \hline
-    Luồng sự kiện chính &
-    \begin{enumerate}
-        \item Quản trị viên gửi yêu cầu xem danh sách cuộc bầu cử theo định danh cử tri hoặc ứng viên tới BFF Gateway.
-        \item BFF Gateway chuyển tiếp yêu cầu tới Coordinator Service.
-        \item Coordinator Service truy vấn các cuộc bầu cử liên kết với định danh theo vai trò đã chỉ định.
-        \item Coordinator Service trả về danh sách cuộc bầu cử cùng các thông tin cơ bản.
-        \item Quản trị viên nhận kết quả.
-    \end{enumerate} \\
-    \hline
-    Luồng sự kiện thay thế &
-    \begin{itemize}
-        \item 3a. Người dùng không có cuộc bầu cử nào liên kết: Coordinator Service trả về danh sách rỗng, không phát sinh lỗi.
     \end{itemize} \\
     \hline
 \end{longtable}
 
 \subsubsection{Xem danh sách cuộc bầu cử của cử tri}
 
-Chức năng \textit{xem danh sách cuộc bầu cử của cử tri} cho phép cử tri liệt kê các cuộc bầu cử mà mình được phép tham gia, cùng với trạng thái bỏ phiếu của bản thân trong từng cuộc bầu cử. Cử tri có thể lọc theo trạng thái cuộc bầu cử để tập trung vào những cuộc bầu cử đang mở.
+Chức năng \textit{xem danh sách cuộc bầu cử của cử tri} cho phép cử tri liệt kê các cuộc bầu cử mà mình được phép tham gia, cùng với trạng thái bỏ phiếu của bản thân trong từng cuộc bầu cử.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{Diagrams/Usecase/XemBauCuCuaToi.pdf}
+    \makebox[\textwidth][c]{\includegraphics[width=0.91\textwidth, keepaspectratio]{Diagrams/Usecase/XemBauCuCuaToi.pdf}}
     \caption{Biểu đồ Use Case ``Xem danh sách cuộc bầu cử của cử tri''}
     \label{fig:uc-xem-bau-cu-cua-toi}
 \end{figure}
@@ -830,7 +777,7 @@ Chức năng \textit{xem danh sách cuộc bầu cử của cử tri} cho phép 
     \hline
     Luồng sự kiện thay thế &
     \begin{itemize}
-        \item 1a. Tham số lọc theo trạng thái không hợp lệ: BFF Gateway từ chối yêu cầu.
+        \item 1a. Tham số lọc theo không hợp lệ: BFF Gateway từ chối yêu cầu, không gọi tới Coordinator Service.
     \end{itemize} \\
     \hline
 \end{longtable}
@@ -841,7 +788,7 @@ Chức năng \textit{xem chi tiết cuộc bầu cử đang tham gia} dành cho 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{Diagrams/Usecase/XemChiTietBauCuThamGia.pdf}
+    \makebox[\textwidth][c]{\includegraphics[width=0.91\textwidth, keepaspectratio]{Diagrams/Usecase/XemChiTietBauCuThamGia.pdf}}
     \caption{Biểu đồ Use Case ``Xem chi tiết cuộc bầu cử đang tham gia''}
     \label{fig:uc-xem-chi-tiet-bau-cu-tham-gia}
 \end{figure}
@@ -877,7 +824,7 @@ Chức năng \textit{xem chi tiết cuộc bầu cử đang tham gia} dành cho 
     \begin{enumerate}
         \item Cử tri gửi yêu cầu xem chi tiết cuộc bầu cử tới BFF Gateway theo định danh.
         \item BFF Gateway xác thực, lấy định danh cử tri từ phiên và chuyển tiếp yêu cầu tới Coordinator Service.
-        \item Coordinator Service truy xuất thông tin cuộc bầu cử, danh sách ứng viên và bản ghi quan hệ cử tri-cuộc bầu cử của cử tri yêu cầu.
+        \item Coordinator Service truy xuất thông tin, danh sách định danh ứng viên của cuộc bầu cử mà cử tri yêu cầu.
         \item Coordinator Service yêu cầu Identity Service trả về hồ sơ ứng viên.
         \item Coordinator Service tổng hợp dữ liệu và trả về kết quả.
         \item Cử tri nhận chi tiết cuộc bầu cử cùng trạng thái bỏ phiếu của bản thân.
@@ -893,11 +840,11 @@ Chức năng \textit{xem chi tiết cuộc bầu cử đang tham gia} dành cho 
 
 \subsubsection{Bỏ phiếu}
 
-Chức năng \textit{bỏ phiếu} là quy trình cốt lõi của hệ thống, được triển khai bằng cơ chế \textbf{chữ ký mù EC-Schnorr tập thể}. Cử tri lần lượt thực hiện ba bước: khởi tạo phiên bỏ phiếu để nhận cam kết tập thể từ ba Signing Node, gửi thách thức mù để được ký từng phần và tổng hợp chữ ký, cuối cùng nộp cam kết phiếu mù lên blockchain. Sau ba bước, lá phiếu được ghi nhận trên sổ cái mà không thành phần nào trong hệ thống biết được lựa chọn ứng viên của cử tri.
+Chức năng \textit{bỏ phiếu} là quy trình cốt lõi của hệ thống, được triển khai bằng cơ chế \textbf{chữ ký mù tập thể EC-Schnorr}. Cử tri lần lượt thực hiện ba bước: khởi tạo phiên bỏ phiếu để nhận cam kết tập thể từ ba Signing Node, gửi thông số ký mù để được ký từng phần và tổng hợp chữ ký, cuối cùng nộp cam kết phiếu mù lên blockchain. Sau ba bước, lá phiếu được ghi nhận trên blockchain mà không thành phần nào trong hệ thống biết được lựa chọn ứng viên của cử tri.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{Diagrams/Usecase/BoPhieu.pdf}
+    \makebox[\textwidth][c]{\includegraphics[width=0.91\textwidth, keepaspectratio]{Diagrams/Usecase/BoPhieu.pdf}}
     \caption{Biểu đồ Use Case ``Bỏ phiếu''}
     \label{fig:uc-bo-phieu}
 \end{figure}
@@ -928,18 +875,24 @@ Chức năng \textit{bỏ phiếu} là quy trình cốt lõi của hệ thống,
         \item Cử tri thuộc danh sách cử tri của cuộc bầu cử và chưa từng bỏ phiếu trong cuộc bầu cử này.
     \end{itemize} \\
     \hline
-    Điều kiện sau & Cam kết phiếu mù của cử tri được ghi lên blockchain và lưu vào cơ sở dữ liệu kèm tham chiếu giao dịch; cử tri được đánh dấu đã bỏ phiếu và nhận về biên lai để xác minh sau này. \\
+    Điều kiện sau &
+    \begin{itemize}
+        \item Cam kết phiếu mù của cử tri được ghi lên blockchain (trạng thái CONFIRMED) và lưu vào cơ sở dữ liệu kèm tham chiếu giao dịch; cử tri được đánh dấu đã bỏ phiếu và nhận về biên lai để xác minh sau này.
+        \item Trong trường hợp lỗi tạm thời, tự động phục hồi bản ghi ở trạng thái {PENDING\_CHAIN} hoặc xóa bản ghi nếu phiếu chưa được ghi lên blockchain.
+    \end{itemize} \\
     \hline
     Luồng sự kiện chính &
     \begin{enumerate}
         \item Cử tri gửi yêu cầu khởi tạo phiên bỏ phiếu tới BFF Gateway kèm định danh cuộc bầu cử.
+        \item BFF Gateway xác thực, lấy định danh cử tri từ phiên và chuyển tiếp yêu cầu tới Coordinator Service.
         \item Coordinator Service kiểm tra điều kiện, gửi yêu cầu sinh cam kết song song tới ba Signing Node và tổng hợp thành cam kết tập thể; phiên được lưu trong Redis kèm thời gian sống ngắn.
-        \item Cử tri nhận cam kết tập thể và khóa công khai tập thể, chọn từ một đến \pkg{maxSelectableCandidates} ứng viên, sau đó thực hiện làm mù phiếu (sinh các hệ số mù bí mật, tính cam kết mù và thách thức mù gắn với tập ứng viên đã chọn).
-        \item Cử tri gửi thách thức mù tới BFF Gateway để yêu cầu ký phiếu mù.
+        \item Cử tri nhận cam kết tập thể và khóa công khai tập thể, chọn từ một đến \pkg{maxSelectableCandidates} ứng viên, sau đó thực hiện làm mù phiếu (sinh các hệ số mù bí mật, tính cam kết mù và thông số ký mù gắn với tập ứng viên đã chọn).
+        \item Cử tri gửi thông số ký mù tới BFF Gateway để yêu cầu ký phiếu mù.
         \item Coordinator Service kiểm tra phiên còn hợp lệ, gửi yêu cầu ký từng phần song song tới ba Signing Node; mỗi node ghi nhận một bản ghi đã ký vào cơ sở dữ liệu riêng và xóa nonce ngay sau khi ký.
-        \item Coordinator Service tổng hợp các chữ ký từng phần thành chữ ký tổng và trả về cho cử tri; cử tri thực hiện giải mù để thu được chữ ký EC-Schnorr cuối cùng.
-        \item Cử tri gửi cam kết phiếu mù cùng chữ ký tổng và định danh phiên tới BFF Gateway.
-        \item Coordinator Service xác minh phiên, gọi Mạng blockchain qua Chainlaunch để ghi cam kết phiếu kèm định danh phiếu, sau đó lưu bản ghi phiếu cùng tham chiếu giao dịch vào cơ sở dữ liệu và đánh dấu phiên đã bỏ phiếu.
+        \item Coordinator Service tổng hợp các chữ ký từng phần thành chữ ký tổng và trả về cho cử tri; cử tri thực hiện giải mù để thu được chữ ký cuối cùng.
+        \item Cử tri gửi cam kết phiếu mù cùng chữ ký tổng và định danh phiên tới BFF Gateway, và được chuyển tiếp yêu cầu tới Coordinator Service.
+        \item Coordinator Service xác minh phiên và sinh định danh phiếu duy nhất, ghi trước bản ghi phiếu với trạng thái {PENDING\_CHAIN} vào cơ sở dữ liệu với ràng buộc duy nhất \pkg{(electionId, voterId)}, ngăn hai yêu cầu bỏ phiếu song song từ cùng một cử tri; sau đó gọi blockchain qua Chainlaunch để ghi cam kết phiếu.
+        \item Chainlaunch ghi nhận phiếu vào sổ cái và trả về tham chiếu giao dịch; Coordinator Service cập nhật trạng thái phiếu từ {PENDING\_CHAIN} sang CONFIRMED kèm tham chiếu giao dịch và đánh dấu phiên đã hoàn tất.
         \item Cử tri nhận biên lai gồm định danh phiếu, cam kết phiếu mù và tham chiếu giao dịch blockchain.
     \end{enumerate} \\
     \hline
@@ -947,19 +900,20 @@ Chức năng \textit{bỏ phiếu} là quy trình cốt lõi của hệ thống,
     \begin{itemize}
         \item 2a. Cử tri đã có bản ghi phiếu trong cuộc bầu cử: Coordinator Service từ chối khởi tạo phiên.
         \item 2b. Khóa công khai tập thể từ các Signing Node không khớp với khóa lưu trong cuộc bầu cử: Coordinator Service từ chối khởi tạo phiên nhằm chống tấn công lặp giữa các cuộc bầu cử.
-        \item 5a. Một Signing Node phát hiện vi phạm ràng buộc duy nhất khi ghi bản ghi đã ký: giao dịch nội bộ của node bị hủy và yêu cầu ký toàn bộ bị từ chối.
-        \item 8a. Mạng blockchain phản hồi lỗi khi ghi phiếu: Coordinator Service hủy lưu bản ghi phiếu và trả về lỗi cho cử tri.
+        \item 5a. Một Signing Node phát hiện vi phạm ràng buộc duy nhất khi ghi bản ghi đã ký: yêu cầu ký toàn bộ bị từ chối.
+        \item 8a. Bản ghi {PENDING\_CHAIN} cho cặp \pkg{(electionId, voterId)} đã tồn tại (yêu cầu bỏ phiếu song song hoặc cử tri đã bỏ phiếu): Coordinator Service từ chối với lỗi xung đột, không gọi blockchain.
+        \item 8b. Chainlaunch phản hồi lỗi khi ghi phiếu: Coordinator Service truy vấn \texttt{GetVote} trên blockchain để phân định. Nếu phiếu đã được ghi, phục hồi trạng thái CONFIRMED kèm tham chiếu giao dịch từ blockchain. Nếu chưa ghi, xóa bản ghi {PENDING\_CHAIN} và trả về lỗi cho cử tri.
     \end{itemize} \\
     \hline
 \end{longtable}
 
 \subsubsection{Tiết lộ phiếu sau khi cuộc bầu cử đóng}
 
-Chức năng \textit{tiết lộ phiếu} là bước cuối của quy trình bỏ phiếu mù: sau khi cuộc bầu cử đóng, cử tri công khai chữ ký EC-Schnorr đã giải mù cho tập ứng viên mình đã chọn thông qua một điểm cuối công khai không yêu cầu xác thực. Vì máy chủ không biết người gửi là ai, điểm tin cậy duy nhất là tính hợp lệ của chữ ký EC-Schnorr đối với khóa công khai tập thể của cuộc bầu cử.
+Chức năng \textit{tiết lộ phiếu} là bước cuối của quy trình bỏ phiếu mù. Sau khi cuộc bầu cử đóng, khách ẩn danh (do chính cử tri đại diện gửi mà không kèm phiên xác thực) công khai chữ ký EC-Schnorr đã giải mù cho tập ứng viên mình đã chọn thông qua Reveal-Vote Service không yêu cầu xác thực. Vì Reveal-Vote Service không biết người gửi là ai, điểm tin cậy duy nhất là tính hợp lệ của chữ ký EC-Schnorr đối với khóa công khai tập thể của cuộc bầu cử.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{Diagrams/Usecase/TietLoPhieu.pdf}
+    \makebox[\textwidth][c]{\includegraphics[width=0.91\textwidth, keepaspectratio]{Diagrams/Usecase/TietLoPhieu.pdf}}
     \caption{Biểu đồ Use Case ``Tiết lộ phiếu sau khi cuộc bầu cử đóng''}
     \label{fig:uc-tiet-lo-phieu}
 \end{figure}
@@ -985,33 +939,32 @@ Chức năng \textit{tiết lộ phiếu} là bước cuối của quy trình b�
     \hline
     Điều kiện trước &
     \begin{itemize}
-        \item Cuộc bầu cử ở trạng thái đóng.
+        \item Cuộc bầu cử ở trạng thái CLOSED.
         \item Khách sở hữu chữ ký EC-Schnorr đã giải mù cho lựa chọn ứng viên trong cuộc bầu cử.
     \end{itemize} \\
     \hline
     Điều kiện sau &
     \begin{itemize}
-        \item Một bản ghi phiếu tiết lộ gồm định danh cuộc bầu cử, danh sách định danh ứng viên, khóa giải mù và chữ ký được ghi lên blockchain và lưu vào cơ sở dữ liệu Reveal-Vote.
+        \item Một bản ghi phiếu tiết lộ gồm định danh cuộc bầu cử, danh sách định danh ứng viên, khóa giải mù và tham số của chữ ký mù được lưu vào cơ sở dữ liệu Reveal-Vote và blockchain. Trong trường hợp blockchain đã ghi nhưng cơ sở dữ liệu chưa lưu, bản ghi được phục hồi qua truy vấn \texttt{GetUsedReveal}.
         \item Nếu tổng số phiếu đã tiết lộ đạt tổng số phiếu đã nộp, cuộc bầu cử được tự động chuyển sang trạng thái hoàn tất và các khóa của ba Signing Node được dọn dẹp.
     \end{itemize} \\
     \hline
     Luồng sự kiện chính &
     \begin{enumerate}
-        \item Khách gửi yêu cầu tiết lộ phiếu tới Reveal-Vote qua điểm cuối HTTP công khai (không kèm token), gồm danh sách định danh ứng viên đã chọn và chữ ký EC-Schnorr.
-        \item Reveal-Vote yêu cầu Coordinator Service trả về thông tin cuộc bầu cử để xác nhận trạng thái đóng và lấy khóa công khai tập thể.
-        \item Reveal-Vote chuẩn hóa (canonicalize) danh sách ứng viên, kiểm tra mọi ứng viên được chọn đều thuộc cuộc bầu cử và số lượng không vượt quá \pkg{maxSelectableCandidates}, sau đó xác minh chữ ký EC-Schnorr với khóa công khai tập thể và sinh khóa giải mù từ hai thành phần chữ ký.
-        \item Reveal-Vote gửi yêu cầu ghi phiếu tiết lộ lên Mạng blockchain qua Chainlaunch, sau đó lưu bản ghi phiếu tiết lộ và tham chiếu giao dịch vào cơ sở dữ liệu.
-        \item Reveal-Vote so sánh tổng số phiếu đã tiết lộ với tổng số phiếu đã nộp do Coordinator Service cung cấp.
-        \item Nếu hai con số trùng nhau, Reveal-Vote yêu cầu Coordinator Service chuyển trạng thái cuộc bầu cử sang hoàn tất; Coordinator Service phát thông điệp dọn dẹp khóa cho các Signing Node.
+        \item Khách gửi yêu cầu tiết lộ phiếu tới Reveal-Vote Service qua cổng công khai, gồm danh sách định danh ứng viên đã chọn và chữ ký EC-Schnorr.
+        \item Reveal-Vote Service yêu cầu Coordinator Service trả về thông tin cuộc bầu cử để xác nhận trạng thái CLOSED và lấy khóa công khai tập thể.
+        \item Reveal-Vote Service chuẩn hóa (canonicalize) danh sách ứng viên, kiểm tra mọi ứng viên được chọn đều thuộc cuộc bầu cử và số lượng không vượt quá \pkg{maxSelectableCandidates}, sau đó xác minh chữ ký EC-Schnorr với khóa công khai tập thể và sinh khóa giải mù từ hai thành phần chữ ký.
+        \item Reveal-Vote Service gửi yêu cầu ghi phiếu tiết lộ lên mạng blockchain qua Chainlaunch với revealKey chỉ được dùng một lần. Khi Chainlaunch phản hồi thành công, lưu bản ghi phiếu tiết lộ kèm tham chiếu giao dịch vào cơ sở dữ liệu.
+        \item Reveal-Vote Service so sánh tổng số phiếu đã tiết lộ với tổng số phiếu đã nộp do Coordinator Service cung cấp, nếu bằng nhau thì Reveal-Vote Service yêu cầu Coordinator Service chuyển trạng thái cuộc bầu cử sang COMPLETED; Coordinator Service gửi thông điệp cho các Signing Node yêu cầu dọn dẹp khóa.
         \item Khách nhận xác nhận tiết lộ thành công kèm cờ cho biết cuộc bầu cử đã hoàn tất hay chưa.
     \end{enumerate} \\
     \hline
     Luồng sự kiện thay thế &
     \begin{itemize}
-        \item 3a. Danh sách ứng viên không hợp lệ (vượt quá số tối đa cho phép hoặc chứa ứng viên không thuộc cuộc bầu cử): Reveal-Vote từ chối tiết lộ.
-        \item 3b. Chữ ký EC-Schnorr không hợp lệ: Reveal-Vote từ chối tiết lộ.
-        \item 4a. Khóa giải mù đã tồn tại trong cơ sở dữ liệu hoặc trên blockchain: yêu cầu bị từ chối nhằm chống tấn công lặp.
-        \item 4b. Mạng blockchain phản hồi lỗi: Reveal-Vote hủy lưu bản ghi và trả về lỗi.
+        \item 3a. Danh sách ứng viên không hợp lệ (vượt quá số tối đa cho phép hoặc chứa ứng viên không thuộc cuộc bầu cử): Reveal-Vote Service từ chối tiết lộ.
+        \item 3b. Chữ ký EC-Schnorr không hợp lệ: Reveal-Vote Service từ chối tiết lộ.
+        \item 4a. Khóa giải mù đã tồn tại trong cơ sở dữ liệu: vi phạm ràng buộc duy nhất \pkg{(electionId, revealKey)}, Reveal-Vote Service từ chối yêu cầu lặp nhằm chống tấn công phát lại (replay attack).
+        \item 4b. Chainlaunch phản hồi lỗi khi ghi phiếu tiết lộ: Reveal-Vote Service truy vấn \texttt{GetUsedReveal} trên blockchain để phân định. Nếu revealKey đã tồn tại trên blockchain và \pkg{candidateIds} khớp, lưu bản ghi vào cơ sở dữ liệu với \texttt{blockchainRef}. Nếu revealKey chưa tồn tại trên blockchain, trả về lỗi cho khách.
     \end{itemize} \\
     \hline
 \end{longtable}
@@ -1022,7 +975,7 @@ Khóa bí mật phiếu (gồm các hệ số làm mù và hai thành phần ch�
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{Diagrams/Usecase/QuanLyKhoaBiMat.pdf}
+    \makebox[\textwidth][c]{\includegraphics[width=0.91\textwidth, keepaspectratio]{Diagrams/Usecase/QuanLyKhoaBiMat.pdf}}
     \caption{Biểu đồ Use Case ``Sao lưu khóa bí mật phiếu''}
     \label{fig:uc-quan-ly-khoa-bi-mat}
 \end{figure}
@@ -1127,7 +1080,7 @@ Chức năng \textit{xác minh phiếu bầu} cho phép bất kỳ khách nào d
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{Diagrams/Usecase/XacMinhPhieuBau.pdf}
+    \makebox[\textwidth][c]{\includegraphics[width=0.91\textwidth, keepaspectratio]{Diagrams/Usecase/XacMinhPhieuBau.pdf}}
     \caption{Biểu đồ Use Case ``Xác minh phiếu bầu''}
     \label{fig:uc-xac-minh-phieu-bau}
 \end{figure}
@@ -1184,7 +1137,7 @@ Chức năng \textit{xem kết quả bầu cử} công bố số phiếu đã đ
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{Diagrams/Usecase/XemKetQuaBauCu.pdf}
+    \makebox[\textwidth][c]{\includegraphics[width=0.91\textwidth, keepaspectratio]{Diagrams/Usecase/XemKetQuaBauCu.pdf}}
     \caption{Biểu đồ Use Case ``Xem kết quả bầu cử''}
     \label{fig:uc-xem-ket-qua-bau-cu}
 \end{figure}
@@ -1234,7 +1187,7 @@ Chức năng \textit{kiểm toán số phiếu} cho phép bất kỳ khách nào
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{Diagrams/Usecase/KiemToanSoPhieu.pdf}
+    \makebox[\textwidth][c]{\includegraphics[width=0.91\textwidth, keepaspectratio]{Diagrams/Usecase/KiemToanSoPhieu.pdf}}
     \caption{Biểu đồ Use Case ``Kiểm toán số phiếu''}
     \label{fig:uc-kiem-toan-so-phieu}
 \end{figure}

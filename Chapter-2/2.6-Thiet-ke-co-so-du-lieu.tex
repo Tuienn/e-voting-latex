@@ -152,7 +152,7 @@ Bảng \pkg{votes} lưu các phiếu mù đã được ký tập thể và nộp
     electionId        & ObjectId & Định danh cuộc bầu cử, tham chiếu sang \pkg{elections.id}. \\ \hline
     voterId           & ObjectId & Định danh cử tri trong cuộc bầu cử, tham chiếu sang \pkg{election\_voters.id}, được sử dụng để chặn bỏ phiếu trùng. \\ \hline
     blinded\allowbreak Commitment & String   & Cam kết mù của phiếu, là chuỗi băm SHA-256 hex 64 ký tự của điểm cam kết $C'$. \\ \hline
-    status            & Enum (\textit{VoteStatus}) & Trạng thái ghi nhận của phiếu, nhận một trong hai giá trị \pkg{PENDING\_CHAIN} (đã ghi DB nhưng chưa xác nhận trên blockchain) và \pkg{CONFIRMED} (đã có trên blockchain). \\ \hline
+    status            & Enum (\textit{VoteStatus}) & Trạng thái ghi nhận của phiếu, nhận một trong hai giá trị \pkg{PENDING\_CHAIN} (đã ghi cơ sở dữ liệu nhưng chưa xác nhận trên blockchain) và \pkg{CONFIRMED} (đã có trên blockchain). \\ \hline
     blockchain\allowbreak Ref     & String?  & Mã giao dịch Hyperledger Fabric của lệnh ghi nhận \pkg{SubmitVote}; để trống khi phiếu còn ở trạng thái \pkg{PENDING\_CHAIN}. \\ \hline
     createdAt         & DateTime & Thời điểm phiếu được nộp, sinh tự động. \\ \hline
     updatedAt         & DateTime & Thời điểm cập nhật gần nhất (khi xác nhận hoặc đồng bộ lại), sinh tự động. \\ \hline

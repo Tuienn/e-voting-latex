@@ -40,17 +40,49 @@ alt Chữ ký không hợp lệ
 else Chữ ký hợp lệ
   Reveal -> Reveal: Tính khóa định danh phiếu tiết lộ và mã băm
 
+  note over Reveal, Fabric
+    Chain-first: ghi lên blockchain trước để
+    đảm bảo revealKey chỉ dùng một lần trên chain.
+  end note
+
   Reveal -> Fabric: Gửi phiếu tiết lộ lên blockchain
   activate Fabric
-  Fabric -> Fabric: Kiểm tra gốc Merkle đã cam kết và khóa chưa được dùng
+  Fabric -> Fabric: Kiểm tra gốc Merkle đã cam kết và revealKey chưa được dùng
   Fabric -> Fabric: Ghi nhận phiếu, tăng kết quả ứng viên
-  Fabric --> Reveal: Trả về mã giao dịch
-  deactivate Fabric
 
-  Reveal -> ReDB: Lưu phiếu tiết lộ kèm mã giao dịch
-  activate ReDB
-  ReDB --> Reveal: Xác nhận lưu phiếu
-  deactivate ReDB
+  alt Blockchain ghi thành công
+    Fabric --> Reveal: Trả về mã giao dịch (txId)
+    deactivate Fabric
+
+    Reveal -> ReDB: Lưu phiếu tiết lộ kèm tham chiếu giao dịch
+    activate ReDB
+    ReDB --> Reveal: Xác nhận lưu phiếu
+    deactivate ReDB
+
+  else Blockchain phản hồi lỗi (partial-fail hoặc lỗi thật)
+    Fabric --> Reveal: Trả về lỗi
+    deactivate Fabric
+
+    Reveal -> Fabric: Truy vấn GetUsedReveal (query, không throw)
+    activate Fabric
+    Fabric --> Reveal: Kết quả truy vấn revealKey
+    deactivate Fabric
+
+    alt revealKey đã tồn tại trên chain và candidateIds khớp (partial-fail)
+      note over Reveal
+        Option B: blockchainRef = null vì GetUsedReveal không trả txId.
+        @@unique(electionId, revealKey) đảm bảo idempotent recovery.
+      end note
+
+      Reveal -> ReDB: Lưu phiếu tiết lộ với blockchainRef = null
+      activate ReDB
+      ReDB --> Reveal: Xác nhận (hoặc P2002 nếu đã tồn tại)
+      deactivate ReDB
+
+    else revealKey chưa tồn tại trên chain (lỗi thật)
+      Reveal --> Voter: Trả về lỗi blockchain
+    end
+  end
 
   Reveal -> ReDB: Đếm số phiếu đã tiết lộ
   activate ReDB

@@ -36,7 +36,6 @@ rectangle "Quản lý cuộc bầu cử (Admin)" {
   usecase "Quản lý cử tri trong cuộc bầu cử" as UC_MngVoter
   usecase "Điều hành cuộc bầu cử" as UC_RunElec
   usecase "Xem danh sách phiếu" as UC_ViewVotes
-  usecase "Xem cuộc bầu cử theo cử tri hoặc ứng viên" as UC_ElecByUser
 }
 
 together {
@@ -71,7 +70,6 @@ admin --> UC_MngCand
 admin --> UC_MngVoter
 admin --> UC_RunElec
 admin --> UC_ViewVotes
-admin --> UC_ElecByUser
 
 voter --> UC_MyElecs
 voter --> UC_MyElecDetail

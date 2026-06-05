@@ -65,32 +65,70 @@ ref over Admin, BFF : Xác thực & Kiểm tra quyền ADMIN
 BFF -> Coordinator: Chuyển tiếp yêu cầu đóng
 activate Coordinator
 
-Coordinator -> CoDB: Truy vấn cuộc bầu cử và danh sách phiếu
+Coordinator -> CoDB: Truy vấn cuộc bầu cử và danh sách phiếu CONFIRMED
 activate CoDB
-CoDB --> Coordinator: Trả về danh sách cam kết phiếu mù
+CoDB --> Coordinator: Trả về danh sách cam kết phiếu mù đã xác nhận
 deactivate CoDB
 
 Coordinator -> Coordinator: Xây dựng cây Merkle và tính gốc Merkle
 
+note over Coordinator, CoDB
+  Write-DB-First: ghi CLOSING trước khi gọi chain.
+  Ngăn đồng thời hai yêu cầu đóng song song.
+end note
+
+Coordinator -> CoDB: Ghi trạng thái CLOSING kèm gốc Merkle (transaction)
+activate CoDB
+CoDB --> Coordinator: Xác nhận ghi CLOSING
+deactivate CoDB
+
 Coordinator -> Fabric: Gửi yêu cầu cam kết gốc Merkle lên blockchain
 activate Fabric
 Fabric -> Fabric: Ghi nhận giao dịch lên sổ cái
-Fabric --> Coordinator: Trả về mã giao dịch
-deactivate Fabric
 
-Coordinator -> CoDB: Cập nhật trạng thái sang đã đóng kèm gốc Merkle
-activate CoDB
-CoDB --> Coordinator: Xác nhận cập nhật thành công
-deactivate CoDB
+alt Blockchain ghi thành công
+  Fabric --> Coordinator: Trả về mã giao dịch (txId)
+  deactivate Fabric
 
-Coordinator -> Redis: Lưu cache tổng số phiếu của cuộc bầu cử
-activate Redis
-Redis --> Coordinator: Xác nhận lưu cache
-deactivate Redis
+  Coordinator -> CoDB: Cập nhật CLOSING → CLOSED kèm txId và merkleRoot xác nhận
+  activate CoDB
+  CoDB --> Coordinator: Xác nhận CLOSED
+  deactivate CoDB
 
-Coordinator --> BFF: Trả về cuộc bầu cử đã đóng
+  Coordinator -> Redis: Lưu cache tổng số phiếu cuộc bầu cử
+  activate Redis
+  Redis --> Coordinator: Xác nhận lưu cache
+  deactivate Redis
+
+  Coordinator --> BFF: Trả về cuộc bầu cử đã đóng
+  BFF --> Admin: Thông báo đóng cuộc bầu cử thành công
+
+else Blockchain phản hồi lỗi (partial-fail hoặc lỗi thật)
+  Fabric --> Coordinator: Trả về lỗi
+  deactivate Fabric
+
+  Coordinator -> Fabric: Truy vấn GetMerkleRoot (query, không throw)
+  activate Fabric
+  Fabric --> Coordinator: Kết quả truy vấn
+  deactivate Fabric
+
+  alt Gốc Merkle đã cam kết trên chain (partial-fail)
+    Coordinator -> CoDB: Phục hồi CLOSED kèm txId và merkleRoot từ chain
+    activate CoDB
+    CoDB --> Coordinator: Xác nhận CLOSED
+    deactivate CoDB
+    Coordinator --> BFF: Trả về cuộc bầu cử đã đóng (phục hồi)
+    BFF --> Admin: Thông báo đóng thành công (phục hồi)
+  else Chưa cam kết (lỗi thật)
+    Coordinator -> CoDB: Rollback CLOSING → ACTIVE, merkleRoot = null
+    activate CoDB
+    CoDB --> Coordinator: Xác nhận rollback
+    deactivate CoDB
+    Coordinator --> BFF: Trả về lỗi đóng cuộc bầu cử
+    BFF --> Admin: Hiển thị thông báo lỗi
+  end
+end
+
 deactivate Coordinator
-
-BFF --> Admin: Thông báo đóng cuộc bầu cử thành công
 deactivate BFF
 @enduml

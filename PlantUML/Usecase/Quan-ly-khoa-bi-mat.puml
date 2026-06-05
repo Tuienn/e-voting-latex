@@ -1,19 +1,12 @@
 @startuml QuanLyKhoaBiMat
 left to right direction
-skinparam packageStyle rectangle
-
 actor "Cử tri" as voter
 
-usecase "Đăng nhập hệ thống" as UC_Login
-
-rectangle "Quản lý khóa bí mật phiếu" {
+rectangle "Sao lưu khóa bí mật phiếu" {
   usecase "Sao lưu khóa bí mật phiếu" as UC_Backup
   usecase "Khôi phục khóa bí mật phiếu" as UC_Restore
 }
 
 voter --> UC_Backup
 voter --> UC_Restore
-
-UC_Backup ..> UC_Login : <<include>>
-UC_Restore ..> UC_Login : <<include>>
 @enduml
