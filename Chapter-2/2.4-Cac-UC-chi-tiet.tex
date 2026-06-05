@@ -123,56 +123,6 @@ Chức năng \textit{tạo tài khoản người dùng} cho phép quản trị v
     \hline
 \end{longtable}
 
-\subsubsection{Tìm kiếm người dùng}
-
-Chức năng \textit{tìm kiếm người dùng} hỗ trợ quản trị viên định vị tài khoản theo từ khóa, vai trò, trạng thái và phân trang, là cơ sở cho mọi thao tác quản lý người dùng tiếp theo.
-
-\begin{figure}[H]
-    \centering
-    \makebox[\textwidth][c]{\includegraphics[width=0.7\textwidth, keepaspectratio]{Diagrams/Usecase/TimKiemNguoiDung.pdf}}
-    \caption{Biểu đồ Use Case ``Tìm kiếm người dùng''}
-    \label{fig:uc-tim-kiem-nguoi-dung}
-\end{figure}
-
-\begin{longtable}{|p{0.22\textwidth}|p{0.72\textwidth}|}
-    \caption{Đặc tả Use Case ``Tìm kiếm người dùng''}
-    \label{tab:uc-tim-kiem-nguoi-dung} \\
-    \hline
-    \textbf{Thuộc tính} & \textbf{Nội dung} \\
-    \hline
-    \endfirsthead
-    \hline
-    \textbf{Thuộc tính} & \textbf{Nội dung} \\
-    \hline
-    \endhead
-    \hline
-    \endfoot
-    \hline
-    \endlastfoot
-    Tên chức năng & Tìm kiếm và lọc người dùng. \\
-    \hline
-    Tác nhân & Quản trị viên. \\
-    \hline
-    Điều kiện trước & Đã đăng nhập với vai trò quản trị viên. \\
-    \hline
-    Điều kiện sau & Hệ thống trả về danh sách người dùng phân trang theo các tiêu chí lọc. \\
-    \hline
-    Luồng sự kiện chính &
-    1.~Quản trị viên gửi yêu cầu tìm kiếm tới BFF Gateway kèm các tham số (email, tên, vai trò, trạng thái, phân trang). \\
-    &
-    2.~BFF Gateway chuyển tiếp yêu cầu tới Identity Service. \\
-    &
-    3.~Identity Service xây dựng truy vấn lọc và phân trang trên cơ sở dữ liệu. \\
-    &
-    4.~Identity Service trả về tổng số bản ghi cùng trang dữ liệu tương ứng. \\
-    &
-    5.~Quản trị viên nhận kết quả tìm kiếm. \\
-    \hline
-    Luồng sự kiện thay thế &
-    \tabitem 1a. Dữ liệu đầu vào không hợp lệ: BFF Gateway từ chối yêu cầu, không gọi tới Identity Service. \\
-    \hline
-\end{longtable}
-
 \subsubsection{Quản lý trạng thái tài khoản}
 
 Chức năng \textit{quản lý trạng thái tài khoản} cho phép quản trị viên kích hoạt hoặc vô hiệu hóa một tài khoản nhằm kiểm soát quyền truy cập của người dùng. Tài khoản đã bị vô hiệu hóa không thể đăng nhập và không thể tham gia bỏ phiếu kể cả khi đã thuộc danh sách cử tri của một cuộc bầu cử.
@@ -290,56 +240,6 @@ Chức năng \textit{tạo cuộc bầu cử} là điểm khởi đầu của v�
     \tabitem 5a. Tên cuộc bầu cử đã tồn tại: Coordinator Service trả về lỗi vi phạm ràng buộc duy nhất. \\
     &
     \tabitem 5b. Số ứng viên tối đa được chọn không hợp lệ: Coordinator Service từ chối tạo cuộc bầu cử và trả về thông báo lỗi. \\
-    \hline
-\end{longtable}
-
-\subsubsection{Tìm kiếm cuộc bầu cử}
-
-Chức năng \textit{tìm kiếm cuộc bầu cử} cho phép quản trị viên định vị cuộc bầu cử theo từ khóa, trạng thái và khoảng thời gian. Đây là cơ sở chung cho các thao tác xem chi tiết, điều hành cũng như quản lý ứng viên và cử tri của cuộc bầu cử.
-
-\begin{figure}[H]
-    \centering
-    \makebox[\textwidth][c]{\includegraphics[width=0.7\textwidth, keepaspectratio]{Diagrams/Usecase/TimKiemCuocBauCu.pdf}}
-    \caption{Biểu đồ Use Case ``Tìm kiếm cuộc bầu cử''}
-    \label{fig:uc-tim-kiem-cuoc-bau-cu}
-\end{figure}
-
-\begin{longtable}{|p{0.22\textwidth}|p{0.72\textwidth}|}
-    \caption{Đặc tả Use Case ``Tìm kiếm cuộc bầu cử''}
-    \label{tab:uc-tim-kiem-cuoc-bau-cu} \\
-    \hline
-    \textbf{Thuộc tính} & \textbf{Nội dung} \\
-    \hline
-    \endfirsthead
-    \hline
-    \textbf{Thuộc tính} & \textbf{Nội dung} \\
-    \hline
-    \endhead
-    \hline
-    \endfoot
-    \hline
-    \endlastfoot
-    Tên chức năng & Tìm kiếm và lọc cuộc bầu cử. \\
-    \hline
-    Tác nhân & Quản trị viên. \\
-    \hline
-    Điều kiện trước & Đã đăng nhập với vai trò quản trị viên. \\
-    \hline
-    Điều kiện sau & Hệ thống trả về danh sách cuộc bầu cử phân trang theo các tiêu chí lọc. \\
-    \hline
-    Luồng sự kiện chính &
-    1.~Quản trị viên gửi yêu cầu tìm kiếm tới BFF Gateway kèm các tham số (tên, trạng thái, khoảng thời gian, phân trang). \\
-    &
-    2.~BFF Gateway chuyển tiếp yêu cầu tới Coordinator Service. \\
-    &
-    3.~Coordinator Service xây dựng truy vấn lọc và phân trang trên cơ sở dữ liệu. \\
-    &
-    4.~Coordinator Service trả về tổng số bản ghi và trang dữ liệu tương ứng. \\
-    &
-    5.~Quản trị viên nhận kết quả tìm kiếm. \\
-    \hline
-    Luồng sự kiện thay thế &
-    \tabitem 1a. Dữ liệu đầu vào không hợp lệ: BFF Gateway từ chối yêu cầu, không gọi tới Coordinator Service. \\
     \hline
 \end{longtable}
 
@@ -645,56 +545,6 @@ Chức năng \textit{xem danh sách phiếu} cho phép quản trị viên giám 
     \hline
 \end{longtable}
 
-\subsubsection{Xem danh sách cuộc bầu cử của cử tri}
-
-Chức năng \textit{xem danh sách cuộc bầu cử của cử tri} cho phép cử tri liệt kê các cuộc bầu cử mà mình được phép tham gia, cùng với trạng thái bỏ phiếu của bản thân trong từng cuộc bầu cử.
-
-\begin{figure}[H]
-    \centering
-    \makebox[\textwidth][c]{\includegraphics[width=0.91\textwidth, keepaspectratio]{Diagrams/Usecase/XemBauCuCuaToi.pdf}}
-    \caption{Biểu đồ Use Case ``Xem danh sách cuộc bầu cử của cử tri''}
-    \label{fig:uc-xem-bau-cu-cua-toi}
-\end{figure}
-
-\begin{longtable}{|p{0.22\textwidth}|p{0.72\textwidth}|}
-    \caption{Đặc tả Use Case ``Xem danh sách cuộc bầu cử của cử tri''}
-    \label{tab:uc-xem-bau-cu-cua-toi} \\
-    \hline
-    \textbf{Thuộc tính} & \textbf{Nội dung} \\
-    \hline
-    \endfirsthead
-    \hline
-    \textbf{Thuộc tính} & \textbf{Nội dung} \\
-    \hline
-    \endhead
-    \hline
-    \endfoot
-    \hline
-    \endlastfoot
-    Tên chức năng & Xem danh sách cuộc bầu cử mà cử tri tham gia. \\
-    \hline
-    Tác nhân & Cử tri. \\
-    \hline
-    Điều kiện trước & Đã đăng nhập với vai trò Cử tri. \\
-    \hline
-    Điều kiện sau & Hệ thống trả về danh sách cuộc bầu cử của chính cử tri kèm trạng thái bỏ phiếu của bản thân. \\
-    \hline
-    Luồng sự kiện chính &
-    1.~Cử tri gửi yêu cầu xem danh sách cuộc bầu cử của mình tới BFF Gateway kèm tham số lọc tùy chọn theo trạng thái. \\
-    &
-    2.~BFF Gateway xác thực, lấy định danh cử tri từ phiên và chuyển tiếp yêu cầu tới Coordinator Service. \\
-    &
-    3.~Coordinator Service truy vấn các cuộc bầu cử mà cử tri được phép tham gia, kèm trạng thái bỏ phiếu của cử tri đó. \\
-    &
-    4.~Coordinator Service trả về danh sách cuộc bầu cử. \\
-    &
-    5.~Cử tri nhận kết quả. \\
-    \hline
-    Luồng sự kiện thay thế &
-    \tabitem 1a. Tham số lọc theo không hợp lệ: BFF Gateway từ chối yêu cầu, không gọi tới Coordinator Service. \\
-    \hline
-\end{longtable}
-
 \subsubsection{Xem chi tiết cuộc bầu cử đang tham gia}
 
 Chức năng \textit{xem chi tiết cuộc bầu cử đang tham gia} dành cho cử tri muốn xem thông tin cụ thể của một cuộc bầu cử trước khi quyết định bỏ phiếu. Cử tri chỉ có thể xem chi tiết của các cuộc bầu cử mà mình thuộc danh sách cử tri hợp lệ.
@@ -726,7 +576,7 @@ Chức năng \textit{xem chi tiết cuộc bầu cử đang tham gia} dành cho 
     Tác nhân & Cử tri. \\
     \hline
     Điều kiện trước &
-    \tabitem Đã đăng nhập với vai trò Cử tri. \\
+    \tabitem Đã đăng nhập với vai trò cử tri. \\
     &
     \tabitem Cử tri thuộc danh sách cử tri của cuộc bầu cử cần xem. \\
     \hline
@@ -783,7 +633,7 @@ Chức năng \textit{bỏ phiếu} là quy trình cốt lõi của hệ thống,
     Tác nhân & Cử tri (chính); Mạng blockchain (hệ thống ngoài). \\
     \hline
     Điều kiện trước &
-    \tabitem Đã đăng nhập với vai trò Cử tri. \\
+    \tabitem Đã đăng nhập với vai trò cử tri. \\
     &
     \tabitem Cuộc bầu cử đang ở trạng thái hoạt động. \\
     &
@@ -871,7 +721,7 @@ Chức năng \textit{tiết lộ phiếu} là bước cuối của quy trình b�
     \tabitem Nếu tổng số phiếu đã tiết lộ đạt tổng số phiếu đã nộp, cuộc bầu cử được tự động chuyển sang trạng thái hoàn tất và các khóa của ba Signing Node được dọn dẹp. \\
     \hline
     Luồng sự kiện chính &
-    1.~Khách gửi yêu cầu tiết lộ phiếu tới Reveal-Vote Service qua cổng công khai, gồm danh sách định danh ứng viên đã chọn và chữ ký EC-Schnorr. \\
+    1.~Khách gửi yêu cầu tiết lộ phiếu tới Reveal-Vote Service qua cổng HTTP công khai, gồm danh sách định danh ứng viên đã chọn và chữ ký EC-Schnorr. \\
     &
     2.~Reveal-Vote Service yêu cầu Coordinator Service trả về thông tin cuộc bầu cử để xác nhận trạng thái CLOSED và lấy khóa công khai tập thể. \\
     &
@@ -896,13 +746,13 @@ Chức năng \textit{tiết lộ phiếu} là bước cuối của quy trình b�
 
 \subsubsection{Sao lưu khóa bí mật phiếu}
 
-Khóa bí mật phiếu (gồm các hệ số làm mù và hai thành phần chữ ký) được lưu cục bộ an toàn trên thiết bị của cử tri; việc mất thiết bị có thể dẫn đến mất khả năng tiết lộ và xác minh phiếu về sau nếu cử tri chưa sao lưu khóa. Chức năng \textit{sao lưu khóa bí mật phiếu} cho phép cử tri sao lưu các khóa này lên máy chủ theo mô hình \textit{zero-knowledge}: dữ liệu được mã hóa hoàn toàn phía thiết bị bằng khóa dẫn từ một mã PIN, máy chủ không bao giờ nắm được mã PIN hay nội dung khóa. Hình~\ref{fig:uc-quan-ly-khoa-bi-mat} mô tả hai chức năng sao lưu và khôi phục khóa, đều được cử tri thao tác sau khi đăng nhập.
+Khóa bí mật phiếu (gồm các hệ số làm mù và hai thành phần chữ ký) được lưu cục bộ an toàn trên thiết bị của cử tri; việc mất thiết bị có thể dẫn đến mất khả năng tiết lộ và xác minh phiếu về sau nếu cử tri chưa sao lưu khóa. Chức năng \textit{sao lưu khóa bí mật phiếu} cho phép cử tri sao lưu các khóa này lên máy chủ theo mô hình \textit{zero-knowledge}: dữ liệu được mã hóa hoàn toàn phía thiết bị bằng khóa dẫn từ một mã PIN, máy chủ không bao giờ nắm được mã PIN hay nội dung khóa.
 
 \begin{figure}[H]
     \centering
-    \makebox[\textwidth][c]{\includegraphics[width=0.7\textwidth, keepaspectratio]{Diagrams/Usecase/QuanLyKhoaBiMat.pdf}}
+    \makebox[\textwidth][c]{\includegraphics[width=0.7\textwidth, keepaspectratio]{Diagrams/Usecase/SaoLuuKhoaBiMat.pdf}}
     \caption{Biểu đồ Use Case ``Sao lưu khóa bí mật phiếu''}
-    \label{fig:uc-quan-ly-khoa-bi-mat}
+    \label{fig:uc-sao-luu-khoa-bi-mat}
 \end{figure}
 
 \begin{longtable}{|p{0.22\textwidth}|p{0.72\textwidth}|}
@@ -925,7 +775,7 @@ Khóa bí mật phiếu (gồm các hệ số làm mù và hai thành phần ch�
     Tác nhân & Cử tri. \\
     \hline
     Điều kiện trước &
-    \tabitem Đã đăng nhập với vai trò Cử tri. \\
+    \tabitem Đã đăng nhập với vai trò cử tri. \\
     &
     \tabitem Thiết bị có ít nhất một khóa bí mật phiếu trong kho lưu trữ an toàn. \\
     &
@@ -955,6 +805,13 @@ Khóa bí mật phiếu (gồm các hệ số làm mù và hai thành phần ch�
 
 Chức năng \textit{khôi phục khóa bí mật phiếu} cho phép cử tri lấy lại các khóa đã sao lưu khi chuyển sang thiết bị mới hoặc cài lại ứng dụng. Quá trình giải mã diễn ra hoàn toàn phía thiết bị bằng mã PIN, do đó mã PIN sai sẽ làm bước xác thực của AES-256-GCM thất bại ngay tại máy khách.
 
+\begin{figure}[H]
+    \centering
+    \makebox[\textwidth][c]{\includegraphics[width=0.7\textwidth, keepaspectratio]{Diagrams/Usecase/KhoiPhucKhoaBiMat.pdf}}
+    \caption{Biểu đồ Use Case ``Khôi phục khóa bí mật phiếu''}
+    \label{fig:uc-khoi-phuc-khoa-bi-mat}
+\end{figure}
+
 \begin{longtable}{|p{0.22\textwidth}|p{0.72\textwidth}|}
     \caption{Đặc tả Use Case ``Khôi phục khóa bí mật phiếu''}
     \label{tab:uc-khoi-phuc-khoa} \\
@@ -975,7 +832,7 @@ Chức năng \textit{khôi phục khóa bí mật phiếu} cho phép cử tri l�
     Tác nhân & Cử tri. \\
     \hline
     Điều kiện trước &
-    \tabitem Đã đăng nhập với vai trò Cử tri. \\
+    \tabitem Đã đăng nhập với vai trò cử tri. \\
     &
     \tabitem Tồn tại một bản sao lưu khóa bí mật phiếu trên máy chủ. \\
     &
@@ -1039,7 +896,7 @@ Chức năng \textit{xác minh phiếu bầu} cho phép bất kỳ khách nào d
     Điều kiện sau & Hệ thống trả về kết quả xác minh từng tầng kèm kết luận tổng hợp. \\
     \hline
     Luồng sự kiện chính &
-    1.~Khách gửi yêu cầu xác minh phiếu tới BFF Gateway qua điểm cuối công khai kèm thông tin từ biên lai. \\
+    1.~Khách gửi yêu cầu xác minh phiếu tới BFF Gateway qua cổng HTTP công khai kèm thông tin từ biên lai. \\
     &
     2.~BFF Gateway chuyển tiếp yêu cầu tới Coordinator Service. \\
     &
@@ -1095,18 +952,18 @@ Chức năng \textit{xem kết quả bầu cử} công bố số phiếu đã đ
     Điều kiện sau & Hệ thống trả về số phiếu cho từng ứng viên kèm đối chiếu giữa cơ sở dữ liệu và blockchain. \\
     \hline
     Luồng sự kiện chính &
-    1.~Khách gửi yêu cầu xem kết quả tới Reveal-Vote qua điểm cuối HTTP công khai theo định danh cuộc bầu cử. \\
+    1.~Khách gửi yêu cầu xem kết quả tới Reveal-Vote Service qua cổng HTTP công khai theo định danh cuộc bầu cử. \\
     &
-    2.~Reveal-Vote yêu cầu Coordinator Service trả về thông tin cuộc bầu cử để kiểm tra trạng thái. \\
+    2.~Reveal-Vote Service yêu cầu Coordinator Service trả về thông tin cuộc bầu cử để kiểm tra trạng thái. \\
     &
-    3.~Reveal-Vote thực hiện song song ba thao tác: nhóm và đếm số phiếu đã tiết lộ theo ứng viên từ cơ sở dữ liệu; truy vấn kết quả kiểm phiếu từ Mạng blockchain; lấy hồ sơ ứng viên từ Identity Service. \\
+    3.~Reveal-Vote Service thực hiện song song ba thao tác: nhóm và đếm số phiếu đã tiết lộ theo ứng viên từ cơ sở dữ liệu; truy vấn kết quả kiểm phiếu từ mạng blockchain; lấy hồ sơ ứng viên từ Identity Service. \\
     &
-    4.~Reveal-Vote ghép tên ứng viên với hai con số đếm và đối chiếu tổng số phiếu giữa cơ sở dữ liệu và blockchain. \\
+    4.~Reveal-Vote Service ghép tên ứng viên với hai con số đếm và đối chiếu tổng số phiếu giữa cơ sở dữ liệu và blockchain. \\
     &
     5.~Khách nhận kết quả chi tiết cho từng ứng viên. \\
     \hline
     Luồng sự kiện thay thế &
-    \tabitem 2a. Cuộc bầu cử chưa đóng: Reveal-Vote từ chối trả kết quả. \\
+    \tabitem 2a. Cuộc bầu cử chưa đóng: Reveal-Vote Service từ chối trả kết quả. \\
     \hline
 \end{longtable}
 
@@ -1145,15 +1002,15 @@ Chức năng \textit{kiểm toán số phiếu} cho phép bất kỳ khách nào
     Điều kiện sau & Hệ thống trả về bản đối chiếu các con số liên quan đến cuộc bầu cử giữa cơ sở dữ liệu và blockchain. \\
     \hline
     Luồng sự kiện chính &
-    1.~Khách gửi yêu cầu kiểm toán tới Reveal-Vote qua điểm cuối HTTP công khai theo định danh cuộc bầu cử. \\
+    1.~Khách gửi yêu cầu kiểm toán tới Reveal-Vote Service qua cổng HTTP công khai theo định danh cuộc bầu cử. \\
     &
-    2.~Reveal-Vote thực hiện song song ba thao tác: đếm số phiếu đã tiết lộ trong cơ sở dữ liệu của Reveal-Vote; yêu cầu Coordinator Service trả về tổng số phiếu đã nộp; truy vấn các chỉ số kiểm toán từ Mạng blockchain gồm tổng số phiếu, số phiếu đã tiết lộ và trạng thái cam kết gốc Merkle. \\
+    2.~Reveal-Vote Service thực hiện song song ba thao tác: đếm số phiếu đã tiết lộ trong cơ sở dữ liệu của Reveal-Vote Service; yêu cầu Coordinator Service trả về tổng số phiếu đã nộp; truy vấn các chỉ số kiểm toán từ Mạng blockchain gồm tổng số phiếu, số phiếu đã tiết lộ và trạng thái cam kết gốc Merkle. \\
     &
-    3.~Reveal-Vote tổng hợp các con số và trạng thái, sau đó trả kết quả đối chiếu cho khách. \\
+    3.~Reveal-Vote Service tổng hợp các con số và trạng thái, sau đó trả kết quả đối chiếu cho khách. \\
     &
     4.~Khách nhận bảng đối chiếu chi tiết. \\
     \hline
     Luồng sự kiện thay thế &
-    \tabitem 2a. Cuộc bầu cử không tồn tại: Reveal-Vote trả về lỗi không tìm thấy. \\
+    \tabitem 2a. Cuộc bầu cử không tồn tại: Reveal-Vote Service trả về lỗi không tìm thấy. \\
     \hline
 \end{longtable}

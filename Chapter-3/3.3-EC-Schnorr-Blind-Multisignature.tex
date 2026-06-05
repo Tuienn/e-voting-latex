@@ -1,4 +1,4 @@
-\subsection{Lớp mật mã — EC-Schnorr Blind Multisignature}
+\subsection{Lớp mật mã -- EC-Schnorr Blind Multisignature}
 
 \subsubsection{Lý do lựa chọn EC-Schnorr trên đường cong secp256k1}
 
@@ -20,16 +20,25 @@ Kích thước point & không áp dụng & 33 byte (dạng nén) \\
 \hline
 Tốc độ nhân vô hướng & làm mốc so sánh & nhanh hơn từ 5 đến 25 lần \\
 \hline
-Tính tổng hợp (\textit{linearity}) & không hỗ trợ & có — $s = \sum s_i \bmod n$ \\
+Tính tổng hợp (\textit{linearity}) & không hỗ trợ & có -- $s = \sum s_i \bmod n$ \\
 \hline
 Hỗ trợ tạo chữ ký mù & phức tạp & tự nhiên qua các hệ số làm mù \\
 \hline
 \end{tabularx}
 \end{table}
 
-Tính \textit{linearity} là yếu tố mang tính quyết định trong kiến trúc nhiều node ký: ba node ký độc lập, mỗi node sinh chữ ký phần (\textit{partial signature}) của riêng mình, sau đó bộ điều phối chỉ cần cộng dồn các giá trị scalar — không cần một vòng giao tiếp bổ sung và không tạo ra ràng buộc lệ thuộc lẫn nhau giữa các node.
+Tính \textit{linearity} là yếu tố mang tính quyết định trong kiến trúc nhiều node ký: ba node ký độc lập, mỗi node sinh chữ ký phần (\textit{partial signature}) của riêng mình, sau đó bộ điều phối chỉ cần cộng dồn các giá trị scalar -- không cần một vòng giao tiếp bổ sung và không tạo ra ràng buộc lệ thuộc lẫn nhau giữa các node.
 
 \subsubsection{Giao thức ký mù tập thể}
+
+Tham số hệ thống được cố định cho toàn bộ vòng đời ứng dụng:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth, keepaspectratio]{Figures/code/ec-schnorr-params.png}
+    \caption{Tham số hệ thống EC-Schnorr cố định trong toàn bộ vòng đời ứng dụng}
+    \label{fig:ec-schnorr-params}
+\end{figure}
 
 Giao thức được chia thành sáu pha hoạt động tuần tự, trải dài trên ba thực thể là cử tri (trình duyệt), bộ điều phối (\textit{Coordinator}) và ba node ký (\textit{Signing Nodes}):
 
@@ -77,4 +86,4 @@ Lược đồ ký mù tập thể EC-Schnorr triển khai trong hệ thống cun
     \item \textbf{Chống tấn công phát lại liên bầu cử (\textit{Cross-election replay prevention}):} thông điệp $M$ được gắn định danh bầu cử qua \textit{domain separator} \textit{``ev-vote-v2''} kết hợp \pkg{electionId} và tập \pkg{candidateIds} canonical. Một chữ ký hợp lệ trong bầu cử $A$ khi xác thực trong bầu cử $B$ sẽ thu được $h_{check} \neq h$ vì thông điệp $M$ khác.
 \end{itemize}
 
-Toàn bộ thư viện \pkg{ec-schnorr} của hệ thống được hiện thực dựa trên \pkg{@noble/curves} (\pkg{secp256k1}) và \pkg{@noble/hashes} (SHA-256) — các thư viện cài đặt theo thời gian hằng (\textit{constant-time}), không phụ thuộc native binding và chạy được trên cả Node.js lẫn trình duyệt, qua đó cho phép cử tri tự kiểm chứng chữ ký bằng cùng một mã nguồn ngay tại máy của mình.
+Toàn bộ thư viện \pkg{ec-schnorr} của hệ thống được hiện thực dựa trên \pkg{@noble/curves} (\pkg{secp256k1}) và \pkg{@noble/hashes} (SHA-256) -- các thư viện cài đặt theo thời gian hằng (\textit{constant-time}), không phụ thuộc native binding và chạy được trên cả Node.js lẫn trình duyệt, qua đó cho phép cử tri tự kiểm chứng chữ ký bằng cùng một mã nguồn ngay tại máy của mình.

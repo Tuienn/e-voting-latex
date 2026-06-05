@@ -40,7 +40,12 @@ else Cuộc bầu cử đang chờ
     Coordinator --> BFF: Thông báo dữ liệu ứng viên không hợp lệ
     BFF --> Admin: Hiển thị lỗi nhập liệu
   else Danh sách hợp lệ
-    Coordinator -> CoDB: Cập nhật danh sách ứng viên của cuộc bầu cử
+    note over Coordinator, CoDB
+      Xác nhận lại trạng thái PENDING trước khi ghi
+      để đảm bảo tính nhất quán trong môi trường đồng thời.
+    end note
+
+    Coordinator -> CoDB: Cập nhật danh sách ứng viên của cuộc bầu cử\n(xác nhận lại trạng thái PENDING trước khi thực hiện)
     activate CoDB
     CoDB --> Coordinator: Xác nhận cập nhật thành công
     deactivate CoDB

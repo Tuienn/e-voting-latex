@@ -1,0 +1,59 @@
+@startuml BoPhieu_2
+hide footbox
+autonumber
+skinparam maxMessageSize 200
+
+actor "Voter " as Voter
+participant "BFF Gateway\n(:3000)" as BFF
+participant "Coordinator Service\n(:3303)" as Coordinator
+collections "Signing Nodes\n(:3304 / :3305 / :3306)" as Nodes
+database "Redis\n(Vote Session)" as Redis
+
+== Bước 2: Yêu cầu ký phiếu mù tập thể ==
+
+Voter -> BFF: Gửi thử thách mù kèm định danh phiên
+activate BFF
+
+ref over Voter, BFF : Xác thực & Kiểm tra quyền VOTER
+
+BFF -> Coordinator: Chuyển tiếp yêu cầu ký phiếu mù
+activate Coordinator
+
+Coordinator -> Redis: Kiểm tra phiên hợp lệ và chưa được ký
+activate Redis
+Redis --> Coordinator: Trả về trạng thái phiên
+deactivate Redis
+
+alt Phiên không hợp lệ
+  Coordinator --> BFF: Từ chối ký phiếu
+  BFF --> Voter: Hiển thị thông báo lỗi
+else Phiên hợp lệ
+  par Yêu cầu ký thành phần song song
+    Coordinator -> Nodes: Yêu cầu ký thành phần kèm thử thách mù
+    activate Nodes
+    Nodes -> Nodes: Ghi nhận cử tri đã được ký để chống ký lặp
+    Nodes -> Nodes: Tính chữ ký thành phần và xóa nonce
+    Nodes --> Coordinator: Trả về chữ ký thành phần
+    deactivate Nodes
+  end
+
+  Coordinator -> Coordinator: Tổng hợp chữ ký tập thể
+
+  Coordinator -> Redis: Cập nhật phiên sang trạng thái đã ký
+  activate Redis
+  Redis --> Coordinator: Xác nhận cập nhật
+  deactivate Redis
+
+  Coordinator --> BFF: Trả về chữ ký tập thể đã ký mù
+  deactivate Coordinator
+
+  BFF --> Voter: Trả về chữ ký tập thể
+end
+
+deactivate BFF
+
+note over Voter
+  Cử tri giải mù chữ ký trên trình duyệt và
+  kiểm tra cục bộ trước khi nộp phiếu.
+end note
+@enduml

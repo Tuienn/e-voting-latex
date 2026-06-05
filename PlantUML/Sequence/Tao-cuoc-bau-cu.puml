@@ -32,16 +32,26 @@ Coordinator -> Coordinator: Kiểm tra các ứng viên tồn tại và đang ho
 alt Có ứng viên không hợp lệ
   Coordinator --> BFF: Thông báo dữ liệu ứng viên không hợp lệ
   BFF --> Admin: Hiển thị thông báo lỗi
-else Danh sách hợp lệ
-  Coordinator -> CoDB: Tạo cuộc bầu cử ở trạng thái PENDING
-  activate CoDB
-  CoDB --> Coordinator: Xác nhận tạo thành công
-  deactivate CoDB
+else Danh sách ứng viên hợp lệ
+  Coordinator -> Coordinator: Kiểm tra ràng buộc tên duy nhất và\nsố ứng viên tối đa được chọn mỗi lá phiếu
 
-  Coordinator --> BFF: Trả về thông tin cuộc bầu cử mới
-  deactivate Coordinator
+  alt Tên cuộc bầu cử đã tồn tại
+    Coordinator --> BFF: Trả về lỗi vi phạm ràng buộc tên duy nhất
+    BFF --> Admin: Hiển thị thông báo lỗi tên đã tồn tại
+  else Số ứng viên tối đa được chọn không hợp lệ
+    Coordinator --> BFF: Trả về lỗi số ứng viên tối đa không hợp lệ
+    BFF --> Admin: Hiển thị thông báo lỗi
+  else Hợp lệ
+    Coordinator -> CoDB: Tạo cuộc bầu cử ở trạng thái PENDING
+    activate CoDB
+    CoDB --> Coordinator: Xác nhận tạo thành công
+    deactivate CoDB
 
-  BFF --> Admin: Thông báo tạo cuộc bầu cử thành công
+    Coordinator --> BFF: Trả về thông tin cuộc bầu cử mới
+    deactivate Coordinator
+
+    BFF --> Admin: Thông báo tạo cuộc bầu cử thành công
+  end
 end
 
 deactivate BFF

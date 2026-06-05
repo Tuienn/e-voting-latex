@@ -13,7 +13,7 @@ Bước \textit{Xác thực và Kiểm tra quyền} xuất hiện lặp lại tr
 
 \subsubsection{Xác thực người dùng}
 
-Biểu đồ tuần tự của chức năng xác thực người dùng mô tả ba thao tác trong vòng đời phiên làm việc: đăng nhập, làm mới phiên và đăng xuất. BFF Gateway tiếp nhận yêu cầu từ người dùng, sau đó chuyển tiếp tới Identity Service để kiểm tra tài khoản, mật khẩu và trạng thái kích hoạt. Redis được sử dụng để lưu, xoay vòng và thu hồi refresh token nhằm bảo đảm phiên đăng nhập có thể bị chấm dứt một cách chủ động.
+Biểu đồ tuần tự của chức năng xác thực người dùng mô tả ba thao tác trong vòng đời phiên làm việc: đăng nhập, làm mới phiên và đăng xuất. Ở luồng đăng nhập, Identity Service phân nhánh xử lý ba trường hợp riêng biệt: thông tin đăng nhập không hợp lệ, tài khoản bị vô hiệu hóa và đăng nhập thành công; trong đó tài khoản bị vô hiệu hóa bị từ chối cấp token mà không tiết lộ lý do chi tiết. Redis được sử dụng để lưu, xoay vòng và thu hồi refresh token nhằm bảo đảm phiên đăng nhập có thể bị chấm dứt một cách chủ động.
 
 \begin{figure}[H]
     \centering
@@ -33,17 +33,6 @@ Biểu đồ tuần tự của chức năng tạo tài khoản người dùng m�
     \label{fig:seq-tao-danh-sach-nguoi-dung}
 \end{figure}
 
-\subsubsection{Tìm kiếm người dùng}
-
-Biểu đồ tuần tự này mô tả quá trình quản trị viên tìm kiếm tài khoản theo từ khóa, vai trò, trạng thái và thông tin phân trang. Sau khi BFF Gateway xác thực quyền quản trị, Identity Service xây dựng truy vấn lọc trên cơ sở dữ liệu người dùng. Kết quả trả về gồm danh sách bản ghi theo trang và tổng số bản ghi phù hợp với điều kiện lọc.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth, keepaspectratio]{Diagrams/Sequence/TimKiemNguoiDung.pdf}
-    \caption{Biểu đồ tuần tự ``Tìm kiếm người dùng''}
-    \label{fig:seq-tim-kiem-nguoi-dung}
-\end{figure}
-
 \subsubsection{Quản lý trạng thái tài khoản}
 
 Biểu đồ tuần tự này mô tả thao tác kích hoạt hoặc vô hiệu hóa tài khoản người dùng. Sau khi yêu cầu được xác thực quyền quản trị tại BFF Gateway, Identity Service truy vấn tài khoản mục tiêu và cập nhật trạng thái trong cơ sở dữ liệu. Trạng thái mới được trả về cho quản trị viên, đồng thời là cơ sở để hệ thống từ chối đăng nhập hoặc bỏ phiếu đối với tài khoản đã bị vô hiệu hóa.
@@ -57,24 +46,13 @@ Biểu đồ tuần tự này mô tả thao tác kích hoạt hoặc vô hiệu 
 
 \subsubsection{Tạo cuộc bầu cử}
 
-Biểu đồ tuần tự của chức năng tạo cuộc bầu cử mô tả luồng quản trị viên khởi tạo một cuộc bầu cử mới ở trạng thái PENDING. Coordinator Service tiếp nhận dữ liệu, yêu cầu Identity Service kiểm tra danh sách ứng viên ban đầu và các ràng buộc cấu hình như số ứng viên tối đa được chọn. Khi dữ liệu hợp lệ, cuộc bầu cử được ghi vào MongoDB của Coordinator Service và trả về cho quản trị viên.
+Biểu đồ tuần tự của chức năng tạo cuộc bầu cử mô tả luồng quản trị viên khởi tạo một cuộc bầu cử mới ở trạng thái PENDING. Coordinator Service tiếp nhận dữ liệu, yêu cầu Identity Service xác minh danh sách ứng viên ban đầu, sau đó kiểm tra hai ràng buộc quan trọng: tên cuộc bầu cử phải là duy nhất trong hệ thống và số ứng viên tối đa được chọn phải nằm trong khoảng hợp lệ. Mỗi vi phạm ràng buộc trả về lỗi tương ứng trước khi Coordinator Service ghi bản ghi cuộc bầu cử vào MongoDB.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth, keepaspectratio]{Diagrams/Sequence/TaoCuocBauCu.pdf}
     \caption{Biểu đồ tuần tự ``Tạo cuộc bầu cử''}
     \label{fig:seq-tao-cuoc-bau-cu}
-\end{figure}
-
-\subsubsection{Tìm kiếm cuộc bầu cử}
-
-Biểu đồ tuần tự này thể hiện cách quản trị viên tra cứu danh sách cuộc bầu cử theo từ khóa, trạng thái, khoảng thời gian và phân trang. BFF Gateway kiểm tra quyền truy cập trước khi chuyển yêu cầu tới Coordinator Service. Coordinator Service xây dựng truy vấn trên cơ sở dữ liệu cuộc bầu cử và trả về danh sách phù hợp để phục vụ các thao tác quản trị tiếp theo.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth, keepaspectratio]{Diagrams/Sequence/TimKiemCuocBauCu.pdf}
-    \caption{Biểu đồ tuần tự ``Tìm kiếm cuộc bầu cử''}
-    \label{fig:seq-tim-kiem-cuoc-bau-cu}
 \end{figure}
 
 \subsubsection{Xem chi tiết cuộc bầu cử}
@@ -90,7 +68,7 @@ Biểu đồ tuần tự của chức năng xem chi tiết cuộc bầu cử mô
 
 \subsubsection{Quản lý ứng viên trong cuộc bầu cử}
 
-Biểu đồ tuần tự này mô tả thao tác thêm hoặc xóa ứng viên khỏi một cuộc bầu cử cụ thể. Coordinator Service trước hết kiểm tra cuộc bầu cử có tồn tại và còn ở trạng thái PENDING hay không, nhằm tránh thay đổi danh sách ứng viên sau khi cuộc bầu cử đã bắt đầu. Identity Service được gọi để xác minh các tài khoản ứng viên trước khi Coordinator Service cập nhật danh sách trong cơ sở dữ liệu.
+Biểu đồ tuần tự này mô tả thao tác thêm hoặc xóa ứng viên khỏi một cuộc bầu cử cụ thể. Coordinator Service kiểm tra trạng thái PENDING của cuộc bầu cử, sau đó gọi Identity Service để xác minh danh sách tài khoản ứng viên. Trước khi thực hiện ghi, Coordinator Service xác nhận lại trạng thái PENDING một lần nữa nhằm đảm bảo tính nhất quán trong môi trường đồng thời; danh sách ứng viên chỉ được cập nhật khi cả hai kiểm tra đều thông qua.
 
 \begin{figure}[H]
     \centering
@@ -101,7 +79,7 @@ Biểu đồ tuần tự này mô tả thao tác thêm hoặc xóa ứng viên k
 
 \subsubsection{Quản lý cử tri trong cuộc bầu cử}
 
-Biểu đồ tuần tự của chức năng quản lý cử tri mô tả cách quản trị viên thêm hoặc xóa cử tri khỏi danh sách được phép tham gia một cuộc bầu cử. Coordinator Service kiểm tra trạng thái PENDING của cuộc bầu cử trước khi cho phép thay đổi, vì danh sách cử tri quyết định quyền bỏ phiếu. Identity Service xác minh danh sách tài khoản cử tri, sau đó Coordinator Service cập nhật quan hệ cử tri trong MongoDB.
+Biểu đồ tuần tự của chức năng quản lý cử tri mô tả cách quản trị viên thêm hoặc xóa cử tri khỏi danh sách được phép tham gia một cuộc bầu cử. Coordinator Service trước tiên gọi Identity Service để xác minh danh sách tài khoản cử tri; sau khi danh sách hợp lệ, Coordinator Service mở giao dịch ghi và kiểm tra lại trạng thái PENDING bên trong giao dịch để ngăn xung đột khi trạng thái cuộc bầu cử thay đổi đồng thời. Nếu trạng thái thay đổi trong khi giao dịch đang mở, giao dịch bị rollback và hệ thống trả về lỗi xung đột.
 
 \begin{figure}[H]
     \centering
@@ -112,18 +90,25 @@ Biểu đồ tuần tự của chức năng quản lý cử tri mô tả cách q
 
 \subsubsection{Điều hành cuộc bầu cử}
 
-Biểu đồ tuần tự này mô tả hai mốc chính trong vòng đời cuộc bầu cử: bắt đầu và đóng cuộc bầu cử. Khi bắt đầu, Coordinator Service kiểm tra điều kiện cấu hình và yêu cầu các Signing Node sinh khóa công khai tập thể EC-Schnorr trước khi chuyển trạng thái sang ACTIVE. Khi đóng, hệ thống tổng hợp các cam kết phiếu, sinh gốc Merkle và ghi cam kết này lên blockchain qua Chainlaunch Gateway.
+Biểu đồ tuần tự của chức năng điều hành cuộc bầu cử được tách thành hai luồng riêng. Hình~\ref{fig:seq-dieu-hanh-cuoc-bau-cu-bat-dau} mô tả luồng bắt đầu: Coordinator Service kiểm tra điều kiện cấu hình và phối hợp với ba Signing Node sinh khóa công khai tập thể EC-Schnorr trước khi chuyển trạng thái sang ACTIVE. Hình~\ref{fig:seq-dieu-hanh-cuoc-bau-cu-dong} mô tả luồng đóng: hệ thống xây dựng cây Merkle từ toàn bộ cam kết phiếu đã xác nhận, ghi trạng thái trung gian CLOSING vào cơ sở dữ liệu trước khi cam kết gốc Merkle lên blockchain, và xử lý phục hồi trong trường hợp partial-fail.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth, keepaspectratio]{Diagrams/Sequence/DieuHanhCuocBauCu.pdf}
-    \caption{Biểu đồ tuần tự ``Điều hành cuộc bầu cử''}
-    \label{fig:seq-dieu-hanh-cuoc-bau-cu}
+    \includegraphics[width=0.9\textwidth, keepaspectratio]{Diagrams/Sequence/DieuHanhCuocBauCu_BatDau.pdf}
+    \caption{Biểu đồ tuần tự ``Điều hành cuộc bầu cử --- Bắt đầu''}
+    \label{fig:seq-dieu-hanh-cuoc-bau-cu-bat-dau}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth, keepaspectratio]{Diagrams/Sequence/DieuHanhCuocBauCu_Dong.pdf}
+    \caption{Biểu đồ tuần tự ``Điều hành cuộc bầu cử --- Đóng''}
+    \label{fig:seq-dieu-hanh-cuoc-bau-cu-dong}
 \end{figure}
 
 \subsubsection{Xem danh sách phiếu trong cuộc bầu cử}
 
-Biểu đồ tuần tự của chức năng xem danh sách phiếu mô tả luồng quản trị viên giám sát các phiếu đã nộp trong một cuộc bầu cử. Coordinator Service truy vấn các bản ghi phiếu theo định danh cuộc bầu cử, kèm thông tin phân trang và các trường công khai như cam kết phiếu mù, thời điểm tạo, tham chiếu giao dịch blockchain. Luồng này không trả về lựa chọn ứng viên hay bất kỳ dữ liệu bí mật nào của cử tri.
+Biểu đồ tuần tự của chức năng xem danh sách phiếu mô tả luồng quản trị viên giám sát các phiếu đã nộp trong một cuộc bầu cử. Coordinator Service kiểm tra cuộc bầu cử tồn tại trước khi truy vấn danh sách phiếu; nếu không tìm thấy, luồng dừng và trả về lỗi ngay tại Coordinator Service. Kết quả trả về theo phân trang với các trường công khai như cam kết phiếu mù, thời điểm tạo và tham chiếu giao dịch blockchain, không bao gồm lựa chọn ứng viên hay bất kỳ dữ liệu bí mật nào của cử tri.
 
 \begin{figure}[H]
     \centering
@@ -132,20 +117,9 @@ Biểu đồ tuần tự của chức năng xem danh sách phiếu mô tả lu�
     \label{fig:seq-xem-danh-sach-phieu}
 \end{figure}
 
-\subsubsection{Xem danh sách cuộc bầu cử của cử tri}
-
-Biểu đồ tuần tự này thể hiện luồng cử tri xem các cuộc bầu cử mà mình thuộc danh sách tham gia. Sau khi BFF Gateway xác thực token và vai trò cử tri, Coordinator Service tra cứu quan hệ giữa cử tri và cuộc bầu cử trong MongoDB. Kết quả trả về gồm thông tin tóm tắt từng cuộc bầu cử và trạng thái bỏ phiếu của chính cử tri.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth, keepaspectratio]{Diagrams/Sequence/XemBauCuCuaToi.pdf}
-    \caption{Biểu đồ tuần tự ``Xem danh sách cuộc bầu cử của cử tri''}
-    \label{fig:seq-xem-bau-cu-cua-toi}
-\end{figure}
-
 \subsubsection{Xem chi tiết cuộc bầu cử đang tham gia}
 
-Biểu đồ tuần tự của chức năng này mô tả cách cử tri xem thông tin chi tiết của một cuộc bầu cử trước khi bỏ phiếu. Coordinator Service kiểm tra cử tri có thuộc danh sách hợp lệ của cuộc bầu cử hay không, sau đó lấy cấu hình cuộc bầu cử và danh sách ứng viên. Identity Service được sử dụng để bổ sung hồ sơ ứng viên, còn trạng thái bỏ phiếu của cử tri được trả về cùng dữ liệu chi tiết.
+Biểu đồ tuần tự của chức năng này mô tả cách cử tri xem thông tin chi tiết của một cuộc bầu cử trước khi bỏ phiếu. BFF Gateway lấy toàn bộ danh sách cuộc bầu cử mà cử tri thuộc về từ Coordinator Service, sau đó tự đối chiếu quyền truy cập và từ chối ngay tại BFF nếu cuộc bầu cử yêu cầu không nằm trong danh sách đó. Khi hợp lệ, BFF gọi lần thứ hai đến Coordinator Service, nơi thực hiện đồng thời hai truy vấn: lấy thông tin cuộc bầu cử kèm hồ sơ ứng viên từ Identity Service, và truy vấn trạng thái bỏ phiếu cá nhân của cử tri. Trước khi trả về, Coordinator Service loại bỏ danh sách cử tri khỏi kết quả để bảo vệ quyền riêng tư.
 
 \begin{figure}[H]
     \centering
@@ -156,18 +130,32 @@ Biểu đồ tuần tự của chức năng này mô tả cách cử tri xem th�
 
 \subsubsection{Bỏ phiếu}
 
-Biểu đồ tuần tự của chức năng bỏ phiếu mô tả ba bước chính: khởi tạo phiên bỏ phiếu, yêu cầu ký phiếu mù tập thể và nộp cam kết phiếu mù. Coordinator Service phối hợp với Redis để duy trì phiên bỏ phiếu tạm thời và với các Signing Node để sinh chữ ký EC-Schnorr từng phần. Sau khi cử tri nộp cam kết phiếu mù, hệ thống ghi nhận phiếu trong cơ sở dữ liệu và blockchain mà không tiết lộ lựa chọn ứng viên.
+Quy trình bỏ phiếu gồm ba bước được minh họa qua ba biểu đồ tuần tự riêng. Hình~\ref{fig:seq-bo-phieu-1} mô tả bước khởi tạo phiên: Coordinator Service kiểm tra điều kiện cử tri, thu thập cam kết từng phần của ba Signing Node và tổng hợp thành cam kết tập thể lưu trong Redis. Hình~\ref{fig:seq-bo-phieu-2} mô tả bước ký phiếu mù: mỗi Signing Node tính chữ ký thành phần độc lập, Coordinator Service tổng hợp thành chữ ký tập thể rồi trả về để cử tri giải mù. Hình~\ref{fig:seq-bo-phieu-3} mô tả bước nộp phiếu: hệ thống áp dụng chiến lược DB-First với ràng buộc duy nhất \pkg{(electionId, voterId)} để ngăn bỏ phiếu song song, sau đó ghi cam kết phiếu mù lên blockchain và xử lý phục hồi trong trường hợp partial-fail.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[height=0.9\textheight, keepaspectratio]{Diagrams/Sequence/BoPhieu.pdf}
-    \caption{Biểu đồ tuần tự ``Bỏ phiếu''}
-    \label{fig:seq-bo-phieu}
+    \includegraphics[width=0.9\textwidth, keepaspectratio]{Diagrams/Sequence/BoPhieu_1.pdf}
+    \caption{Biểu đồ tuần tự ``Bỏ phiếu --- Bước 1: Khởi tạo phiên bỏ phiếu''}
+    \label{fig:seq-bo-phieu-1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth, keepaspectratio]{Diagrams/Sequence/BoPhieu_2.pdf}
+    \caption{Biểu đồ tuần tự ``Bỏ phiếu --- Bước 2: Yêu cầu ký phiếu mù tập thể''}
+    \label{fig:seq-bo-phieu-2}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth, keepaspectratio]{Diagrams/Sequence/BoPhieu_3.pdf}
+    \caption{Biểu đồ tuần tự ``Bỏ phiếu --- Bước 3: Nộp cam kết phiếu mù''}
+    \label{fig:seq-bo-phieu-3}
 \end{figure}
 
 \subsubsection{Tiết lộ phiếu sau khi cuộc bầu cử đóng}
 
-Biểu đồ tuần tự này mô tả bước công khai phiếu sau khi cuộc bầu cử đã đóng. Reveal-Vote Service nhận yêu cầu từ khách ẩn danh, kiểm tra trạng thái cuộc bầu cử, chuẩn hóa danh sách ứng viên và xác minh chữ ký EC-Schnorr bằng khóa công khai tập thể. Khi hợp lệ, phiếu tiết lộ được ghi lên blockchain và cơ sở dữ liệu; nếu tất cả phiếu đã được tiết lộ, hệ thống chuyển cuộc bầu cử sang trạng thái hoàn tất.
+Biểu đồ tuần tự này mô tả bước công khai phiếu sau khi cuộc bầu cử đã đóng. Reveal-Vote Service nhận yêu cầu từ khách ẩn danh, kiểm tra trạng thái cuộc bầu cử, chuẩn hóa danh sách ứng viên và xác minh chữ ký EC-Schnorr bằng khóa công khai tập thể. Khi hợp lệ, hệ thống áp dụng chiến lược Chain-first: ghi phiếu tiết lộ lên blockchain trước, sau đó mới lưu bản ghi kèm tham chiếu giao dịch vào cơ sở dữ liệu; trong trường hợp partial-fail, hệ thống truy vấn blockchain để phục hồi tham chiếu giao dịch trước khi lưu. Nếu tất cả phiếu đã được tiết lộ, hệ thống chuyển cuộc bầu cử sang trạng thái hoàn tất và dọn dẹp khóa tại các Signing Node.
 
 \begin{figure}[H]
     \centering
@@ -200,7 +188,7 @@ Biểu đồ tuần tự này mô tả cách khách công khai xem kết quả s
 
 \subsubsection{Kiểm toán số phiếu}
 
-Biểu đồ tuần tự của chức năng kiểm toán số phiếu mô tả luồng khách lấy các chỉ số đối chiếu giữa hệ thống nội bộ và blockchain. Reveal-Vote Service tổng hợp số phiếu đã tiết lộ từ cơ sở dữ liệu, số phiếu đã nộp từ Coordinator Service và các chỉ số kiểm toán từ chaincode. Kết quả giúp người xem kiểm tra tính nhất quán của tổng số phiếu, số phiếu đã tiết lộ và trạng thái cam kết gốc Merkle.
+Biểu đồ tuần tự của chức năng kiểm toán số phiếu mô tả luồng khách lấy các chỉ số đối chiếu giữa hệ thống nội bộ và blockchain. Reveal-Vote Service kiểm tra cuộc bầu cử tồn tại trước khi thực hiện bất kỳ truy vấn nào; nếu không tìm thấy, luồng dừng và trả về lỗi ngay lập tức. Khi cuộc bầu cử tồn tại, Reveal-Vote Service thực hiện song song ba truy vấn: đếm phiếu đã tiết lộ từ cơ sở dữ liệu, lấy tổng số phiếu đã nộp từ Coordinator Service và truy vấn các chỉ số kiểm toán từ chaincode. Kết quả giúp người xem kiểm tra tính nhất quán của tổng số phiếu, số phiếu đã tiết lộ và trạng thái cam kết gốc Merkle.
 
 \begin{figure}[H]
     \centering

@@ -1,0 +1,73 @@
+@startuml BoPhieu_1
+hide footbox
+autonumber
+skinparam maxMessageSize 200
+
+actor "Voter " as Voter
+participant "BFF Gateway\n(:3000)" as BFF
+participant "Coordinator Service\n(:3303)" as Coordinator
+collections "Signing Nodes\n(:3304 / :3305 / :3306)" as Nodes
+database "MongoDB\n(Coordinator DB)" as DB
+database "Redis\n(Vote Session)" as Redis
+
+== Bước 1: Khởi tạo phiên bỏ phiếu ==
+
+Voter -> BFF: Yêu cầu khởi tạo phiên bỏ phiếu
+activate BFF
+
+ref over Voter, BFF : Xác thực & Kiểm tra quyền VOTER
+
+BFF -> Coordinator: Chuyển tiếp yêu cầu khởi tạo phiên
+activate Coordinator
+
+Coordinator -> DB: Kiểm tra cử tri thuộc cuộc bầu cử và chưa bỏ phiếu
+activate DB
+DB --> Coordinator: Trả về thông tin tham gia
+deactivate DB
+
+alt Cử tri đã bỏ phiếu hoặc không hợp lệ
+  Coordinator --> BFF: Từ chối khởi tạo phiên
+  BFF --> Voter: Hiển thị thông báo lỗi
+else Hợp lệ
+  Coordinator -> Redis: Kiểm tra phiên cũ của cử tri
+  activate Redis
+  Redis --> Coordinator: Trả về phiên cũ nếu có
+  deactivate Redis
+
+  opt Phiên cũ tồn tại
+    Coordinator ->> Nodes: Yêu cầu hủy nonce phiên cũ
+  end
+
+  Coordinator -> Coordinator: Sinh định danh phiên mới
+
+  par Yêu cầu sinh cam kết song song
+    Coordinator -> Nodes: Yêu cầu sinh cam kết phiên
+    activate Nodes
+    Nodes -> Nodes: Sinh nonce và tính điểm cam kết
+    Nodes --> Coordinator: Trả về điểm cam kết và khóa công khai thành phần
+    deactivate Nodes
+  end
+
+  Coordinator -> Coordinator: Tổng hợp cam kết tập thể
+  Coordinator -> Coordinator: Đối chiếu khóa công khai với khóa của cuộc bầu cử
+
+  Coordinator -> Redis: Lưu phiên ở trạng thái chưa ký
+  activate Redis
+  Redis --> Coordinator: Xác nhận lưu phiên
+  deactivate Redis
+
+  Coordinator --> BFF: Trả về cam kết tập thể và định danh phiên
+  deactivate Coordinator
+
+  BFF --> Voter: Trả về cam kết tập thể và khóa công khai
+end
+
+deactivate BFF
+
+note over Voter
+  Cử tri thực hiện làm mù phiếu trên trình duyệt:
+  - Chọn ứng viên
+  - Sinh hệ số làm mù bí mật
+  - Tính cam kết phiếu mù và thử thách mù
+end note
+@enduml

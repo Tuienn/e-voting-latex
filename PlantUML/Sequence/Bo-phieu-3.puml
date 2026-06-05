@@ -1,0 +1,111 @@
+@startuml BoPhieu_3
+hide footbox
+autonumber
+skinparam maxMessageSize 200
+
+actor "Voter " as Voter
+participant "BFF Gateway\n(:3000)" as BFF
+participant "Coordinator Service\n(:3303)" as Coordinator
+participant "Chainlaunch Gateway\n(:8100)" as Fabric
+database "MongoDB\n(Coordinator DB)" as DB
+database "Redis\n(Vote Session)" as Redis
+
+== Bước 3: Nộp cam kết phiếu mù ==
+
+Voter -> BFF: Nộp cam kết phiếu mù kèm chữ ký phiên
+activate BFF
+
+ref over Voter, BFF : Xác thực & Kiểm tra quyền VOTER
+
+BFF -> Coordinator: Chuyển tiếp yêu cầu nộp phiếu
+activate Coordinator
+
+Coordinator -> Redis: Đối chiếu phiên và chữ ký đã ký
+activate Redis
+Redis --> Coordinator: Trả về trạng thái phiên
+deactivate Redis
+
+Coordinator -> DB: Kiểm tra trạng thái cuộc bầu cử
+activate DB
+DB --> Coordinator: Trả về trạng thái cuộc bầu cử
+deactivate DB
+
+alt Phiên không khớp hoặc cuộc bầu cử đã đóng
+  Coordinator --> BFF: Từ chối nộp phiếu
+  BFF --> Voter: Hiển thị thông báo lỗi
+else Hợp lệ
+  note over Coordinator, DB
+    Write-DB-First: ghi PENDING_CHAIN trước khi gọi chain.
+    Ràng buộc unique(electionId, voterId) làm mutex phân tán.
+  end note
+
+  Coordinator -> DB: Tạo bản ghi phiếu trạng thái PENDING_CHAIN
+  activate DB
+  DB --> Coordinator: Xác nhận hoặc lỗi P2002 nếu đã tồn tại
+  deactivate DB
+
+  alt Bản ghi đã tồn tại (cử tri bỏ phiếu song song hoặc đã bỏ phiếu)
+    Coordinator --> BFF: Từ chối – cử tri đã bỏ phiếu (conflict)
+    BFF --> Voter: Hiển thị thông báo xung đột
+
+  else Ghi PENDING_CHAIN thành công
+    Coordinator -> Fabric: Gửi cam kết phiếu mù lên blockchain
+    activate Fabric
+    Fabric -> Fabric: Ghi nhận phiếu vào sổ cái
+
+    alt Blockchain ghi thành công
+      Fabric --> Coordinator: Trả về mã giao dịch (txId)
+      deactivate Fabric
+
+      Coordinator -> DB: Cập nhật PENDING_CHAIN → CONFIRMED kèm txId
+      activate DB
+      DB --> Coordinator: Xác nhận CONFIRMED
+      deactivate DB
+
+      Coordinator -> Redis: Đánh dấu phiên đã hoàn tất bỏ phiếu
+      activate Redis
+      Redis --> Coordinator: Xác nhận cập nhật
+      deactivate Redis
+
+      Coordinator --> BFF: Trả về biên lai phiếu
+      BFF --> Voter: Thông báo bỏ phiếu thành công
+
+    else Blockchain phản hồi lỗi (partial-fail hoặc lỗi thật)
+      Fabric --> Coordinator: Trả về lỗi
+      deactivate Fabric
+
+      Coordinator -> Fabric: Truy vấn GetVote (query, không throw)
+      activate Fabric
+      Fabric --> Coordinator: Kết quả truy vấn
+      deactivate Fabric
+
+      alt Phiếu đã được ghi trên chain (partial-fail)
+        Coordinator -> DB: Phục hồi CONFIRMED kèm txId từ chain
+        activate DB
+        DB --> Coordinator: Xác nhận CONFIRMED
+        deactivate DB
+
+        Coordinator -> Redis: Đánh dấu phiên đã hoàn tất
+        activate Redis
+        Redis --> Coordinator: Xác nhận
+        deactivate Redis
+
+        Coordinator --> BFF: Trả về biên lai phiếu (phục hồi)
+        BFF --> Voter: Thông báo bỏ phiếu thành công
+
+      else Phiếu chưa ghi trên chain (lỗi thật)
+        Coordinator -> DB: Xóa bản ghi PENDING_CHAIN
+        activate DB
+        DB --> Coordinator: Xác nhận xóa
+        deactivate DB
+
+        Coordinator --> BFF: Trả về lỗi blockchain
+        BFF --> Voter: Hiển thị thông báo lỗi
+      end
+    end
+  end
+end
+
+deactivate Coordinator
+deactivate BFF
+@enduml

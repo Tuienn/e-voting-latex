@@ -15,7 +15,7 @@ activate BFF
 
 ref over Voter, BFF : Xác thực & Kiểm tra quyền VOTER
 
-BFF -> Coordinator: Gửi yêu cầu lấy danh sách cuộc bầu cử của cử tri
+BFF -> Coordinator: Lấy danh sách cuộc bầu cử của cử tri
 activate Coordinator
 Coordinator -> CoDB: Truy vấn các cuộc bầu cử có cử tri tham gia
 activate CoDB
@@ -29,27 +29,33 @@ BFF -> BFF: Đối chiếu cuộc bầu cử yêu cầu với danh sách cử tr
 alt Cử tri không thuộc cuộc bầu cử
   BFF --> Voter: Từ chối truy cập do không có quyền
 else Cử tri thuộc cuộc bầu cử
-  BFF -> Coordinator: Gửi yêu cầu lấy thông tin đầy đủ cuộc bầu cử
+  BFF -> Coordinator: Lấy thông tin đầy đủ cuộc bầu cử và trạng thái phiếu của cử tri
   activate Coordinator
 
-  Coordinator -> CoDB: Truy vấn cuộc bầu cử
-  activate CoDB
-  CoDB --> Coordinator: Trả về thông tin cuộc bầu cử
-  deactivate CoDB
+  par Truy vấn song song
+    Coordinator -> CoDB: Truy vấn cuộc bầu cử và danh sách ứng viên
+    activate CoDB
+    CoDB --> Coordinator: Trả về thông tin cuộc bầu cử
+    deactivate CoDB
 
-  Coordinator -> Identity: Yêu cầu thông tin các ứng viên
-  activate Identity
-  Identity -> IdDB: Truy vấn ứng viên
-  activate IdDB
-  IdDB --> Identity: Trả về thông tin ứng viên
-  deactivate IdDB
-  Identity --> Coordinator: Trả về danh sách ứng viên
-  deactivate Identity
+    Coordinator -> Identity: Yêu cầu thông tin các ứng viên
+    activate Identity
+    Identity -> IdDB: Truy vấn ứng viên
+    activate IdDB
+    IdDB --> Identity: Trả về thông tin ứng viên
+    deactivate IdDB
+    Identity --> Coordinator: Trả về danh sách ứng viên
+    deactivate Identity
+  else
+    Coordinator -> CoDB: Truy vấn trạng thái bỏ phiếu của cử tri (CONFIRMED)
+    activate CoDB
+    CoDB --> Coordinator: Trả về bản ghi phiếu nếu có
+    deactivate CoDB
+  end
 
-  Coordinator --> BFF: Trả về chi tiết cuộc bầu cử kèm danh sách thành phần
+  Coordinator -> Coordinator: Loại bỏ danh sách cử tri khỏi kết quả\nđể bảo vệ quyền riêng tư
+  Coordinator --> BFF: Trả về chi tiết cuộc bầu cử kèm trạng thái bỏ phiếu cá nhân
   deactivate Coordinator
-
-  BFF -> BFF: Loại bỏ danh sách cử tri khỏi dữ liệu trả về để bảo vệ quyền riêng tư
 
   BFF --> Voter: Hiển thị chi tiết cuộc bầu cử
 end

@@ -1,0 +1,10 @@
+@startuml KhoiPhucKhoaBiMat_UC
+left to right direction
+actor "Cử tri" as voter
+
+rectangle "Khôi phục khóa bí mật phiếu" {
+  usecase "Khôi phục khóa bí mật phiếu" as UC_Restore
+}
+
+voter --> UC_Restore
+@enduml

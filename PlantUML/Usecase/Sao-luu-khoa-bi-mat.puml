@@ -1,12 +1,10 @@
-@startuml QuanLyKhoaBiMat
+@startuml SaoLuuKhoaBiMat_UC
 left to right direction
 actor "Cử tri" as voter
 
 rectangle "Sao lưu khóa bí mật phiếu" {
   usecase "Sao lưu khóa bí mật phiếu" as UC_Backup
-  usecase "Khôi phục khóa bí mật phiếu" as UC_Restore
 }
 
 voter --> UC_Backup
-voter --> UC_Restore
 @enduml

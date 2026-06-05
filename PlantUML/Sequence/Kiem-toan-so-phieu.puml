@@ -17,29 +17,43 @@ note over Reveal
   Điểm cuối công khai, không yêu cầu xác thực
 end note
 
-par Truy vấn song song
-  Reveal -> ReDB: Đếm tổng số phiếu đã tiết lộ trong cơ sở dữ liệu
-  activate ReDB
-  ReDB --> Reveal: Trả về tổng số phiếu đã tiết lộ
-  deactivate ReDB
-else
-  Reveal -> Coordinator: Yêu cầu tổng số phiếu đã nộp
-  activate Coordinator
-  Coordinator -> CoDB: Đếm phiếu trong cuộc bầu cử
-  activate CoDB
-  CoDB --> Coordinator: Trả về tổng số phiếu đã nộp
-  deactivate CoDB
-  Coordinator --> Reveal: Trả về tổng số phiếu đã nộp
-  deactivate Coordinator
-else
-  Reveal -> Fabric: Yêu cầu thống kê kiểm toán trên blockchain
-  activate Fabric
-  Fabric --> Reveal: Trả về tổng số phiếu, số phiếu đã tiết lộ và trạng thái gốc Merkle
-  deactivate Fabric
+Reveal -> Coordinator: Kiểm tra cuộc bầu cử tồn tại
+activate Coordinator
+Coordinator -> CoDB: Truy vấn cuộc bầu cử theo định danh
+activate CoDB
+CoDB --> Coordinator: Trả về kết quả truy vấn
+deactivate CoDB
+Coordinator --> Reveal: Trả về thông tin cuộc bầu cử
+deactivate Coordinator
+
+alt Cuộc bầu cử không tồn tại
+  Reveal --> Guest: Trả về lỗi không tìm thấy
+else Cuộc bầu cử tồn tại
+  par Truy vấn song song
+    Reveal -> ReDB: Đếm tổng số phiếu đã tiết lộ trong cơ sở dữ liệu
+    activate ReDB
+    ReDB --> Reveal: Trả về tổng số phiếu đã tiết lộ
+    deactivate ReDB
+  else
+    Reveal -> Coordinator: Yêu cầu tổng số phiếu đã nộp
+    activate Coordinator
+    Coordinator -> CoDB: Đếm phiếu trong cuộc bầu cử
+    activate CoDB
+    CoDB --> Coordinator: Trả về tổng số phiếu đã nộp
+    deactivate CoDB
+    Coordinator --> Reveal: Trả về tổng số phiếu đã nộp
+    deactivate Coordinator
+  else
+    Reveal -> Fabric: Yêu cầu thống kê kiểm toán trên blockchain
+    activate Fabric
+    Fabric --> Reveal: Trả về tổng số phiếu, số phiếu đã tiết lộ và trạng thái gốc Merkle
+    deactivate Fabric
+  end
+
+  Reveal -> Reveal: So sánh số liệu giữa cơ sở dữ liệu và blockchain
+
+  Reveal --> Guest: Trả về báo cáo kiểm toán kèm chỉ báo khớp hoặc lệch
 end
 
-Reveal -> Reveal: So sánh số liệu giữa cơ sở dữ liệu và blockchain
-
-Reveal --> Guest: Trả về báo cáo kiểm toán kèm chỉ báo khớp hoặc lệch
 deactivate Reveal
 @enduml

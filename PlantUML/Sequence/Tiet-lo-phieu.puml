@@ -69,12 +69,7 @@ else Chữ ký hợp lệ
     deactivate Fabric
 
     alt revealKey đã tồn tại trên chain và candidateIds khớp (partial-fail)
-      note over Reveal
-        Option B: blockchainRef = null vì GetUsedReveal không trả txId.
-        @@unique(electionId, revealKey) đảm bảo idempotent recovery.
-      end note
-
-      Reveal -> ReDB: Lưu phiếu tiết lộ với blockchainRef = null
+      Reveal -> ReDB: Lưu phiếu tiết lộ kèm tham chiếu giao dịch từ blockchain
       activate ReDB
       ReDB --> Reveal: Xác nhận (hoặc P2002 nếu đã tồn tại)
       deactivate ReDB

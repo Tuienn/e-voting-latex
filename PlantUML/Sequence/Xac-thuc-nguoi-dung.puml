@@ -25,6 +25,9 @@ deactivate DB
 alt Tài khoản không tồn tại hoặc mật khẩu sai
   Identity --> BFF: Thông báo thông tin đăng nhập không hợp lệ
   BFF --> User: Hiển thị lỗi đăng nhập
+else Tài khoản bị vô hiệu hóa
+  Identity --> BFF: Thông báo tài khoản không khả dụng
+  BFF --> User: Hiển thị lỗi tài khoản bị vô hiệu hóa
 else Tài khoản hợp lệ
   Identity -> Identity: Phát hành access token và refresh token
   Identity -> Redis: Lưu refresh token theo người dùng

@@ -1,0 +1,6 @@
+Orderer:
+    BatchSize:
+        MaxMessageCount:   500    # số giao dịch tối đa trong một khối
+        AbsoluteMaxBytes:  10 MB  # kích thước tuyệt đối tối đa
+        PreferredMaxBytes:  2 MB  # cắt khối khi vượt ngưỡng ưu tiên
+    BatchTimeout:          2s     # thời gian tối đa chờ đủ lô

@@ -1,0 +1,55 @@
+@startuml DieuHanhCuocBauCu_BatDau
+hide footbox
+autonumber
+skinparam maxMessageSize 200
+
+actor "Admin " as Admin
+participant "BFF Gateway\n(:3000)" as BFF
+participant "Coordinator Service\n(:3303)" as Coordinator
+collections "Signing Nodes\n(:3304 / :3305 / :3306)" as Nodes
+database "MongoDB\n(Coordinator DB)" as CoDB
+
+== Bắt đầu cuộc bầu cử ==
+
+Admin -> BFF: Yêu cầu bắt đầu cuộc bầu cử
+activate BFF
+
+ref over Admin, BFF : Xác thực & Kiểm tra quyền ADMIN
+
+BFF -> Coordinator: Chuyển tiếp yêu cầu bắt đầu
+activate Coordinator
+
+Coordinator -> CoDB: Truy vấn cuộc bầu cử
+activate CoDB
+CoDB --> Coordinator: Trả về thông tin cuộc bầu cử
+deactivate CoDB
+
+Coordinator -> Coordinator: Kiểm tra trạng thái và số lượng tối thiểu của ứng viên, cử tri
+
+alt Không đủ điều kiện bắt đầu
+  Coordinator --> BFF: Từ chối bắt đầu cuộc bầu cử
+  BFF --> Admin: Hiển thị thông báo lỗi
+else Đủ điều kiện
+  par Yêu cầu sinh khóa song song
+    Coordinator -> Nodes: Yêu cầu sinh cặp khóa ký
+    activate Nodes
+    Nodes -> Nodes: Sinh khóa và mã hóa khóa bí mật
+    Nodes --> Coordinator: Trả về các khóa công khai thành phần
+    deactivate Nodes
+  end
+
+  Coordinator -> Coordinator: Tổng hợp khóa công khai tập thể
+
+  Coordinator -> CoDB: Cập nhật trạng thái sang ACTIVE và lưu khóa công khai tập thể
+  activate CoDB
+  CoDB --> Coordinator: Xác nhận cập nhật thành công
+  deactivate CoDB
+
+  Coordinator --> BFF: Trả về cuộc bầu cử đã khởi động
+  deactivate Coordinator
+
+  BFF --> Admin: Thông báo bắt đầu thành công
+end
+
+deactivate BFF
+@enduml

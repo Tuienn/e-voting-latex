@@ -18,31 +18,29 @@ ref over Admin, BFF : Xác thực & Kiểm tra quyền ADMIN
 BFF -> Coordinator: Chuyển tiếp yêu cầu cập nhật danh sách cử tri
 activate Coordinator
 
-Coordinator -> CoDB: Truy vấn cuộc bầu cử
-activate CoDB
-CoDB --> Coordinator: Trả về thông tin cuộc bầu cử
-deactivate CoDB
+Coordinator -> Identity: Yêu cầu thông tin các cử tri
+activate Identity
+Identity -> IdDB: Truy vấn cử tri
+activate IdDB
+IdDB --> Identity: Trả về thông tin cử tri
+deactivate IdDB
+Identity --> Coordinator: Trả về danh sách cử tri hợp lệ
+deactivate Identity
 
-alt Cuộc bầu cử không ở trạng thái chờ
-  Coordinator --> BFF: Từ chối thay đổi do cuộc bầu cử đã khởi động
-  BFF --> Admin: Hiển thị thông báo lỗi
-else Cuộc bầu cử đang chờ
-  Coordinator -> Identity: Yêu cầu thông tin các cử tri
-  activate Identity
-  Identity -> IdDB: Truy vấn cử tri
-  activate IdDB
-  IdDB --> Identity: Trả về thông tin cử tri
-  deactivate IdDB
-  Identity --> Coordinator: Trả về danh sách cử tri hợp lệ
-  deactivate Identity
+alt Có cử tri không hợp lệ
+  Coordinator --> BFF: Thông báo dữ liệu cử tri không hợp lệ
+  BFF --> Admin: Hiển thị lỗi nhập liệu
+else Danh sách hợp lệ
+  Coordinator -> CoDB: Mở giao dịch cập nhật danh sách cử tri
+  activate CoDB
+  CoDB -> CoDB: Kiểm tra lại trạng thái cuộc bầu cử phải là PENDING
 
-  alt Có cử tri không hợp lệ
-    Coordinator --> BFF: Thông báo dữ liệu cử tri không hợp lệ
-    BFF --> Admin: Hiển thị lỗi nhập liệu
-  else Danh sách hợp lệ
-    Coordinator -> CoDB: Mở giao dịch cập nhật danh sách cử tri
-    activate CoDB
-    CoDB -> CoDB: Kiểm tra lại trạng thái cuộc bầu cử
+  alt Trạng thái cuộc bầu cử thay đổi trong khi giao dịch đang mở
+    CoDB --> Coordinator: Rollback giao dịch, trả về lỗi xung đột
+    deactivate CoDB
+    Coordinator --> BFF: Trả về lỗi xung đột trạng thái
+    BFF --> Admin: Hiển thị thông báo lỗi xung đột
+  else Trạng thái vẫn là PENDING
     CoDB -> CoDB: Thêm hoặc xóa cử tri tương ứng
     CoDB --> Coordinator: Xác nhận giao dịch thành công
     deactivate CoDB

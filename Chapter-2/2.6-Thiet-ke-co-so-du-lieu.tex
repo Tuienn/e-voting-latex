@@ -8,21 +8,16 @@ Hệ thống bao gồm bốn cơ sở dữ liệu tương ứng với bốn nhó
 
 Bảng \pkg{users} lưu trữ toàn bộ tài khoản trong hệ thống, bao gồm cả ba vai trò: quản trị viên, cử tri và ứng viên. Mật khẩu được băm bằng thuật toán bcrypt trước khi lưu, hệ thống không bao giờ lưu trữ mật khẩu nguyên bản.
 
-\begin{fitlongtable}{|p{0.22\textwidth}|p{0.22\textwidth}|p{0.50\textwidth}|}
+\begin{table}[H]
+    \centering
+    \small
+    \setlength{\tabcolsep}{3pt}
     \caption{Cấu trúc bảng users}
-    \label{tab:db-users} \\
+    \label{tab:db-users}
+    \begin{tabularx}{\textwidth}{|Y|Y|Y|}
     \hline
     \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
     \hline
-    \endfirsthead
-    \hline
-    \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
-    \hline
-    \endhead
-    \hline
-    \endfoot
-    \hline
-    \endlastfoot
     id        & ObjectId  & Khóa chính của bản ghi, sinh tự động. \\ \hline
     email     & String    & Địa chỉ thư điện tử dùng để đăng nhập, có ràng buộc duy nhất. \\ \hline
     password  & String    & Chuỗi băm mật khẩu theo thuật toán bcrypt. \\ \hline
@@ -31,7 +26,8 @@ Bảng \pkg{users} lưu trữ toàn bộ tài khoản trong hệ thống, bao g�
     isActive  & Boolean   & Trạng thái kích hoạt của tài khoản; mặc định là \pkg{true}. \\ \hline
     createdAt & DateTime  & Thời điểm tạo bản ghi, sinh tự động. \\ \hline
     updatedAt & DateTime  & Thời điểm cập nhật gần nhất, sinh tự động. \\ \hline
-\end{fitlongtable}
+    \end{tabularx}
+\end{table}
 
 \textbf{Ràng buộc và chỉ mục:} thuộc tính \pkg{email} có ràng buộc duy nhất nhằm bảo đảm mỗi địa chỉ chỉ tương ứng với một tài khoản; chỉ mục đơn trên trường \pkg{role} hỗ trợ thao tác lọc nhanh theo vai trò khi quản trị viên duyệt danh sách người dùng.
 
@@ -39,21 +35,16 @@ Bảng \pkg{users} lưu trữ toàn bộ tài khoản trong hệ thống, bao g�
 
 Bảng \pkg{vote\_secret\_backups} lưu bản sao lưu khóa bí mật phiếu của cử tri theo mô hình \textit{zero-knowledge}. Dữ liệu được mã hóa hai lớp: lớp ngoài do máy khách (ứng dụng di động) dẫn xuất khóa từ mã PIN rồi mã hóa, lớp trong do Identity Service áp dụng thêm trước khi lưu trữ (\textit{at-rest encryption}). Máy chủ không bao giờ nhận mã PIN nên không thể giải lớp do máy khách tạo (xem mục Sao lưu và khôi phục khóa bí mật phiếu ở Chương 3).
 
-\begin{fitlongtable}{|p{0.22\textwidth}|p{0.22\textwidth}|p{0.50\textwidth}|}
+\begin{table}[H]
+    \centering
+    \small
+    \setlength{\tabcolsep}{3pt}
     \caption{Cấu trúc bảng {vote\_secret\_backups}}
-    \label{tab:db-vote-secret-backups} \\
+    \label{tab:db-vote-secret-backups}
+    \begin{tabularx}{\textwidth}{|Y|Y|Y|}
     \hline
     \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
     \hline
-    \endfirsthead
-    \hline
-    \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
-    \hline
-    \endhead
-    \hline
-    \endfoot
-    \hline
-    \endlastfoot
     id         & ObjectId & Khóa chính của bản ghi, sinh tự động. \\ \hline
     userId     & ObjectId & Định danh cử tri sở hữu bản sao lưu, tham chiếu sang \pkg{users.id}; có ràng buộc duy nhất. \\ \hline
     cipher     & String   & Bản mã \textit{at-rest} của envelope do máy khách tạo (đã mã hóa bằng PIN), biểu diễn base64. \\ \hline
@@ -63,7 +54,8 @@ Bảng \pkg{vote\_secret\_backups} lưu bản sao lưu khóa bí mật phiếu c
     version    & Int      & Phiên bản định dạng envelope; mặc định là $1$. \\ \hline
     createdAt  & DateTime & Thời điểm tạo bản ghi, sinh tự động. \\ \hline
     updatedAt  & DateTime & Thời điểm cập nhật gần nhất, sinh tự động. \\ \hline
-\end{fitlongtable}
+    \end{tabularx}
+\end{table}
 
 \textbf{Ràng buộc và chỉ mục:} thuộc tính \pkg{userId} có ràng buộc duy nhất nhằm bảo đảm mỗi cử tri chỉ giữ một bản sao lưu khóa bí mật phiếu tại một thời điểm; thao tác sao lưu lần sau sẽ ghi đè bản ghi hiện có.
 
@@ -71,34 +63,30 @@ Bảng \pkg{vote\_secret\_backups} lưu bản sao lưu khóa bí mật phiếu c
 
 Bảng \pkg{elections} là bảng trung tâm của nghiệp vụ bầu cử, lưu trữ thông tin định danh, trạng thái vòng đời, danh sách ứng viên, khóa công khai tập thể và các tham chiếu blockchain của mỗi cuộc bầu cử.
 
-\begin{fitlongtable}{|p{0.24\textwidth}|p{0.22\textwidth}|p{0.48\textwidth}|}
+\begin{table}[H]
+    \centering
+    \small
+    \setlength{\tabcolsep}{3pt}
     \caption{Cấu trúc bảng elections}
-    \label{tab:db-elections} \\
+    \label{tab:db-elections}
+    \begin{tabularx}{\textwidth}{|Y|Y|Y|}
     \hline
     \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
     \hline
-    \endfirsthead
-    \hline
-    \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
-    \hline
-    \endhead
-    \hline
-    \endfoot
-    \hline
-    \endlastfoot
     id                  & ObjectId  & Khóa chính của cuộc bầu cử, sinh tự động. \\ \hline
     name                & String    & Tên cuộc bầu cử, có ràng buộc duy nhất. \\ \hline
-    status              & Enum (\textit{ElectionStatus}) & Trạng thái vòng đời, nhận một trong các giá trị \pkg{PENDING}, \pkg{ACTIVE}, \pkg{CLOSING}, \pkg{CLOSED}, \pkg{COMPLETED}; mặc định là \pkg{PENDING}. Trạng thái \pkg{CLOSING} là trạng thái trung gian khi đóng cuộc bầu cử (xem mục Nhất quán dữ liệu blockchain--MongoDB). \\ \hline
+    status              & Enum (\textit{ElectionStatus}) & Trạng thái vòng đời, nhận một trong các giá trị PENDING, ACTIVE, CLOSING, CLOSED, COMPLETED; mặc định là PENDING. Trạng thái CLOSING là trạng thái trung gian khi đóng cuộc bầu cử (xem mục Nhất quán dữ liệu blockchain--MongoDB). \\ \hline
     candidateIds        & String[]  & Danh sách định danh của các ứng viên thuộc cuộc bầu cử, tham chiếu sang \pkg{users.id}. \\ \hline
-    max\allowbreak Selectable\allowbreak Candidates & Int & Số ứng viên tối đa mỗi cử tri được chọn trên một lá phiếu; mặc định là $1$, hợp lệ khi $1 \le \textit{max} \le |\textit{candidateIds}|$. \\ \hline
+    max\allowbreak Selectable\allowbreak Candidates & Int & Số ứng viên tối đa mỗi cử tri được chọn trên một lá phiếu; mặc định là $1$, hợp lệ khi $1 \le \textit{max} \l |\textit{candidateIds}|$. \\ \hline
     collective\allowbreak Public\allowbreak Key & String?   & Khóa công khai tập thể EC-Schnorr (điểm trên đường cong secp256k1, biểu diễn dưới dạng hex 66 ký tự), được sinh khi bắt đầu cuộc bầu cử. \\ \hline
     merkleRoot          & String?   & Gốc Merkle của tập phiếu mù, biểu diễn dưới dạng chuỗi băm SHA-256 hex 64 ký tự, được tính khi đóng cuộc bầu cử. \\ \hline
-    blockchainRef       & String?   & Mã giao dịch Hyperledger Fabric của lệnh ghi nhận \pkg{CommitMerkleRoot}. \\ \hline
-    startDate           & DateTime? & Thời điểm cuộc bầu cử chuyển sang trạng thái \pkg{ACTIVE}. \\ \hline
-    endDate             & DateTime? & Thời điểm cuộc bầu cử chuyển sang trạng thái \pkg{COMPLETED}. \\ \hline
+    blockchainRef       & String?   & Mã giao dịch blockchain của lệnh ghi nhận \pkg{CommitMerkleRoot}; được cập nhật sau khi chain xác nhận. \\ \hline
+    startDate           & DateTime? & Thời điểm cuộc bầu cử chuyển sang trạng thái ACTIVE. \\ \hline
+    endDate             & DateTime? & Thời điểm cuộc bầu cử chuyển sang trạng thái COMPLETED. \\ \hline
     createdAt           & DateTime  & Thời điểm tạo bản ghi, sinh tự động. \\ \hline
     updatedAt           & DateTime  & Thời điểm cập nhật gần nhất, sinh tự động. \\ \hline
-\end{fitlongtable}
+    \end{tabularx}
+\end{table}
 
 \textbf{Ràng buộc và chỉ mục:} thuộc tính \pkg{name} có ràng buộc duy nhất; chỉ mục tổ hợp \pkg{(status, startDate, endDate)} hỗ trợ truy vấn danh sách cuộc bầu cử theo trạng thái trong một khoảng thời gian.
 
@@ -106,26 +94,22 @@ Bảng \pkg{elections} là bảng trung tâm của nghiệp vụ bầu cử, lư
 
 Bảng \pkg{election\_voters} mô hình hóa quan hệ nhiều-nhiều giữa cuộc bầu cử và cử tri, ghi nhận danh sách cử tri đủ điều kiện tham gia một cuộc bầu cử cụ thể.
 
-\begin{fitlongtable}{|p{0.22\textwidth}|p{0.22\textwidth}|p{0.50\textwidth}|}
+\begin{table}[H]
+    \centering
+    \small
+    \setlength{\tabcolsep}{3pt}
     \caption{Cấu trúc bảng {election\_voters}}
-    \label{tab:db-election-voters} \\
+    \label{tab:db-election-voters}
+    \begin{tabularx}{\textwidth}{|Y|Y|Y|}
     \hline
     \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
     \hline
-    \endfirsthead
-    \hline
-    \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
-    \hline
-    \endhead
-    \hline
-    \endfoot
-    \hline
-    \endlastfoot
     id         & ObjectId  & Khóa chính của bản ghi, sinh tự động. \\ \hline
     electionId & ObjectId  & Định danh cuộc bầu cử, tham chiếu sang \pkg{elections.id}. \\ \hline
     voterId    & ObjectId  & Định danh cử tri, tham chiếu sang \pkg{users.id} của Identity Service. \\ \hline
     createdAt  & DateTime  & Thời điểm cử tri được thêm vào cuộc bầu cử, sinh tự động. \\ \hline
-\end{fitlongtable}
+    \end{tabularx}
+\end{table}
 
 \textbf{Ràng buộc và chỉ mục:} cặp \pkg{(electionId, voterId)} có ràng buộc duy nhất nhằm bảo đảm một cử tri chỉ được ghi danh một lần cho mỗi cuộc bầu cử; chỉ mục đơn trên \pkg{voterId} hỗ trợ truy vấn danh sách cuộc bầu cử mà một cử tri được tham gia.
 
@@ -133,30 +117,26 @@ Bảng \pkg{election\_voters} mô hình hóa quan hệ nhiều-nhiều giữa cu
 
 Bảng \pkg{votes} lưu các phiếu mù đã được ký tập thể và nộp lên hệ thống. Bản ghi chỉ chứa cam kết mù (\textit{blinded commitment}) chứ không chứa thông tin về ứng viên được chọn, bảo đảm tính ẩn danh ngay từ tầng lưu trữ.
 
-\begin{fitlongtable}{|p{0.24\textwidth}|p{0.22\textwidth}|p{0.48\textwidth}|}
+\begin{table}[H]
+    \centering
+    \small
+    \setlength{\tabcolsep}{3pt}
     \caption{Cấu trúc bảng votes}
-    \label{tab:db-votes} \\
+    \label{tab:db-votes}
+    \begin{tabularx}{\textwidth}{|Y|Y|Y|}
     \hline
     \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
     \hline
-    \endfirsthead
-    \hline
-    \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
-    \hline
-    \endhead
-    \hline
-    \endfoot
-    \hline
-    \endlastfoot
     id                & ObjectId & Khóa chính của bản ghi phiếu, sinh tự động. \\ \hline
     electionId        & ObjectId & Định danh cuộc bầu cử, tham chiếu sang \pkg{elections.id}. \\ \hline
-    voterId           & ObjectId & Định danh cử tri trong cuộc bầu cử, tham chiếu sang \pkg{election\_voters.id}, được sử dụng để chặn bỏ phiếu trùng. \\ \hline
+    voterId           & ObjectId & Định danh cử tri, tham chiếu sang \pkg{users.id} của Identity Service; cùng với \pkg{electionId} tạo thành tham chiếu hợp lệ tới bản ghi \pkg{election\_voters} và được sử dụng để chặn bỏ phiếu trùng. \\ \hline
     blinded\allowbreak Commitment & String   & Cam kết mù của phiếu, là chuỗi băm SHA-256 hex 64 ký tự của điểm cam kết $C'$. \\ \hline
     status            & Enum (\textit{VoteStatus}) & Trạng thái ghi nhận của phiếu, nhận một trong hai giá trị \pkg{PENDING\_CHAIN} (đã ghi cơ sở dữ liệu nhưng chưa xác nhận trên blockchain) và \pkg{CONFIRMED} (đã có trên blockchain). \\ \hline
-    blockchain\allowbreak Ref     & String?  & Mã giao dịch Hyperledger Fabric của lệnh ghi nhận \pkg{SubmitVote}; để trống khi phiếu còn ở trạng thái \pkg{PENDING\_CHAIN}. \\ \hline
+    blockchain\allowbreak Ref     & String?  & Mã giao dịch blockchain của lệnh ghi nhận \pkg{SubmitVote}; để trống khi phiếu còn ở trạng thái \pkg{PENDING\_CHAIN}. \\ \hline
     createdAt         & DateTime & Thời điểm phiếu được nộp, sinh tự động. \\ \hline
     updatedAt         & DateTime & Thời điểm cập nhật gần nhất (khi xác nhận hoặc đồng bộ lại), sinh tự động. \\ \hline
-\end{fitlongtable}
+    \end{tabularx}
+\end{table}
 
 \textbf{Ràng buộc và chỉ mục:} cặp \pkg{(electionId, voterId)} có ràng buộc duy nhất nhằm chặn cử tri bỏ phiếu hai lần; cặp \pkg{(electionId, blindedCommitment)} có ràng buộc duy nhất nhằm bảo đảm không tồn tại hai phiếu trùng cam kết mù trong cùng một cuộc bầu cử; chỉ mục tổ hợp \pkg{(electionId, createdAt)} phục vụ truy vấn danh sách phiếu theo thứ tự thời gian, và chỉ mục \pkg{(status, createdAt)} hỗ trợ tiến trình đồng bộ nền quét các phiếu còn kẹt ở trạng thái \pkg{PENDING\_CHAIN}.
 
@@ -164,27 +144,23 @@ Bảng \pkg{votes} lưu các phiếu mù đã được ký tập thể và nộp
 
 Bảng \pkg{key\_pairs} thuộc cơ sở dữ liệu của mỗi node ký (\textit{signing node}), lưu cặp khóa EC-Schnorr riêng của node đó cho từng cuộc bầu cử. Tổng ba khóa công khai của ba node sẽ được Coordinator tổng hợp thành khóa công khai tập thể.
 
-\begin{fitlongtable}{|p{0.22\textwidth}|p{0.22\textwidth}|p{0.50\textwidth}|}
+\begin{table}[H]
+    \centering
+    \small
+    \setlength{\tabcolsep}{3pt}
     \caption{Cấu trúc bảng {key\_pairs}}
-    \label{tab:db-key-pairs} \\
+    \label{tab:db-key-pairs}
+    \begin{tabularx}{\textwidth}{|Y|Y|Y|}
     \hline
     \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
     \hline
-    \endfirsthead
-    \hline
-    \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
-    \hline
-    \endhead
-    \hline
-    \endfoot
-    \hline
-    \endlastfoot
     id         & ObjectId & Khóa chính của bản ghi, sinh tự động. \\ \hline
     electionId & ObjectId & Định danh cuộc bầu cử mà cặp khóa thuộc về, tham chiếu sang \pkg{elections.id}; có ràng buộc duy nhất. \\ \hline
     publicKey  & String   & Khóa công khai $P_i = d_i \cdot G$ của node, biểu diễn dưới dạng điểm nén hex 66 ký tự trên đường cong secp256k1. \\ \hline
     privateKey & String   & Khóa bí mật $d_i$ đã được mã hóa AES-256-GCM, biểu diễn dưới dạng chuỗi hex. \\ \hline
     createdAt  & DateTime & Thời điểm sinh cặp khóa, sinh tự động. \\ \hline
-\end{fitlongtable}
+    \end{tabularx}
+\end{table}
 
 \textbf{Ràng buộc và chỉ mục:} thuộc tính \pkg{electionId} có ràng buộc duy nhất nhằm bảo đảm mỗi cuộc bầu cử chỉ tương ứng với một cặp khóa duy nhất trên mỗi node ký.
 
@@ -192,27 +168,23 @@ Bảng \pkg{key\_pairs} thuộc cơ sở dữ liệu của mỗi node ký (\text
 
 Bảng \pkg{signed\_voters} ghi nhận vĩnh viễn việc một node ký đã phát hành chữ ký từng phần cho cặp (cuộc bầu cử, cử tri) nhằm chặn tích lũy nhiều chữ ký trên cùng một danh tính cử tri, qua đó phòng tránh cử tri tiết lộ nhiều phiếu trong giai đoạn giải mù.
 
-\begin{fitlongtable}{|p{0.22\textwidth}|p{0.22\textwidth}|p{0.50\textwidth}|}
+\begin{table}[H]
+    \centering
+    \small
+    \setlength{\tabcolsep}{3pt}
     \caption{Cấu trúc bảng {signed\_voters}}
-    \label{tab:db-signed-voters} \\
+    \label{tab:db-signed-voters}
+    \begin{tabularx}{\textwidth}{|Y|Y|Y|}
     \hline
     \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
     \hline
-    \endfirsthead
-    \hline
-    \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
-    \hline
-    \endhead
-    \hline
-    \endfoot
-    \hline
-    \endlastfoot
     id         & ObjectId & Khóa chính của bản ghi, sinh tự động. \\ \hline
     electionId & ObjectId & Định danh cuộc bầu cử, tham chiếu sang \pkg{elections.id}. \\ \hline
-    voterId    & ObjectId & Định danh cử tri, tham chiếu sang \pkg{election\_voters.id}. \\ \hline
+    voterId    & ObjectId & Định danh cử tri, tham chiếu sang \pkg{users.id} của Identity Service. \\ \hline
     sessionId  & String   & Định danh phiên ký (chuỗi UUID v4) mà node đã tiêu thụ \textit{nonce} để phát hành chữ ký từng phần. \\ \hline
     signedAt   & DateTime & Thời điểm node phát hành chữ ký từng phần, sinh tự động. \\ \hline
-\end{fitlongtable}
+    \end{tabularx}
+\end{table}
 
 \textbf{Ràng buộc và chỉ mục:} cặp \pkg{(electionId, voterId)} có ràng buộc duy nhất nhằm bảo đảm mỗi cử tri chỉ được node ký phục vụ đúng một lần cho mỗi cuộc bầu cử.
 
@@ -220,21 +192,16 @@ Bảng \pkg{signed\_voters} ghi nhận vĩnh viễn việc một node ký đã p
 
 Bảng \pkg{revealed\_votes} lưu các phiếu đã được giải mù sau khi cuộc bầu cử đóng. Mỗi bản ghi tương ứng với đúng một lá phiếu, chỉ chứa danh sách định danh ứng viên được chọn cùng với chữ ký Schnorr đã giải mù, không tham chiếu tới định danh cử tri để giữ tính không thể liên kết (\textit{unlinkability}).
 
-\begin{fitlongtable}{|p{0.24\textwidth}|p{0.28\textwidth}|p{0.42\textwidth}|}
+\begin{table}[H]
+    \centering
+    \small
+    \setlength{\tabcolsep}{3pt}
     \caption{Cấu trúc bảng {revealed\_votes}}
-    \label{tab:db-revealed-votes} \\
+    \label{tab:db-revealed-votes}
+    \begin{tabularx}{\textwidth}{|Y|Y|Y|}
     \hline
     \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
     \hline
-    \endfirsthead
-    \hline
-    \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
-    \hline
-    \endhead
-    \hline
-    \endfoot
-    \hline
-    \endlastfoot
     id            & ObjectId & Khóa chính của bản ghi, sinh tự động. \\ \hline
     electionId    & ObjectId & Định danh cuộc bầu cử, tham chiếu sang \pkg{elections.id}. \\ \hline
     candidateIds  & ObjectId[] & Danh sách định danh ứng viên được chọn trên lá phiếu (dạng nguyên bản, đã chuẩn hóa (canonicalize): loại bỏ phần tử trùng lặp và sắp xếp), tham chiếu sang \pkg{users.id}. \\ \hline
@@ -242,8 +209,9 @@ Bảng \pkg{revealed\_votes} lưu các phiếu đã được giải mù sau khi 
     signature     & Embedded (\textit{Signature\allowbreak Revealed\allowbreak Vote}) & Đối tượng nhúng chứa chữ ký Schnorr đã giải mù gồm hai thành phần con. \\ \hline
     signature.h   & String   & Thành phần $h$ của chữ ký, là vô hướng hex 64 ký tự. \\ \hline
     signature.\allowbreak sPrime & String & Thành phần $s'$ của chữ ký (đã giải mù), là vô hướng hex 64 ký tự. \\ \hline
-    blockchain\allowbreak Ref & String   & Mã giao dịch Hyperledger Fabric của lệnh ghi nhận \pkg{RevealVoteCompact}. \\ \hline
+    blockchain\allowbreak Ref & String?  & Mã giao dịch blockchain của lệnh ghi nhận \pkg{RevealVoteCompact}; có thể null khi bản ghi được phục hồi qua cơ chế retry mà \pkg{GetUsedReveal} không trả \pkg{transactionId}. \\ \hline
     revealedAt    & DateTime & Thời điểm phiếu được giải mù, sinh tự động. \\ \hline
-\end{fitlongtable}
+    \end{tabularx}
+\end{table}
 
 \textbf{Ràng buộc và chỉ mục:} cặp \pkg{(electionId, revealKey)} và bộ ba \pkg{(electionId, signature.h, signature.sPrime)} đều có ràng buộc duy nhất nhằm chặn phát lại cùng một chữ ký để tiết lộ nhiều phiếu; chỉ mục đơn trên \pkg{electionId} phục vụ truy vấn thống kê kết quả bầu cử, trong đó số phiếu theo từng ứng viên được tính qua phép \texttt{aggregateRaw} với toán tử \texttt{\$unwind} trên mảng \pkg{candidateIds}.

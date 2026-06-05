@@ -1,6 +1,6 @@
 \subsection{Kiểm thử hệ thống}
 
-Mục này trình bày môi trường thử nghiệm và kết quả của ba nhóm kiểm thử được thực hiện trực tiếp trên hệ thống đang chạy: kiểm thử tải, kiểm thử toàn vẹn và thống kê sổ cái Hyperledger Fabric.
+Mục này trình bày môi trường thử nghiệm và kết quả của ba nhóm kiểm thử được thực hiện trực tiếp trên hệ thống đang chạy: kiểm thử tải, kiểm thử toàn vẹn và thống kê mạng blockchain Hyperledger Fabric.
 
 \subsubsection{Môi trường triển khai}
 
@@ -117,13 +117,13 @@ Kiểm thử toàn vẹn xác minh hệ thống từ chối sáu lớp vi phạm
 
 Bốn kịch bản tấn công dựa trên chữ ký (giả mạo khi nộp, giả mạo khi tiết lộ, sai ứng viên, bỏ phiếu sau khi đóng) đều bị từ chối đúng như thiết kế. Hai kịch bản còn lại -- \textit{double-vote} và \textit{double-reveal} -- chưa được từ chối: đây là hệ quả của vấn đề nhất quán dual-write giữa cơ sở dữ liệu và blockchain (DB ghi nhận trước khi nhận xác nhận từ blockchain), được xác định là hạn chế cần giải quyết trong phiên bản tiếp theo.
 
-\subsubsection{Thống kê sổ cái Hyperledger Fabric}
+\subsubsection{Thống kê mạng blockchain Hyperledger Fabric}
 
 Bảng~\ref{tab:block-stats} tổng hợp chỉ số sổ cái qua năm pha kiểm thử (tổng 666 block, 1.901 giao dịch).
 
 \begin{table}[H]
     \centering
-    \caption{Thống kê sổ cái Hyperledger Fabric theo pha kiểm thử}
+    \caption{Thống kê mạng blockchain Hyperledger Fabric theo pha kiểm thử}
     \label{tab:block-stats}
     \small
     \begin{tabular}{cccccc}

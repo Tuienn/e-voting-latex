@@ -1,6 +1,6 @@
 \subsection{Nhất quán dữ liệu giữa blockchain và MongoDB}
 
-Mỗi thao tác nghiệp vụ quan trọng của hệ thống đều phải ghi đồng thời lên hai hệ lưu trữ tách biệt: sổ cái Hyperledger Fabric và cơ sở dữ liệu MongoDB. Hai lần ghi này không thể bọc chung trong một giao dịch nguyên tử (\textit{atomic}). Nếu ghi blockchain trước rồi ghi cơ sở dữ liệu sau (\textit{chain-first}), một lỗi xảy ra ở bước ghi cơ sở dữ liệu — \textbf{sau khi} blockchain đã ghi nhận thành công — sẽ làm hai bên lệch nhau; và vì sổ cái là bất biến nên không thể hoàn tác. Bảng~\ref{tab:dual-write} liệt kê ba điểm ghi kép cùng hậu quả khi lệch theo hướng \textit{chain-first}.
+Mỗi thao tác nghiệp vụ quan trọng của hệ thống đều phải ghi đồng thời lên hai hệ lưu trữ tách biệt: mạng blockchain Hyperledger Fabric và cơ sở dữ liệu MongoDB. Hai lần ghi này không thể bọc chung trong một giao dịch nguyên tử (\textit{atomic}). Nếu ghi blockchain trước rồi ghi cơ sở dữ liệu sau (\textit{chain-first}), một lỗi xảy ra ở bước ghi cơ sở dữ liệu -- sau khi blockchain đã ghi nhận thành công -- sẽ làm hai bên lệch nhau; và vì sổ cái là bất biến nên không thể hoàn tác. Bảng~\ref{tab:dual-write} liệt kê ba điểm ghi kép cùng hậu quả khi lệch theo hướng \textit{chain-first}.
 
 \begin{table}[H]
 \centering
@@ -12,7 +12,7 @@ Mỗi thao tác nghiệp vụ quan trọng của hệ thống đều phải ghi 
 \hline
 \pkg{SubmitVote} & Blockchain có phiếu, cơ sở dữ liệu thiếu $\rightarrow$ số phiếu hai bên lệch $\rightarrow$ lệnh \pkg{CommitMerkleRoot} bị từ chối khi đóng cuộc bầu cử. \\
 \hline
-\pkg{CommitMerkleRoot} & Blockchain đã đóng, cơ sở dữ liệu còn \pkg{ACTIVE} $\rightarrow$ thử lại bị từ chối (do tính idempotent) $\rightarrow$ cuộc bầu cử bị kẹt. \\
+\pkg{CommitMerkleRoot} & Blockchain đã đóng, cơ sở dữ liệu còn ACTIVE $\rightarrow$ thử lại bị từ chối (do tính idempotent) $\rightarrow$ cuộc bầu cử bị kẹt. \\
 \hline
 \pkg{RevealVoteCompact} & Blockchain đã dùng \pkg{revealKey}, cơ sở dữ liệu thiếu $\rightarrow$, hệ thống sẽ thông báo lỗi ``revealKey đã dùng'' $\rightarrow$ không thể tiết lộ lại. \\
 \hline
@@ -24,13 +24,13 @@ Mỗi thao tác nghiệp vụ quan trọng của hệ thống đều phải ghi 
 Hai thao tác \pkg{SubmitVote} và đóng cuộc bầu cử áp dụng mô hình \textit{DB-first}: ghi cơ sở dữ liệu ở một trạng thái trung gian \textbf{trước}, rồi mới gọi blockchain, sau đó xác nhận lại cơ sở dữ liệu. Trình tự gồm bốn bước:
 
 \begin{itemize}
-    \item \textbf{Bước 1 --- Ghi trạng thái trung gian:} ghi bản ghi với trạng thái \pkg{Vote.status = PENDING\_CHAIN} (đối với phiếu) hoặc \pkg{Election.status = CLOSING} (đối với đóng cuộc bầu cử), trường \pkg{blockchainRef} để trống. Vì cơ sở dữ liệu được ghi trước, ràng buộc duy nhất \pkg{(electionId, voterId)} chặn bỏ phiếu trùng ngay tại bước này — trước cả khi chạm tới blockchain; riêng \pkg{CLOSING} còn đóng vai trò khóa chống đóng cuộc bầu cử đồng thời.
+    \item \textbf{Bước 1 --- Ghi trạng thái trung gian:} ghi bản ghi với trạng thái \pkg{Vote.status = PENDING\_CHAIN} (đối với phiếu) hoặc \pkg{Election.status = CLOSING} (đối với đóng cuộc bầu cử), trường \pkg{blockchainRef} để trống. Vì cơ sở dữ liệu được ghi trước, ràng buộc duy nhất \pkg{(electionId, voterId)} chặn bỏ phiếu trùng ngay tại bước này -- trước cả khi chạm tới blockchain; riêng CLOSING còn đóng vai trò khóa chống đóng cuộc bầu cử đồng thời.
 
     \item \textbf{Bước 2 --- Gọi blockchain:} thực thi giao dịch \textit{invoke} tương ứng.
 
-    \item \textbf{Bước 3 --- Blockchain thành công:} xác nhận cơ sở dữ liệu, chuyển trạng thái sang \pkg{CONFIRMED} (hoặc \pkg{CLOSED}) và ghi \pkg{blockchainRef} bằng mã giao dịch trả về.
+    \item \textbf{Bước 3 --- Blockchain thành công:} xác nhận cơ sở dữ liệu, chuyển trạng thái sang \pkg{CONFIRMED} (hoặc CLOSED) và ghi \pkg{blockchainRef} bằng mã giao dịch trả về.
 
-    \item \textbf{Bước 4 --- Blockchain báo lỗi:} truy vấn lại blockchain (\pkg{GetVote} hoặc \pkg{GetMerkleRoot}) để phân định, vì blockchain là \textbf{nguồn sự thật}: nếu dữ liệu \textit{đã} có trên blockchain thì xác nhận cơ sở dữ liệu và phục hồi mã giao dịch từ kết quả truy vấn; nếu \textit{chưa} có thì hoàn tác cơ sở dữ liệu (xóa phiếu \pkg{PENDING\_CHAIN} hoặc đưa cuộc bầu cử về \pkg{ACTIVE}) rồi ném lỗi để người dùng thử lại.
+    \item \textbf{Bước 4 --- Blockchain báo lỗi:} truy vấn lại blockchain (\pkg{GetVote} hoặc \pkg{GetMerkleRoot}) để phân định, vì blockchain là \textbf{nguồn sự thật}: nếu dữ liệu \textit{đã} có trên blockchain thì xác nhận cơ sở dữ liệu và phục hồi mã giao dịch từ kết quả truy vấn; nếu \textit{chưa} có thì hoàn tác cơ sở dữ liệu (xóa phiếu \pkg{PENDING\_CHAIN} hoặc đưa cuộc bầu cử về ACTIVE) rồi ném lỗi để người dùng thử lại.
 \end{itemize}
 
 Hình~\ref{fig:submit-vote-write-db-first} trình bày hiện thực của mô hình này trong thao tác nộp phiếu.
@@ -44,15 +44,15 @@ Hình~\ref{fig:submit-vote-write-db-first} trình bày hiện thực của mô h
 
 \subsubsection{Giải pháp 2 --- Giữ chain-first kèm tự phục hồi khi thử lại}
 
-Thao tác \pkg{RevealVoteCompact} không đổi thứ tự ghi (vẫn blockchain trước, cơ sở dữ liệu sau) vì \pkg{revealKey} là khóa idempotent tự nhiên trên blockchain. Khi lệnh \textit{invoke} báo lỗi, hệ thống truy vấn \pkg{GetUsedReveal}: nếu blockchain \textit{chưa} có \pkg{revealKey} thì đây là lỗi thật, ném tiếp; nếu blockchain \textit{đã} có (và danh sách ứng viên khớp) thì coi là thử lại sau lỗi một phần, hệ thống ghi lại bản ghi cơ sở dữ liệu với \pkg{blockchainRef} để trống. Ràng buộc duy nhất \pkg{(electionId, revealKey)} vẫn ném lỗi nếu cơ sở dữ liệu đã có bản ghi, do đó tấn công phát lại thật vẫn bị chặn — chỉ phục hồi khi cơ sở dữ liệu còn trống.
+Thao tác \pkg{RevealVoteCompact} không đổi thứ tự ghi (vẫn blockchain trước, cơ sở dữ liệu sau) vì \pkg{revealKey} là khóa idempotent tự nhiên trên blockchain. Khi lệnh \textit{invoke} báo lỗi, hệ thống truy vấn \pkg{GetUsedReveal}: nếu blockchain \textit{chưa} có \pkg{revealKey} thì đây là lỗi thật, ném tiếp; nếu blockchain \textit{đã} có (và danh sách ứng viên khớp) thì coi là thử lại sau lỗi một phần, hệ thống ghi lại bản ghi cơ sở dữ liệu với \pkg{blockchainRef} để trống. Ràng buộc duy nhất \pkg{(electionId, revealKey)} vẫn ném lỗi nếu cơ sở dữ liệu đã có bản ghi, do đó tấn công phát lại thật vẫn bị chặn -- chỉ phục hồi khi cơ sở dữ liệu còn trống.
 
 \subsubsection{Tiến trình đồng bộ nền (Reconciler)}
 
-Hai giải pháp trên xử lý lỗi trong luồng đồng bộ của yêu cầu. Trường hợp tiến trình gặp sự cố giữa bước gọi blockchain và bước xác nhận sẽ để lại bản ghi kẹt ở trạng thái trung gian. Một tiến trình đồng bộ nền (\textit{reconciler}) chạy theo lịch \pkg{@Cron} của \pkg{@nestjs/schedule} đảm nhiệm việc dọn dẹp: định kỳ quét các bản ghi kẹt \textbf{cũ hơn} một ngưỡng thời gian (tránh tranh chấp với yêu cầu đang chạy), có cờ chống chồng lấn chu kỳ:
+Hai giải pháp trên xử lý lỗi trong luồng đồng bộ của yêu cầu. Trường hợp tiến trình gặp sự cố giữa bước gọi blockchain và bước xác nhận sẽ để lại bản ghi kẹt ở trạng thái trung gian. Một tiến trình đồng bộ nền (\textit{reconciler}) đảm nhiệm việc dọn dẹp: định kỳ quét các bản ghi kẹt cũ hơn một ngưỡng thời gian (tránh xung đột với yêu cầu đang chạy), có cờ chống chồng lấn chu kỳ:
 
 \begin{itemize}
     \item Phiếu còn \pkg{PENDING\_CHAIN}: truy vấn \pkg{GetVote} --- nếu có trên blockchain thì chuyển \pkg{CONFIRMED}, nếu không thì xóa bản ghi.
-    \item Cuộc bầu cử còn \pkg{CLOSING}: truy vấn \pkg{GetMerkleRoot} --- nếu đã cố định thì chuyển \pkg{CLOSED} và phục hồi mã giao dịch, nếu không thì giữ nguyên chờ quản trị viên thử lại.
+    \item Cuộc bầu cử còn CLOSING: truy vấn \pkg{GetMerkleRoot} --- nếu đã cố định thì chuyển CLOSED và phục hồi mã giao dịch, nếu không thì giữ nguyên chờ quản trị viên thử lại.
 \end{itemize}
 
 \begin{figure}[H]

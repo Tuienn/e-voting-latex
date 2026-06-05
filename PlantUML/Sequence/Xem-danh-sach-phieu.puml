@@ -16,16 +16,27 @@ ref over Admin, BFF : Xác thực & Kiểm tra quyền ADMIN
 BFF -> Coordinator: Gửi yêu cầu lọc danh sách phiếu
 activate Coordinator
 
-Coordinator -> Coordinator: Xây dựng điều kiện truy vấn theo cuộc bầu cử
-
-Coordinator -> DB: Truy vấn danh sách phiếu kèm phân trang
+Coordinator -> DB: Truy vấn cuộc bầu cử theo định danh
 activate DB
-DB --> Coordinator: Trả về danh sách phiếu và tổng số lượng
+DB --> Coordinator: Trả về thông tin cuộc bầu cử
 deactivate DB
 
-Coordinator --> BFF: Trả về kết quả phân trang
-deactivate Coordinator
+alt Cuộc bầu cử không tồn tại
+  Coordinator --> BFF: Trả về lỗi không tìm thấy
+  BFF --> Admin: Hiển thị thông báo lỗi
+else Cuộc bầu cử tồn tại
+  Coordinator -> Coordinator: Xây dựng điều kiện truy vấn theo cuộc bầu cử
 
-BFF --> Admin: Hiển thị danh sách cam kết phiếu mù và mã giao dịch blockchain
+  Coordinator -> DB: Truy vấn danh sách phiếu kèm phân trang
+  activate DB
+  DB --> Coordinator: Trả về danh sách phiếu và tổng số lượng
+  deactivate DB
+
+  Coordinator --> BFF: Trả về kết quả phân trang
+  deactivate Coordinator
+
+  BFF --> Admin: Hiển thị danh sách cam kết phiếu mù và mã giao dịch blockchain
+end
+
 deactivate BFF
 @enduml
