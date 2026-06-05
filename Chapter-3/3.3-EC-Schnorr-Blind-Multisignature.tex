@@ -31,15 +31,6 @@ Tính \textit{linearity} là yếu tố mang tính quyết định trong kiến 
 
 \subsubsection{Giao thức ký mù tập thể}
 
-Tham số hệ thống được cố định cho toàn bộ vòng đời ứng dụng:
-
-\begin{verbatim}
-Curve:  secp256k1
-n:      bậc của nhóm (256-bit)
-G:      điểm sinh chuẩn
-SCALAR_BYTES = 32,  POINT_BYTES = 33 (compressed)
-\end{verbatim}
-
 Giao thức được chia thành sáu pha hoạt động tuần tự, trải dài trên ba thực thể là cử tri (trình duyệt), bộ điều phối (\textit{Coordinator}) và ba node ký (\textit{Signing Nodes}):
 
 \begin{itemize}
@@ -63,14 +54,14 @@ Mỗi lá phiếu cho phép cử tri chọn từ một đến \pkg{maxSelectable
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth, keepaspectratio]{Figures/code/build-vote-message-canonical.png}
-    \caption{Hàm \texttt{buildVoteMessage} dựng thông điệp $M$ từ \texttt{electionId} và tập \texttt{candidateIds} đã chuẩn hóa (canonicalize)}
+    \caption{Hàm buildVoteMessage dựng thông điệp $M$ từ electionId và tập candidateIds đã chuẩn hóa (canonicalize)}
     \label{fig:build-vote-message}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth, keepaspectratio]{Figures/code/ec-schnorr-sign.png}
-    \caption{Hàm \texttt{signPartial} và \texttt{aggregateSignatures} trong thư viện \texttt{ec-schnorr}}
+    \caption{Hàm signPartial và aggregateSignatures trong thư viện ec-schnorr}
     \label{fig:ec-schnorr-sign}
 \end{figure}
 

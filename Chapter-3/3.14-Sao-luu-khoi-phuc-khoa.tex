@@ -13,7 +13,7 @@ Toàn bộ việc mã hóa diễn ra trên thiết bị, trước khi bất kỳ
     \label{fig:backup-derive-key}
 \end{figure}
 
-\subsubsection{Lớp mã hóa dữ liệu khi lưu trữ (\textit{at-rest encryption}) phía máy chủ}
+\subsubsection{Lớp mã hóa dữ liệu khi lưu trữ (at-rest encryption) phía máy chủ}
 
 Khi nhận được gói envelope, Identity Service áp dụng thêm \textbf{một lớp mã hóa thứ hai} trước khi ghi xuống MongoDB nhằm bảo vệ dữ liệu khi lưu trữ. Lớp này dẫn xuất khóa bằng \pkg{argon2id} từ một bí mật phía máy chủ \pkg{BACKUP\_SECRET} kết hợp một salt ngẫu nhiên theo từng bản ghi, rồi mã hóa bằng \pkg{AES-256-GCM}. Như vậy, một bản sao lưu chịu hai lớp mã hóa độc lập: lớp ngoài chỉ giải được bằng mã PIN của cử tri, lớp trong chỉ giải được khi máy chủ nắm \pkg{BACKUP\_SECRET}. Kẻ tấn công đọc trộm cơ sở dữ liệu sẽ không thu được gì nếu thiếu cả hai bí mật này.
 
