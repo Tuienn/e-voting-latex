@@ -23,7 +23,6 @@ together {
   rectangle "Quản lý người dùng (Admin)" {
     usecase "Tạo tài khoản người dùng" as UC_CreateUser
     usecase "Tìm kiếm người dùng" as UC_SearchUser
-    usecase "Xem thông tin chi tiết người dùng" as UC_ViewUser
     usecase "Cập nhật thông tin người dùng" as UC_UpdateUser
     usecase "Quản lý trạng thái tài khoản" as UC_StatusUser
   }
@@ -48,7 +47,6 @@ together {
   }
 
   rectangle "Cổng công khai (ẩn danh)" {
-    usecase "Xem danh sách cuộc bầu cử công khai" as UC_PubList
     usecase "Tiết lộ phiếu sau khi cuộc bầu cử đóng" as UC_Reveal
     usecase "Xác minh phiếu bầu" as UC_Verify
     usecase "Xem kết quả bầu cử" as UC_Tally
@@ -63,7 +61,6 @@ user --> UC_Profile
 
 admin --> UC_CreateUser
 admin --> UC_SearchUser
-admin --> UC_ViewUser
 admin --> UC_UpdateUser
 admin --> UC_StatusUser
 
@@ -80,7 +77,6 @@ voter --> UC_MyElecs
 voter --> UC_MyElecDetail
 voter --> UC_Vote
 
-guest --> UC_PubList
 guest --> UC_Reveal
 guest --> UC_Verify
 guest --> UC_Tally
