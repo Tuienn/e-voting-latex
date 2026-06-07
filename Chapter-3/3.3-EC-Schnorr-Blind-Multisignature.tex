@@ -47,7 +47,7 @@ Giao thức được chia thành sáu pha hoạt động tuần tự, trải dà
 
     \item \textbf{Pha 1 -- Cam kết:} khi bắt đầu phiên, mỗi node ký sinh nonce ngẫu nhiên $k_i$ và điểm cam kết $R_i = k_i \cdot G$. Bộ điều phối tổng hợp $R = R_1 + R_2 + R_3$ rồi trả về máy khách.
 
-    \item \textbf{Pha 2 -- Làm mù (chỉ thực hiện trong trình duyệt):} cử tri sinh hai hệ số ngẫu nhiên $\alpha, \beta$, tính $C' = R + \alpha \cdot G + \beta \cdot P_{agg}$, hash thông điệp gắn định danh bầu cử và tập ứng viên được chọn $M = \text{SHA256}(\text{``ev-vote-v2''} \,\Vert\, \texttt{0x00} \,\Vert\, \text{electionId} \,\Vert\, \texttt{0x00} \,\Vert\, \text{payload})$, suy ra thử thách $h = \text{SHA256}(M \,\Vert\, C') \bmod n$ và gửi lên máy chủ giá trị $r = (h - \beta) \bmod n$.
+    \item \textbf{Pha 2 -- Làm mù (chỉ thực hiện trong trình duyệt):} cử tri sinh hai hệ số ngẫu nhiên $\alpha, \beta$, tính $C' = R + \alpha \cdot G + \beta \cdot P_{agg}$, hash thông điệp gắn định danh bầu cử và tập ứng viên được chọn $M = \text{SHA256}(\text{``ev-vote-v2''} \,\Vert\, \pkg{0x00} \,\Vert\, \text{electionId} \,\Vert\, \pkg{0x00} \,\Vert\, \text{payload})$, suy ra thử thách $h = \text{SHA256}(M \,\Vert\, C') \bmod n$ và gửi lên máy chủ giá trị $r = (h - \beta) \bmod n$.
 
     \item \textbf{Pha 3 -- Ký phần:} mỗi node ký tính $s_i = (k_i - d_i \cdot r) \bmod n$ rồi \textbf{xóa $k_i$ khỏi bộ nhớ ngay lập tức} (one-time nonce). Hàm tương ứng trong mã nguồn được trình bày trong Hình~\ref{fig:ec-schnorr-sign}.
 
@@ -63,14 +63,14 @@ Mỗi lá phiếu cho phép cử tri chọn từ một đến \pkg{maxSelectable
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth, keepaspectratio]{Figures/code/build-vote-message-canonical.png}
-    \caption{Hàm buildVoteMessage dựng thông điệp $M$ từ electionId và tập candidateIds đã chuẩn hóa (canonicalize)}
+    \caption{Hàm buildVoteMessage dựng thông điệp $M$ từ electionId và tập candidateIds}
     \label{fig:build-vote-message}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth, keepaspectratio]{Figures/code/ec-schnorr-sign.png}
-    \caption{Hàm signPartial và aggregateSignatures trong thư viện ec-schnorr}
+    \caption{Hàm signPartial và aggregateSignatures}
     \label{fig:ec-schnorr-sign}
 \end{figure}
 
@@ -86,4 +86,4 @@ Lược đồ ký mù tập thể EC-Schnorr triển khai trong hệ thống cun
     \item \textbf{Chống tấn công phát lại liên bầu cử (\textit{Cross-election replay prevention}):} thông điệp $M$ được gắn định danh bầu cử qua \textit{domain separator} \textit{``ev-vote-v2''} kết hợp \pkg{electionId} và tập \pkg{candidateIds} canonical. Một chữ ký hợp lệ trong bầu cử $A$ khi xác thực trong bầu cử $B$ sẽ thu được $h_{check} \neq h$ vì thông điệp $M$ khác.
 \end{itemize}
 
-Toàn bộ thư viện \pkg{ec-schnorr} của hệ thống được hiện thực dựa trên \pkg{@noble/curves} (\pkg{secp256k1}) và \pkg{@noble/hashes} (SHA-256) -- các thư viện cài đặt theo thời gian hằng (\textit{constant-time}), không phụ thuộc native binding và chạy được trên cả Node.js lẫn trình duyệt, qua đó cho phép cử tri tự kiểm chứng chữ ký bằng cùng một mã nguồn ngay tại máy của mình.
+Toàn bộ thư viện \pkg{ec-schnorr} của hệ thống được hiện thực dựa trên \pkg{@noble/curves} (\pkg{secp256k1}) và \pkg{@noble/hashes} (SHA-256) -- không phụ thuộc native binding và chạy được trên cả Node.js lẫn trình duyệt, qua đó cho phép cử tri tự kiểm chứng chữ ký bằng cùng một mã nguồn ngay tại máy của mình.

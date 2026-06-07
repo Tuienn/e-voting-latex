@@ -2,11 +2,11 @@
 
 Tầng sổ cái phân tán của hệ thống được hiện thực hóa bằng một chaincode Hyperledger Fabric viết bằng ngôn ngữ Go, mang tên \textit{VoteLedgerContract}. Chaincode chịu trách nhiệm ghi nhận \textbf{các sự kiện bất biến} của quy trình bỏ phiếu (nộp phiếu mù, đóng cuộc bầu cử, giải mù phiếu) và cung cấp các hàm truy vấn phục vụ \textbf{kiểm chứng độc lập}. Chaincode được triển khai theo mô hình \textit{external chaincode} -- tách rời khỏi tiến trình của peer và lắng nghe trên cổng \pkg{9999} -- nhằm thuận tiện cho việc nâng cấp và quan sát.
 
-Chaincode được thiết kế theo nguyên tắc tối giản: không lưu trữ vòng đời cuộc bầu cử \pkg{(PENDING, ACTIVE, CLOSED)}, không quản lý người dùng và không thực thi xác thực danh tính. Toàn bộ trách nhiệm xác thực tài khoản, xác minh chữ ký EC-Schnorr và điều phối quy trình thuộc về các microservice off-chain; chaincode chỉ giữ vai trò là tầng \textit{chứng cứ} không thể chối bỏ. Các hàm được tổ chức thành ba nhóm hợp đồng tương ứng với ba nghiệp vụ cốt lõi: \textit{Vote Contract}, \textit{Merkle Contract} và \textit{Reveal Contract}.
+Chaincode được thiết kế theo nguyên tắc tối giản: không lưu trữ vòng đời cuộc bầu cử \pkg{(PENDING, \pkg{ACTIVE}, \pkg{CLOSED})}, không quản lý người dùng và không thực thi xác thực danh tính. Toàn bộ trách nhiệm xác thực tài khoản, xác minh chữ ký EC-Schnorr và điều phối quy trình thuộc về các microservice off-chain; chaincode chỉ giữ vai trò là tầng \textit{chứng cứ} không thể chối bỏ. Các hàm được tổ chức thành ba nhóm hợp đồng tương ứng với ba nghiệp vụ cốt lõi: \textit{Vote Contract}, \textit{Merkle Contract} và \textit{Reveal Contract}.
 
 \subsubsection{Cấu trúc trạng thái trên sổ cái}
 
-Toàn bộ trạng thái của chaincode được lưu vào \textit{World State} của Fabric thông qua khóa tổ hợp (\textit{composite key}) do hàm \pkg{CreateCompositeKey} tạo ra. Mỗi loại đối tượng có một tiền tố riêng nhằm phân tách không gian tên và thuận tiện cho việc duyệt theo từng nhóm.
+Toàn bộ trạng thái của chaincode được lưu vào \textit{World State} của Fabric thông qua khóa tổ hợp (\textit{composite key}) do hàm \pkg{CreateCompositeKey} tạo ra. Mỗi loại đối tượng có một tiền tố riêng nhằm phân tách không gian tên (\textit{namespace}) và thuận tiện cho việc duyệt theo từng nhóm.
 
 \begin{table}[H]
     \centering
@@ -14,17 +14,17 @@ Toàn bộ trạng thái của chaincode được lưu vào \textit{World State}
     \setlength{\tabcolsep}{3pt}
     \caption{Các không gian tên trạng thái trên sổ cái}
     \label{tab:cc-state-prefix}
-    \begin{tabularx}{\textwidth}{|Y|Y|Y|}
+    \begin{tabularx}{\textwidth}{|L{0.25}|L{0.25}|L{0.50}|}
     \hline
     \textbf{Tiền tố} & \textbf{Khóa tổ hợp} & \textbf{Mô tả} \\
     \hline
     vote       & vote / electionId / voteId & Bản ghi phiếu bầu mù đã được nộp lên blockchain; là nguồn sự thật để đếm tổng số phiếu. \\ \hline
     root       & root / electionId          & Gốc Merkle của tập phiếu trong cuộc bầu cử. \\ \hline
-    usedReveal & usedReveal / electionId / base64url(revealKeyHash) & Bản ghi khóa giải mù đã dùng, lưu kèm danh sách ứng viên được chọn và băm tải trọng; là nguồn sự thật để tổng hợp kết quả kiểm phiếu và đếm số phiếu đã giải mù. \\ \hline
+    usedReveal & usedReveal / electionId / base64url (revealKeyHash) & Bản ghi khóa giải mù đã dùng, lưu kèm danh sách ứng viên được chọn và băm tải trọng; là nguồn sự thật để tổng hợp kết quả kiểm phiếu và đếm số phiếu đã giải mù. \\ \hline
     \end{tabularx}
 \end{table}
 
-\noindent Thiết kế chỉ có \textbf{ba} không gian tên, không có bộ đếm dùng chung (\pkg{stats}, \pkg{tally}). Tổng số phiếu, số phiếu đã giải mù và kết quả kiểm phiếu theo ứng viên đều được tổng hợp theo yêu cầu (\textit{on-demand}) bằng truy vấn khoảng (\pkg{GetStateByPartialCompositeKey}) trực tiếp trên bản ghi gốc. Thiết kế này loại bỏ hoàn toàn xung đột \textit{MVCC\_READ\_CONFLICT} khi nhiều cử tri nộp phiếu hoặc giải mù đồng thời -- vì mỗi giao dịch chỉ ghi đúng một khóa riêng biệt mà không đọc hay ghi bất kỳ khóa chung nào.
+\noindent Tổng số phiếu, số phiếu đã giải mù và kết quả kiểm phiếu theo ứng viên đều được tổng hợp theo yêu cầu (\textit{on-demand}) bằng truy vấn khoảng (\pkg{GetStateByPartialCompositeKey}) trực tiếp trên bản ghi gốc. Thiết kế này loại bỏ hoàn toàn xung đột \textit{MVCC\_READ\_CONFLICT} khi nhiều cử tri nộp phiếu hoặc giải mù đồng thời -- vì mỗi giao dịch chỉ ghi đúng một khóa riêng biệt mà không đọc hay ghi bất kỳ khóa chung nào.
 
 \subsubsection{Tổng hợp các hàm chaincode}
 
@@ -36,7 +36,7 @@ Chaincode cung cấp tổng cộng mười hàm chia thành hai loại theo bả
     \setlength{\tabcolsep}{3pt}
     \caption{Tổng hợp các hàm chaincode}
     \label{tab:cc-overview}
-    \begin{tabularx}{\textwidth}{|Y|Y|Y|Y|}
+    \begin{tabularx}{\textwidth}{|L{0.25}|L{0.10}|L{0.15}|L{0.50}|}
     \hline
     \textbf{Tên hàm} & \textbf{Loại} & \textbf{Nhóm hợp đồng} & \textbf{Mục đích chính} \\
     \hline
@@ -63,7 +63,7 @@ Hàm \pkg{SubmitVote} thuộc loại \textit{invoke}, được Coordinator Servi
     \setlength{\tabcolsep}{3pt}
     \caption{Tham số của hàm SubmitVote}
     \label{tab:cc-submitvote}
-    \begin{tabularx}{\textwidth}{|Y|Y|Y|}
+    \begin{tabularx}{\textwidth}{|L{0.25}|L{0.25}|L{0.50}|}
     \hline
     \textbf{Tham số} & \textbf{Kiểu} & \textbf{Mô tả} \\
     \hline
@@ -83,7 +83,7 @@ Hàm \pkg{GetVote} thuộc loại \textit{query}, trả về bản ghi \pkg{Vote
     \setlength{\tabcolsep}{3pt}
     \caption{Tham số của hàm GetVote}
     \label{tab:cc-getvote}
-    \begin{tabularx}{\textwidth}{|Y|Y|Y|}
+    \begin{tabularx}{\textwidth}{|L{0.25}|L{0.25}|L{0.50}|}
     \hline
     \textbf{Tham số} & \textbf{Kiểu} & \textbf{Mô tả} \\
     \hline
@@ -102,7 +102,7 @@ Hàm \pkg{CommitMerkleRoot} thuộc loại \textit{invoke}, được Coordinator
     \setlength{\tabcolsep}{3pt}
     \caption{Tham số của hàm CommitMerkleRoot}
     \label{tab:cc-commitmerkleroot}
-    \begin{tabularx}{\textwidth}{|Y|Y|Y|}
+    \begin{tabularx}{\textwidth}{|L{0.25}|L{0.25}|L{0.50}|}
     \hline
     \textbf{Tham số} & \textbf{Kiểu} & \textbf{Mô tả} \\
     \hline
@@ -122,7 +122,7 @@ Hàm \pkg{GetMerkleRoot} thuộc loại \textit{query}, trả về đối tượ
     \setlength{\tabcolsep}{3pt}
     \caption{Tham số của hàm GetMerkleRoot}
     \label{tab:cc-getmerkleroot}
-    \begin{tabularx}{\textwidth}{|Y|Y|Y|}
+    \begin{tabularx}{\textwidth}{|L{0.25}|L{0.25}|L{0.50}|}
     \hline
     \textbf{Tham số} & \textbf{Kiểu} & \textbf{Mô tả} \\
     \hline
@@ -140,7 +140,7 @@ Hàm \pkg{VerifyVoteReceipt} thuộc loại \textit{query}, đóng vai trò đi�
     \setlength{\tabcolsep}{3pt}
     \caption{Tham số của hàm VerifyVoteReceipt}
     \label{tab:cc-verifyvotereceipt}
-    \begin{tabularx}{\textwidth}{|Y|Y|Y|}
+    \begin{tabularx}{\textwidth}{|L{0.25}|L{0.25}|L{0.50}|}
     \hline
     \textbf{Tham số} & \textbf{Kiểu} & \textbf{Mô tả} \\
     \hline
@@ -160,7 +160,7 @@ Hàm \pkg{GetAuditCounts} thuộc loại \textit{query}, trả về đối tư�
     \setlength{\tabcolsep}{3pt}
     \caption{Tham số của hàm GetAuditCounts}
     \label{tab:cc-getauditcounts}
-    \begin{tabularx}{\textwidth}{|Y|Y|Y|}
+    \begin{tabularx}{\textwidth}{|L{0.25}|L{0.25}|L{0.50}|}
     \hline
     \textbf{Tham số} & \textbf{Kiểu} & \textbf{Mô tả} \\
     \hline
@@ -178,7 +178,7 @@ Hàm \pkg{RevealVoteCompact} thuộc loại \textit{invoke}, đóng vai trò tru
     \setlength{\tabcolsep}{3pt}
     \caption{Tham số của hàm RevealVoteCompact}
     \label{tab:cc-revealvotecompact}
-    \begin{tabularx}{\textwidth}{|Y|Y|Y|}
+    \begin{tabularx}{\textwidth}{|L{0.25}|L{0.25}|L{0.50}|}
     \hline
     \textbf{Tham số} & \textbf{Kiểu} & \textbf{Mô tả} \\
     \hline
@@ -199,7 +199,7 @@ Hàm \pkg{GetTally} thuộc loại \textit{query}, duyệt toàn bộ bản ghi 
     \setlength{\tabcolsep}{3pt}
     \caption{Tham số của hàm GetTally}
     \label{tab:cc-gettally}
-    \begin{tabularx}{\textwidth}{|Y|Y|Y|}
+    \begin{tabularx}{\textwidth}{|L{0.25}|L{0.25}|L{0.50}|}
     \hline
     \textbf{Tham số} & \textbf{Kiểu} & \textbf{Mô tả} \\
     \hline
@@ -217,7 +217,7 @@ Hàm \pkg{GetUsedReveal} thuộc loại \textit{query}, cho phép tra cứu mộ
     \setlength{\tabcolsep}{3pt}
     \caption{Tham số của hàm GetUsedReveal}
     \label{tab:cc-getusedreveal}
-    \begin{tabularx}{\textwidth}{|Y|Y|Y|}
+    \begin{tabularx}{\textwidth}{|L{0.25}|L{0.25}|L{0.50}|}
     \hline
     \textbf{Tham số} & \textbf{Kiểu} & \textbf{Mô tả} \\
     \hline
@@ -228,7 +228,7 @@ Hàm \pkg{GetUsedReveal} thuộc loại \textit{query}, cho phép tra cứu mộ
 
 \subsubsection{Hàm ComputeRevealPayloadHash}
 
-Hàm \pkg{ComputeRevealPayloadHash} là hàm tiện ích thuộc loại \textit{query}, cho phép tính lại giá trị \pkg{revealPayloadHash} từ bộ ba $(\texttt{candidateIdsJson}, h, s')$, qua đó cho phép bên thứ ba kiểm tra giá trị băm được lưu trên blockchain có khớp với dữ liệu thực hay không.
+Hàm \pkg{ComputeRevealPayloadHash} là hàm tiện ích thuộc loại \textit{query}, cho phép tính lại giá trị \pkg{revealPayloadHash} từ bộ ba $(\pkg{candidateIdsJson}, h, s')$, qua đó cho phép bên thứ ba kiểm tra giá trị băm được lưu trên blockchain có khớp với dữ liệu thực hay không.
 
 \begin{table}[H]
     \centering
@@ -236,7 +236,7 @@ Hàm \pkg{ComputeRevealPayloadHash} là hàm tiện ích thuộc loại \textit{
     \setlength{\tabcolsep}{3pt}
     \caption{Tham số của hàm ComputeRevealPayloadHash}
     \label{tab:cc-computerevealpayloadhash}
-    \begin{tabularx}{\textwidth}{|Y|Y|Y|}
+    \begin{tabularx}{\textwidth}{|L{0.25}|L{0.25}|L{0.50}|}
     \hline
     \textbf{Tham số} & \textbf{Kiểu} & \textbf{Mô tả} \\
     \hline
@@ -253,12 +253,12 @@ Mặc dù chaincode không lưu trạng thái vòng đời tường minh, các r
 \begin{itemize}
     \item \textbf{Pha nhận phiếu:} hàm \pkg{SubmitVote} có thể được gọi song song nhiều lần. Mỗi lần thành công chỉ ghi duy nhất một bản ghi \pkg{VoteView} vào khóa tổ hợp riêng của phiếu đó -- các phiếu đồng thời không bao giờ đụng khóa chung nên không xảy ra \textit{MVCC\_READ\_CONFLICT}.
     \item \textbf{Pha đóng cuộc bầu cử:} hàm \pkg{CommitMerkleRoot} được gọi đúng một lần. Chaincode đếm trực tiếp số bản ghi \pkg{vote} trên sổ cái, đối chiếu với tham số \pkg{voteCountStr} và đặt cờ \pkg{committed = true}; sau pha này, mọi lời gọi \pkg{SubmitVote} đều bị từ chối.
-    \item \textbf{Pha kiểm phiếu:} hàm \pkg{RevealVoteCompact} có thể được gọi song song nhiều lần với điều kiện tiên quyết \pkg{committed = true}. Mỗi lần thành công chỉ ghi duy nhất một bản ghi \pkg{usedReveal} -- không có bộ đếm tally hay RevealCount dùng chung. Kết quả kiểm phiếu và số lá phiếu đã giải mù được tổng hợp on-demand từ tập bản ghi \pkg{usedReveal} và công khai qua hàm \pkg{GetTally} và \pkg{GetAuditCounts}.
+    \item \textbf{Pha kiểm phiếu:} hàm \pkg{RevealVoteCompact} có thể được gọi song song nhiều lần với điều kiện tiên quyết \pkg{committed = true}. Mỗi lần thành công chỉ ghi duy nhất một bản ghi \pkg{usedReveal} -- không có bộ đếm dùng chung. Kết quả kiểm phiếu và số lá phiếu đã giải mù được tổng hợp on-demand từ tập bản ghi \pkg{usedReveal} và công khai qua hàm \pkg{GetTally} và \pkg{GetAuditCounts}.
 \end{itemize}
 
 \subsubsection{Các kiểu dữ liệu trả về}
 
-Tất cả các hàm chaincode trả về chuỗi JSON. Các kiểu dữ liệu được định nghĩa tập trung trong tệp \textit{types.go} và được liệt kê trong Bảng \ref{tab:cc-response-types}.
+Tất cả các hàm chaincode trả về chuỗi JSON. Định nghĩa các kiểu dữ liệu được liệt kê trong Bảng \ref{tab:cc-response-types}.
 
 \begin{table}[H]
     \centering
@@ -266,7 +266,7 @@ Tất cả các hàm chaincode trả về chuỗi JSON. Các kiểu dữ liệu 
     \setlength{\tabcolsep}{3pt}
     \caption{Các kiểu dữ liệu trả về của chaincode}
     \label{tab:cc-response-types}
-    \begin{tabularx}{\textwidth}{|Y|Y|Y|}
+    \begin{tabularx}{\textwidth}{|L{0.24}|L{0.35}|L{0.41}|}
     \hline
     \textbf{Kiểu} & \textbf{Hàm trả về} & \textbf{Các trường chính} \\
     \hline

@@ -2,7 +2,7 @@
 
 Phần này trình bày các biểu đồ tuần tự (\textit{Sequence Diagram}) mô tả luồng tương tác chi tiết giữa các thành phần trong hệ thống cho từng chức năng đã được đặc tả ở mục \ref{tab:uc-xac-thuc-nguoi-dung} và các mục đặc tả tiếp theo. Mỗi biểu đồ thể hiện trình tự trao đổi thông điệp qua các tầng: tác nhân, BFF Gateway, các microservice nghiệp vụ và các thành phần lưu trữ (MongoDB, Redis, Blockchain).
 
-Bước \textit{Xác thực và Kiểm tra quyền} xuất hiện lặp lại trong hầu hết các luồng yêu cầu xác thực; do đó được tách thành một biểu đồ tham chiếu dùng chung (Hình~\ref{fig:seq-ref-auth}) và được tham chiếu dưới dạng \texttt{ref} trong các biểu đồ còn lại nhằm tránh trùng lặp. Biểu đồ này mô tả cách BFF Gateway kiểm tra access token, trích xuất định danh người dùng và đối chiếu vai trò yêu cầu trước khi cho phép xử lý tiếp. Các nhánh lỗi như thiếu token, token hết hạn hoặc vai trò không phù hợp đều bị chặn ngay tại tầng BFF.
+Bước \textit{Xác thực và Kiểm tra quyền} xuất hiện lặp lại trong hầu hết các luồng yêu cầu xác thực; do đó được tách thành một biểu đồ tham chiếu dùng chung (Hình~\ref{fig:seq-ref-auth}) và được tham chiếu dưới dạng \pkg{ref} trong các biểu đồ còn lại nhằm tránh trùng lặp. Biểu đồ này mô tả cách BFF Gateway kiểm tra access token, trích xuất định danh người dùng và đối chiếu vai trò yêu cầu trước khi cho phép xử lý tiếp. Các nhánh lỗi như thiếu token, token hết hạn hoặc vai trò không phù hợp đều bị chặn ngay tại tầng BFF.
 
 \begin{figure}[H]
     \centering
@@ -46,7 +46,7 @@ Biểu đồ tuần tự này mô tả thao tác kích hoạt hoặc vô hiệu 
 
 \subsubsection{Tạo cuộc bầu cử}
 
-Biểu đồ tuần tự của chức năng tạo cuộc bầu cử mô tả luồng quản trị viên khởi tạo một cuộc bầu cử mới ở trạng thái PENDING. Coordinator Service tiếp nhận dữ liệu, yêu cầu Identity Service xác minh danh sách ứng viên ban đầu, sau đó kiểm tra hai ràng buộc quan trọng: tên cuộc bầu cử phải là duy nhất trong hệ thống và số ứng viên tối đa được chọn phải nằm trong khoảng hợp lệ. Mỗi vi phạm ràng buộc trả về lỗi tương ứng trước khi Coordinator Service ghi bản ghi cuộc bầu cử vào MongoDB.
+Biểu đồ tuần tự của chức năng tạo cuộc bầu cử mô tả luồng quản trị viên khởi tạo một cuộc bầu cử mới ở trạng thái \pkg{PENDING}. Coordinator Service tiếp nhận dữ liệu, yêu cầu Identity Service xác minh danh sách ứng viên ban đầu, sau đó kiểm tra hai ràng buộc quan trọng: tên cuộc bầu cử phải là duy nhất trong hệ thống và số ứng viên tối đa được chọn phải nằm trong khoảng hợp lệ. Mỗi vi phạm ràng buộc trả về lỗi tương ứng trước khi Coordinator Service ghi bản ghi cuộc bầu cử vào MongoDB.
 
 \begin{figure}[H]
     \centering
@@ -68,7 +68,7 @@ Biểu đồ tuần tự của chức năng xem chi tiết cuộc bầu cử mô
 
 \subsubsection{Quản lý ứng viên trong cuộc bầu cử}
 
-Biểu đồ tuần tự này mô tả thao tác thêm hoặc xóa ứng viên khỏi một cuộc bầu cử cụ thể. Coordinator Service kiểm tra trạng thái PENDING của cuộc bầu cử, sau đó gọi Identity Service để xác minh danh sách tài khoản ứng viên. Trước khi thực hiện ghi, Coordinator Service xác nhận lại trạng thái PENDING một lần nữa nhằm đảm bảo tính nhất quán trong môi trường đồng thời; danh sách ứng viên chỉ được cập nhật khi cả hai kiểm tra đều thông qua.
+Biểu đồ tuần tự này mô tả thao tác thêm hoặc xóa ứng viên khỏi một cuộc bầu cử cụ thể. Coordinator Service kiểm tra trạng thái \pkg{PENDING} của cuộc bầu cử, sau đó gọi Identity Service để xác minh danh sách tài khoản ứng viên. Trước khi thực hiện ghi, Coordinator Service xác nhận lại trạng thái \pkg{PENDING} một lần nữa nhằm đảm bảo tính nhất quán trong môi trường đồng thời; danh sách ứng viên chỉ được cập nhật khi cả hai kiểm tra đều thông qua.
 
 \begin{figure}[H]
     \centering
@@ -79,7 +79,7 @@ Biểu đồ tuần tự này mô tả thao tác thêm hoặc xóa ứng viên k
 
 \subsubsection{Quản lý cử tri trong cuộc bầu cử}
 
-Biểu đồ tuần tự của chức năng quản lý cử tri mô tả cách quản trị viên thêm hoặc xóa cử tri khỏi danh sách được phép tham gia một cuộc bầu cử. Coordinator Service trước tiên gọi Identity Service để xác minh danh sách tài khoản cử tri; sau khi danh sách hợp lệ, Coordinator Service mở giao dịch ghi và kiểm tra lại trạng thái PENDING bên trong giao dịch để ngăn xung đột khi trạng thái cuộc bầu cử thay đổi đồng thời. Nếu trạng thái thay đổi trong khi giao dịch đang mở, giao dịch bị rollback và hệ thống trả về lỗi xung đột.
+Biểu đồ tuần tự của chức năng quản lý cử tri mô tả cách quản trị viên thêm hoặc xóa cử tri khỏi danh sách được phép tham gia một cuộc bầu cử. Coordinator Service trước tiên gọi Identity Service để xác minh danh sách tài khoản cử tri; sau khi danh sách hợp lệ, Coordinator Service mở giao dịch ghi và kiểm tra lại trạng thái \pkg{PENDING} bên trong giao dịch để ngăn xung đột khi trạng thái cuộc bầu cử thay đổi đồng thời. Nếu trạng thái thay đổi trong khi giao dịch đang mở, giao dịch bị rollback và hệ thống trả về lỗi xung đột.
 
 \begin{figure}[H]
     \centering
@@ -90,19 +90,19 @@ Biểu đồ tuần tự của chức năng quản lý cử tri mô tả cách q
 
 \subsubsection{Điều hành cuộc bầu cử}
 
-Biểu đồ tuần tự của chức năng điều hành cuộc bầu cử được tách thành hai luồng riêng. Hình~\ref{fig:seq-dieu-hanh-cuoc-bau-cu-bat-dau} mô tả luồng bắt đầu: Coordinator Service kiểm tra điều kiện cấu hình và phối hợp với ba Signing Node sinh khóa công khai tập thể EC-Schnorr trước khi chuyển trạng thái sang ACTIVE. Hình~\ref{fig:seq-dieu-hanh-cuoc-bau-cu-dong} mô tả luồng đóng: hệ thống xây dựng cây Merkle từ toàn bộ cam kết phiếu đã xác nhận, ghi trạng thái trung gian CLOSING vào cơ sở dữ liệu trước khi cam kết gốc Merkle lên blockchain, và xử lý phục hồi trong trường hợp partial-fail.
+Biểu đồ tuần tự của chức năng điều hành cuộc bầu cử được tách thành hai luồng riêng. Hình~\ref{fig:seq-dieu-hanh-cuoc-bau-cu-bat-dau} mô tả luồng bắt đầu: Coordinator Service kiểm tra điều kiện cấu hình và phối hợp với ba Signing Node sinh khóa công khai tập thể EC-Schnorr trước khi chuyển trạng thái sang \pkg{ACTIVE}. Hình~\ref{fig:seq-dieu-hanh-cuoc-bau-cu-dong} mô tả luồng đóng: hệ thống xây dựng cây Merkle từ toàn bộ cam kết phiếu đã xác nhận, ghi trạng thái trung gian \pkg{CLOSING} vào cơ sở dữ liệu trước khi cam kết gốc Merkle lên blockchain, và xử lý phục hồi trong trường hợp partial-fail.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth, keepaspectratio]{Diagrams/Sequence/DieuHanhCuocBauCu_BatDau.pdf}
-    \caption{Biểu đồ tuần tự ``Điều hành cuộc bầu cử --- Bắt đầu''}
+    \caption{Biểu đồ tuần tự ``Điều hành cuộc bầu cử -- Bắt đầu''}
     \label{fig:seq-dieu-hanh-cuoc-bau-cu-bat-dau}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth, keepaspectratio]{Diagrams/Sequence/DieuHanhCuocBauCu_Dong.pdf}
-    \caption{Biểu đồ tuần tự ``Điều hành cuộc bầu cử --- Đóng''}
+    \caption{Biểu đồ tuần tự ``Điều hành cuộc bầu cử -- Đóng''}
     \label{fig:seq-dieu-hanh-cuoc-bau-cu-dong}
 \end{figure}
 
@@ -135,21 +135,21 @@ Quy trình bỏ phiếu gồm ba bước được minh họa qua ba biểu đồ
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth, keepaspectratio]{Diagrams/Sequence/BoPhieu_1.pdf}
-    \caption{Biểu đồ tuần tự ``Bỏ phiếu --- Bước 1: Khởi tạo phiên bỏ phiếu''}
+    \caption{Biểu đồ tuần tự ``Bỏ phiếu -- Bước 1: Khởi tạo phiên bỏ phiếu''}
     \label{fig:seq-bo-phieu-1}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth, keepaspectratio]{Diagrams/Sequence/BoPhieu_2.pdf}
-    \caption{Biểu đồ tuần tự ``Bỏ phiếu --- Bước 2: Yêu cầu ký phiếu mù tập thể''}
+    \caption{Biểu đồ tuần tự ``Bỏ phiếu -- Bước 2: Yêu cầu ký phiếu mù tập thể''}
     \label{fig:seq-bo-phieu-2}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth, keepaspectratio]{Diagrams/Sequence/BoPhieu_3.pdf}
-    \caption{Biểu đồ tuần tự ``Bỏ phiếu --- Bước 3: Nộp cam kết phiếu mù''}
+    \caption{Biểu đồ tuần tự ``Bỏ phiếu -- Bước 3: Nộp cam kết phiếu mù''}
     \label{fig:seq-bo-phieu-3}
 \end{figure}
 

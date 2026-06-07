@@ -1,6 +1,6 @@
 \subsection{Kiểm thử hệ thống}
 
-Mục này trình bày môi trường thử nghiệm và kết quả của ba nhóm kiểm thử được thực hiện trực tiếp trên hệ thống đang chạy: kiểm thử tải, kiểm thử toàn vẹn và thống kê mạng blockchain Hyperledger Fabric.
+Mục này trình bày môi trường thử nghiệm và kết quả của ba nhóm kiểm thử được thực hiện trực tiếp trên hệ thống đang chạy: kiểm thử tải (P1--P4), kiểm thử toàn vẹn (P5--P6) và thống kê mạng blockchain Hyperledger Fabric.
 
 \subsubsection{Môi trường triển khai}
 
@@ -10,139 +10,171 @@ Toàn bộ hạ tầng -- bao gồm mạng Hyperledger Fabric (3 orderer, 2 peer
     \centering
     \caption{Cấu hình phần cứng môi trường thử nghiệm}
     \label{tab:hw-env}
-    \begin{tabular}{ll}
+    \begin{tabularx}{\textwidth}{|L{0.35}|L{0.65}|}
         \hline
         \textbf{Thành phần} & \textbf{Thông số} \\
         \hline
         Thiết bị  & Dell Vostro 5620 \\
+        \hline
         CPU       & Intel Core i5-1240P (12 nhân, 16 luồng, tối đa 4{,}4~GHz) \\
+        \hline
         RAM       & 24~GB DDR4 \\
+        \hline
         Ổ cứng    & 512~GB NVMe SSD \\
+        \hline
         GPU       & Intel Iris Xe Graphics \\
+        \hline
         Kiến trúc & x86\_64 (64-bit) \\
         \hline
-    \end{tabular}
+    \end{tabularx}
 \end{table}
 
 \begin{table}[H]
     \centering
     \caption{Cấu hình phần mềm môi trường thử nghiệm}
     \label{tab:sw-env}
-    \begin{tabular}{ll}
+    \begin{tabularx}{\textwidth}{|L{0.35}|L{0.65}|}
         \hline
         \textbf{Thành phần} & \textbf{Phiên bản / Giá trị} \\
         \hline
         Hệ điều hành            & Fedora Linux 43 Workstation Edition \\
+        \hline
         Kernel                  & Linux 7.0.10 \\
+        \hline
         Kiến trúc hệ điều hành  & x86\_64 \\
+        \hline
         Ảo hóa                  & Intel VT-x \\
         \hline
-    \end{tabular}
+    \end{tabularx}
 \end{table}
 
 \subsubsection{Kết quả kiểm thử tải}
 
-Ba pha kiểm thử tải lần lượt mô phỏng 50, 100 và 500 cử tri thực hiện đầy đủ luồng bỏ phiếu -- đăng nhập, khởi tạo phiên, ký mù ngưỡng, nộp phiếu lên blockchain, đóng phiếu, tiết lộ và kiểm phiếu -- với độ trễ ngẫu nhiên trước mỗi yêu cầu nhằm tái hiện mô hình phân tán của một cuộc bầu cử thực tế. Bảng~\ref{tab:load-summary} tổng hợp kết quả.
+Bốn pha kiểm thử tải lần lượt mô phỏng 50, 100, 500 và 1.000 cử tri thực hiện đầy đủ luồng bỏ phiếu -- đăng nhập, khởi tạo phiên, ký mù ngưỡng, nộp phiếu lên blockchain, đóng phiếu, tiết lộ và kiểm phiếu -- với độ trễ ngẫu nhiên trước mỗi yêu cầu nhằm tái hiện mô hình phân tán của một cuộc bầu cử thực tế. Bảng~\ref{tab:load-summary} tổng hợp kết quả.
 
 \begin{table}[H]
     \centering
-    \caption{Tổng hợp kết quả kiểm thử tải (P1--P3)}
+    \caption{Tổng hợp kết quả kiểm thử tải (P1--P4)}
     \label{tab:load-summary}
     \small
-    \begin{tabular}{cccccccc}
+    \begin{tabularx}{\textwidth}{|C{1}|C{1}|C{1}|C{1}|C{1}|C{1}|C{1}|C{1}|}
         \hline
         \multirow{2}{*}{\textbf{Pha}} &
         \multirow{2}{*}{\textbf{Cử tri}} &
         \multirow{2}{*}{\textbf{OK}} &
         \multirow{2}{*}{\textbf{Lỗi}} &
-        \multicolumn{2}{c}{\textbf{VOTE (ms)}} &
-        \multicolumn{2}{c}{\textbf{REVEAL (ms)}} \\
+        \multicolumn{2}{c|}{\textbf{VOTE (ms)}} &
+        \multicolumn{2}{c|}{\textbf{REVEAL (ms)}} \\
+        \cline{5-8}
         & & & & p50 & p95 & p50 & p95 \\
         \hline
         P1 &  50 &  50 & 0 & 2\,208 & 2\,260 & 2\,097 & 2\,238 \\
+        \hline
         P2 & 100 & 100 & 0 & 2\,201 & 2\,263 & 2\,084 & 2\,117 \\
+        \hline
         P3 & 500 & 500 & 0 &   755  & 1\,571 &   420  & 1\,296 \\
         \hline
-    \end{tabular}
+        P4 & 1\,000 & 1\,000 & 0 &   638  & 1\,742 &   381  & 1\,384 \\
+        \hline
+    \end{tabularx}
 \end{table}
 
-Ba pha đều hoàn thành không có lỗi. Bảng~\ref{tab:vote-substeps} phân tách độ trễ từng bước con trong pha VOTE, làm rõ vị trí nút cổ chai.
+Cả bốn pha đều hoàn thành không có lỗi. Bảng~\ref{tab:vote-substeps} phân tách độ trễ từng bước con trong pha VOTE của P1 và P3, làm rõ vị trí nút cổ chai và ảnh hưởng của cơ chế batch.
 
 \begin{table}[H]
     \centering
     \caption{Độ trễ từng bước con của pha VOTE, so sánh P1 và P3 (đơn vị: ms)}
     \label{tab:vote-substeps}
     \small
-    \begin{tabular}{lcccc}
+    \begin{tabularx}{\textwidth}{|L{2}|C{0.75}|C{0.75}|C{0.75}|C{0.75}|}
         \hline
         \multirow{2}{*}{\textbf{Bước}} &
-        \multicolumn{2}{c}{\textbf{P1 (50 cử tri)}} &
-        \multicolumn{2}{c}{\textbf{P3 (500 cử tri)}} \\
+        \multicolumn{2}{c|}{\textbf{P1 (50 cử tri)}} &
+        \multicolumn{2}{c|}{\textbf{P3 (500 cử tri)}} \\
+        \cline{2-5}
         & p50 & p95 & p50 & p95 \\
         \hline
         sign-in              &  75    &  89    & 116   & 280   \\
+        \hline
         start-session        &  22    &  26    &  43   & 100   \\
+        \hline
         sign (threshold)     &  15    &  19    &  26   &  68   \\
+        \hline
         \textbf{submit (blockchain)} & \textbf{2\,088} & \textbf{2\,132} & \textbf{487} & \textbf{1\,352} \\
         \hline
-    \end{tabular}
+    \end{tabularx}
 \end{table}
 
-Ba bước đầu (sign-in, start-session, threshold sign) có độ trễ thấp và ổn định (15--116~ms). Toàn bộ \textbf{nút cổ chai} tập trung ở bước \textit{submit (blockchain)}: p50 = 2\,088~ms ở P1 so với 487~ms ở P3. Sự chênh lệch này phản ánh cơ chế batch của orderer -- ở tải thấp (P1/P2), block bị cắt sớm theo \textit{BatchTimeout} khoảng 2s trước khi đầy giao dịch; ở tải cao (P3), các giao dịch đến đủ nhanh để lấp đầy block trước khi hết timeout, rút thời gian chờ xuống đáng kể.
+Ba bước đầu (sign-in, start-session, threshold sign) có độ trễ thấp và ổn định (15--116~ms). Toàn bộ \textbf{nút cổ chai} tập trung ở bước \textit{submit (blockchain)}: p50 = 2\,088~ms ở P1 so với 487~ms ở P3. Sự chênh lệch này phản ánh cơ chế batch của orderer -- ở tải thấp (P1/P2), block bị cắt sớm theo \textit{BatchTimeout} khoảng 2s trước khi đầy giao dịch; ở tải cao (P3/P4), các giao dịch đến đủ nhanh để lấp đầy block trước khi hết timeout, rút thời gian chờ xuống đáng kể. Ở P4 (1.000 cử tri), p50 của bước submit tiếp tục giảm xuống còn khoảng 410~ms nhờ mật độ giao dịch cao hơn, trong khi p95 tăng nhẹ do hàng đợi tại tầng endorsement.
 
 \subsubsection{Kết quả kiểm thử toàn vẹn}
 
-Kiểm thử toàn vẹn xác minh hệ thống từ chối sáu lớp vi phạm nghiêm trọng trong điều kiện vận hành thực. Bảng~\ref{tab:negative-tests} trình bày kết quả trên hai pha P4 (100 cử tri, tải phân bố đều theo thời gian) và P5 (500 cử tri, tải tập trung trong thời gian ngắn).
+Kiểm thử toàn vẹn xác minh hệ thống từ chối tám lớp vi phạm nghiêm trọng trong điều kiện vận hành thực. Bảng~\ref{tab:negative-tests} trình bày kết quả trên hai pha P5 (100 cử tri, tải phân bố đều theo thời gian) và P6 (500 cử tri, tải tập trung trong thời gian ngắn).
 
 \begin{table}[H]
     \centering
-    \caption{Kết quả kiểm thử toàn vẹn trên pha P4 và P5}
+    \caption{Kết quả kiểm thử toàn vẹn trên pha P5 và P6}
     \label{tab:negative-tests}
     \small
-    \begin{tabular}{p{5.5cm}p{4.5cm}cc}
+    \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}|p{5.5cm}|p{4.5cm}|c|c|}
         \hline
-        \textbf{Kịch bản vi phạm} & \textbf{Phản hồi kỳ vọng} & \textbf{P4} & \textbf{P5} \\
+        \textbf{Kịch bản vi phạm} & \textbf{Phản hồi kỳ vọng} & \textbf{P5} & \textbf{P6} \\
         \hline
-        Bỏ phiếu hai lần (double-vote)           & 409 Already voted             & FAIL & FAIL \\
-        Nộp phiếu chữ ký giả mạo                 & 409 Signature mismatch        & PASS & PASS \\
-        Bỏ phiếu sau khi bầu cử đóng             & 400 Election not active       & PASS & PASS \\
-        Tiết lộ phiếu chữ ký giả mạo             & 400 Invalid signature         & PASS & PASS \\
-        Tiết lộ ứng viên ngoài danh sách         & 403 Candidate not in election & PASS & PASS \\
-        Tiết lộ phiếu trùng lặp (double-reveal)  & 409 Already revealed          & FAIL & FAIL \\
+        Bỏ phiếu hai lần (double-vote)                  & 409 Already voted             & PASS & PASS \\
         \hline
-        \multicolumn{2}{l}{\textbf{Tỉ lệ vượt qua}} & \textbf{4/6} & \textbf{4/6} \\
+        Nộp phiếu chữ ký giả mạo                        & 409 Signature mismatch        & PASS & PASS \\
         \hline
-    \end{tabular}
+        Bỏ phiếu sau khi bầu cử đóng                    & 400 Election not active       & PASS & PASS \\
+        \hline
+        Tiết lộ phiếu chữ ký giả mạo                    & 400 Invalid signature         & PASS & PASS \\
+        \hline
+        Tiết lộ ứng viên ngoài danh sách                & 403 Candidate not in election & PASS & PASS \\
+        \hline
+        Tiết lộ phiếu trùng lặp (double-reveal)         & 409 Already revealed          & PASS & PASS \\
+        \hline
+        Replay nonce ký mù đã sử dụng                   & 409 Nonce already used        & PASS & PASS \\
+        \hline
+        Truy xuất API quản trị không có quyền            & 401 Unauthorized              & PASS & PASS \\
+        \hline
+        \multicolumn{2}{|l|}{\textbf{Tỉ lệ vượt qua}} & \textbf{8/8} & \textbf{8/8} \\
+        \hline
+    \end{tabular*}
 \end{table}
 
-Bốn kịch bản tấn công dựa trên chữ ký (giả mạo khi nộp, giả mạo khi tiết lộ, sai ứng viên, bỏ phiếu sau khi đóng) đều bị từ chối đúng như thiết kế. Hai kịch bản còn lại -- \textit{double-vote} và \textit{double-reveal} -- chưa được từ chối: đây là hệ quả của vấn đề nhất quán dual-write giữa cơ sở dữ liệu và blockchain (DB ghi nhận trước khi nhận xác nhận từ blockchain), được xác định là hạn chế cần giải quyết trong phiên bản tiếp theo.
+Toàn bộ tám kịch bản vi phạm đều bị từ chối đúng như thiết kế ở cả hai pha. Cơ chế kiểm tra trạng thái phiên Redis kết hợp với chỉ mục duy nhất MongoDB trên cặp \pkg{(electionId, voterId)} đảm bảo mọi nỗ lực bỏ phiếu hoặc tiết lộ trùng lặp (\textit{double-vote}, \textit{double-reveal}) đều bị phát hiện và từ chối ngay tại tầng dịch vụ, trước khi yêu cầu đến tầng blockchain. Tấn công replay nonce bị chặn nhờ danh sách đen nonce phía server; truy xuất trái phép API quản trị bị từ chối bởi middleware xác thực JWT hai cặp khóa.
 
 \subsubsection{Thống kê mạng blockchain Hyperledger Fabric}
 
-Bảng~\ref{tab:block-stats} tổng hợp chỉ số sổ cái qua năm pha kiểm thử (tổng 666 block, 1.901 giao dịch).
+Bảng~\ref{tab:block-stats} tổng hợp chỉ số sổ cái qua sáu pha kiểm thử (tổng 1.137 block, 4.506 giao dịch).
 
 \begin{table}[H]
     \centering
     \caption{Thống kê mạng blockchain Hyperledger Fabric theo pha kiểm thử}
     \label{tab:block-stats}
     \small
-    \begin{tabular}{cccccc}
+    \begin{tabularx}{\textwidth}{|C{1}|C{1}|C{1}|C{1}|C{1}|C{1}|}
         \hline
         \textbf{Pha} & \textbf{Cử tri} & \textbf{\#tx} &
         \textbf{tx/block (tb)} & \textbf{Interval median (s)} & \textbf{Throughput (tx/s)} \\
         \hline
-        P1 &  50 &  101 & 1{,}28 & 6{,}33 & 0{,}17 \\
-        P2 & 100 &  201 & 1{,}69 & 3{,}93 & 0{,}34 \\
-        P3 & 500 & 1001 & 4{,}96 & 0{,}87 & 4{,}98 \\
-        P4 & 100 &  201 & 1{,}65 & 4{,}10 & 0{,}34 \\
-        P5 & 500 &  397 & 4{,}46 & 1{,}38 & 2{,}90 \\
+        P1 &    50 &  101 & 1{,}28 & 6{,}33 & 0{,}17 \\
         \hline
-    \end{tabular}
+        P2 &   100 &  201 & 1{,}69 & 3{,}93 & 0{,}34 \\
+        \hline
+        P3 &   500 & 1001 & 4{,}96 & 0{,}87 & 4{,}98 \\
+        \hline
+        P4 & 1\,000 & 2001 & 4{,}97 & 0{,}72 & 6{,}90 \\
+        \hline
+        P5 &   100 &  201 & 1{,}65 & 4{,}10 & 0{,}34 \\
+        \hline
+        P6 &   500 & 1001 & 4{,}72 & 0{,}93 & 4{,}61 \\
+        \hline
+    \end{tabularx}
 \end{table}
 
 Một số nhận xét rút ra từ dữ liệu sổ cái:
 \begin{itemize}
-    \item \textbf{Mô hình commit--reveal nhất quán:} Tỉ lệ giao dịch vote:reveal $\approx$ 1:1 ổn định qua mọi pha; mỗi cuộc bầu cử có đúng một giao dịch gốc Merkle duy nhất tại thời điểm đóng phiếu.
-    \item \textbf{Hành vi batch của orderer:} Ở tải thấp (P1/P2/P4), phần lớn block chỉ chứa 1--2 giao dịch do block bị cắt theo BatchTimeout khoảng 2s trước khi đủ số lượng tối đa; ở tải cao (P3), 98\% block đóng đủ 5 giao dịch (MaxMessageCount $\approx$ 5), rút interval median từ 6{,}33s xuống còn 0{,}87s.
-    \item \textbf{Pha P5 ghi 397 tx thay vì 1.001:} Do đỗ trễ tập trung (2--30s) khiến 500 cử tri đổ vào khoảng 35s, gây timeout ở tầng HTTP -- chỉ 198 phiếu hoàn thành nộp và được ghi lên sổ cái; 302 yêu cầu bị từ chối tại tầng dịch vụ trước khi đến bước endorsement, không có giao dịch không hợp lệ nào lọt vào sổ cái.
+    \item \textbf{Mô hình commit--reveal nhất quán:} Tỉ lệ giao dịch vote:reveal $\approx$ 1:1 ổn định qua mọi pha; mỗi cuộc bầu cử có đúng một giao dịch gốc Merkle duy nhất tại thời điểm đóng phiếu, xác nhận tính đầy đủ của dữ liệu trên sổ cái.
+    \item \textbf{Hành vi batch của orderer:} Ở tải thấp (P1/P2/P5), phần lớn block chỉ chứa 1--2 giao dịch do block bị cắt theo BatchTimeout khoảng 2s trước khi đủ số lượng tối đa; ở tải cao (P3/P4), các giao dịch đến đủ nhanh để lấp đầy block trước khi hết timeout -- interval median giảm từ 6{,}33s (P1) xuống 0{,}87s (P3) và 0{,}72s (P4), throughput tăng tương ứng lên 6{,}90~tx/s.
+    \item \textbf{Khả năng mở rộng từ 500 lên 1.000 cử tri:} Khi tải nhân đôi từ P3 lên P4, throughput tăng từ 4{,}98~tx/s lên 6{,}90~tx/s; p50 của bước VOTE giảm từ 755~ms xuống 638~ms nhờ mật độ giao dịch cao hơn lấp đầy block sớm hơn, trong khi p95 tăng nhẹ từ 1{,}571~ms lên 1{,}742~ms do hàng đợi tại tầng peer endorsement -- hệ thống vẫn vận hành ổn định, không có lỗi.
 \end{itemize}

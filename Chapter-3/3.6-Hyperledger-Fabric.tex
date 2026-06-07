@@ -22,7 +22,7 @@ Thông lượng & 15--30 TPS (PoW) & 3000+ TPS (PBFT/Raft) \\
 \hline
 Chi phí & Phí gas & Không có (hạ tầng riêng) \\
 \hline
-Dữ liệu nhạy cảm & Công khai & Riêng tư theo \textit{channel} \\
+Dữ liệu & Công khai & Riêng tư theo \textit{channel} \\
 \hline
 Ngôn ngữ chaincode & Solidity (EVM) & Go, Java, Node.js \\
 \hline
@@ -43,7 +43,7 @@ Chaincode được triển khai ở chế độ \textit{external} thông qua \pk
 
 \subsubsection{Tích hợp qua Chainlaunch -- phiên đăng nhập}
 
-Backend không trực tiếp giao tiếp với peer Fabric mà gián tiếp qua một \textit{API Gateway} có tên \textbf{Chainlaunch}. Chainlaunch duy trì \textbf{một pool kết nối gRPC} đến peer Fabric thay vì mở kết nối mới cho mỗi yêu cầu từ backend. Cách làm này giúp tránh chi phí thiết lập TLS lặp lại, đồng thời cho phép Chainlaunch áp dụng cân bằng tải và logic \textit{retry/circuit-breaker} ở một điểm duy nhất. Backend chỉ cần gọi REST API thông thường -- toàn bộ độ phức tạp về giao tiếp gRPC với Fabric được đóng gói tại Chainlaunch. Mô hình kết nối tổng thể được minh họa trong Hình~\ref{fig:chainlaunch-architecture}.
+Backend không trực tiếp giao tiếp với peer Fabric mà gián tiếp qua một \textit{API Gateway} của \textbf{Chainlaunch}. Chainlaunch duy trì \textbf{một pool kết nối gRPC} đến peer Fabric thay vì mở kết nối mới cho mỗi yêu cầu từ backend. Cách làm này giúp tránh chi phí thiết lập TLS lặp lại, đồng thời cho phép Chainlaunch áp dụng cân bằng tải và logic \textit{retry/circuit-breaker} ở một điểm duy nhất. Backend chỉ cần gọi REST API thông thường -- toàn bộ độ phức tạp về giao tiếp gRPC với Fabric được đóng gói tại Chainlaunch. Mô hình kết nối tổng thể được minh họa trong Hình~\ref{fig:chainlaunch-architecture}.
 
 \begin{figure}[H]
     \centering

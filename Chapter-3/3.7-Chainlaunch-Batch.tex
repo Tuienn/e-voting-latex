@@ -11,7 +11,7 @@ Hyperledger Fabric không đóng khối cho từng giao dịch riêng lẻ mà \
     \label{fig:configtx-batch}
 \end{figure}
 
-Một khối được đóng khi \textbf{thỏa một trong bốn điều kiện}: (1) số giao dịch đạt \pkg{MaxMessageCount}; (2) tổng kích thước vượt \pkg{AbsoluteMaxBytes}; (3) tổng kích thước vượt \pkg{PreferredMaxBytes} (ngay cả khi chưa đủ \pkg{MaxMessageCount}); hoặc (4) \pkg{BatchTimeout} hết hạn dù lô chỉ có một giao dịch. Trong các điều kiện trên, \pkg{BatchTimeout} là yếu tố quyết định tính chất \textit{hành vi} của mạng -- quyết định độ trễ chung quyết tối thiểu mà cử tri quan sát thấy. Cơ chế đóng khối được minh họa trong Hình~\ref{fig:batch-blockchain}.
+Một khối được đóng khi \textbf{thỏa một trong bốn điều kiện}: (1) số giao dịch đạt \pkg{MaxMessageCount}; (2) tổng kích thước vượt quá \pkg{AbsoluteMaxBytes}; (3) kích thước vượt quá ngưỡng \pkg{PreferredMaxBytes} (dù ngay cả khi chưa đủ \pkg{MaxMessageCount}); hoặc (4) \pkg{BatchTimeout} hết hạn dù lô chỉ có một giao dịch. Trong các điều kiện trên, \pkg{BatchTimeout} là yếu tố quyết định tính chất hành vi của mạng -- quyết định độ trễ chung quyết tối thiểu mà cử tri quan sát thấy. Cơ chế đóng khối được minh họa trong Hình~\ref{fig:batch-blockchain}.
 
 \subsubsection{Đánh đổi giữa thông lượng và độ trễ}
 
@@ -34,7 +34,7 @@ Việc chọn \pkg{BatchTimeout} là một bài toán đánh đổi: tăng giá 
 \end{tabularx}
 \end{table}
 
-Với hệ thống bầu cử, \texttt{BatchTimeout = 2s} là điểm cân bằng phù hợp: 100 cử tri bỏ phiếu đồng thời có thể được gom vào cùng một khối, độ trễ chung quyết mà mỗi cử tri quan sát thấy nằm trong khoảng 2--3 giây -- đủ ngắn để giao diện ứng dụng cập nhật trạng thái phiếu mà không cần duy trì trạng thái chờ lâu, đồng thời đủ thông lượng để xử lý các đợt bỏ phiếu lớn.
+Với hệ thống bầu cử, \pkg{BatchTimeout = 2s} là điểm cân bằng phù hợp: 100 cử tri bỏ phiếu đồng thời có thể được gom vào cùng một khối, độ trễ chung quyết mà mỗi cử tri quan sát thấy nằm trong khoảng 2--3 giây -- đủ ngắn để giao diện ứng dụng cập nhật trạng thái phiếu mà không cần duy trì trạng thái chờ lâu, đồng thời đủ thông lượng để xử lý các đợt bỏ phiếu lớn.
 
 \subsubsection{Phân biệt rõ giữa invoke và query}
 
