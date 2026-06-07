@@ -2,7 +2,7 @@
 
 Tầng sổ cái phân tán của hệ thống được hiện thực hóa bằng một chaincode Hyperledger Fabric viết bằng ngôn ngữ Go, mang tên \textit{VoteLedgerContract}. Chaincode chịu trách nhiệm ghi nhận \textbf{các sự kiện bất biến} của quy trình bỏ phiếu (nộp phiếu mù, đóng cuộc bầu cử, giải mù phiếu) và cung cấp các hàm truy vấn phục vụ \textbf{kiểm chứng độc lập}. Chaincode được triển khai theo mô hình \textit{external chaincode} -- tách rời khỏi tiến trình của peer và lắng nghe trên cổng \pkg{9999} -- nhằm thuận tiện cho việc nâng cấp và quan sát.
 
-Chaincode được thiết kế theo nguyên tắc tối giản: không lưu trữ vòng đời cuộc bầu cử \pkg{(PENDING, \pkg{ACTIVE}, \pkg{CLOSED})}, không quản lý người dùng và không thực thi xác thực danh tính. Toàn bộ trách nhiệm xác thực tài khoản, xác minh chữ ký EC-Schnorr và điều phối quy trình thuộc về các microservice off-chain; chaincode chỉ giữ vai trò là tầng \textit{chứng cứ} không thể chối bỏ. Các hàm được tổ chức thành ba nhóm hợp đồng tương ứng với ba nghiệp vụ cốt lõi: \textit{Vote Contract}, \textit{Merkle Contract} và \textit{Reveal Contract}.
+Chaincode được thiết kế theo nguyên tắc tối giản: không lưu trữ vòng đời cuộc bầu cử (\pkg{PENDING}, \pkg{ACTIVE}, \pkg{CLOSED}), không quản lý người dùng và không thực thi xác thực danh tính. Toàn bộ trách nhiệm xác thực tài khoản, xác minh chữ ký EC-Schnorr và điều phối quy trình thuộc về các microservice off-chain; chaincode chỉ giữ vai trò là tầng \textit{chứng cứ} không thể chối bỏ. Các hàm được tổ chức thành ba nhóm hợp đồng tương ứng với ba nghiệp vụ cốt lõi: \textit{Vote Contract}, \textit{Merkle Contract} và \textit{Reveal Contract}.
 
 \subsubsection{Cấu trúc trạng thái trên sổ cái}
 
@@ -12,7 +12,7 @@ Toàn bộ trạng thái của chaincode được lưu vào \textit{World State}
     \centering
     \small
     \setlength{\tabcolsep}{3pt}
-    \caption{Các không gian tên trạng thái trên sổ cái}
+    \caption{Các namespace trạng thái trên sổ cái}
     \label{tab:cc-state-prefix}
     \begin{tabularx}{\textwidth}{|L{0.25}|L{0.25}|L{0.50}|}
     \hline
@@ -24,7 +24,7 @@ Toàn bộ trạng thái của chaincode được lưu vào \textit{World State}
     \end{tabularx}
 \end{table}
 
-\noindent Tổng số phiếu, số phiếu đã giải mù và kết quả kiểm phiếu theo ứng viên đều được tổng hợp theo yêu cầu (\textit{on-demand}) bằng truy vấn khoảng (\pkg{GetStateByPartialCompositeKey}) trực tiếp trên bản ghi gốc. Thiết kế này loại bỏ hoàn toàn xung đột \textit{MVCC\_READ\_CONFLICT} khi nhiều cử tri nộp phiếu hoặc giải mù đồng thời -- vì mỗi giao dịch chỉ ghi đúng một khóa riêng biệt mà không đọc hay ghi bất kỳ khóa chung nào.
+\noindent Tổng số phiếu, số phiếu đã giải mù và kết quả kiểm phiếu theo ứng viên đều được tổng hợp theo yêu cầu bằng truy vấn khoảng (\pkg{GetStateByPartialCompositeKey}) trực tiếp trên bản ghi gốc. Thiết kế này loại bỏ hoàn toàn xung đột \textit{MVCC\_READ\_CONFLICT} khi nhiều cử tri nộp phiếu hoặc giải mù đồng thời -- vì mỗi giao dịch chỉ ghi đúng một khóa riêng biệt mà không đọc hay ghi bất kỳ khóa chung nào.
 
 \subsubsection{Tổng hợp các hàm chaincode}
 
@@ -170,7 +170,7 @@ Hàm \pkg{GetAuditCounts} thuộc loại \textit{query}, trả về đối tư�
 
 \subsubsection{Hàm RevealVoteCompact}
 
-Hàm \pkg{RevealVoteCompact} thuộc loại \textit{invoke}, đóng vai trò trung tâm trong giai đoạn kiểm phiếu. Chaincode kiểm tra gốc Merkle đã được cố định, đối chiếu \pkg{revealKey} chưa từng xuất hiện trong không gian tên \pkg{usedReveal} (chống phát lại trên chuỗi), sau đó lưu duy nhất một bản ghi \pkg{usedReveal} kèm danh sách ứng viên được chọn, băm tải trọng và định danh giao dịch Fabric. Chaincode không cập nhật bất kỳ bộ đếm tally hay RevealCount dùng chung -- kết quả kiểm phiếu theo ứng viên và số lá phiếu đã giải mù được tổng hợp on-demand bởi \pkg{GetTally} và \pkg{GetAuditCounts} thông qua truy vấn khoảng trên tập bản ghi \pkg{usedReveal}.
+Hàm \pkg{RevealVoteCompact} thuộc loại \textit{invoke}, đóng vai trò trung tâm trong giai đoạn kiểm phiếu. Chaincode kiểm tra gốc Merkle đã được cố định, đối chiếu \pkg{revealKey} chưa từng xuất hiện trong namespace \pkg{usedReveal} (chống phát lại trên chuỗi), sau đó lưu duy nhất một bản ghi \pkg{usedReveal} kèm danh sách ứng viên được chọn, băm tải trọng và định danh giao dịch Fabric. Chaincode không cập nhật bất kỳ bộ đếm tally hay RevealCount dùng chung -- kết quả kiểm phiếu theo ứng viên và số lá phiếu đã giải mù được tổng hợp on-demand bởi \pkg{GetTally} và \pkg{GetAuditCounts} thông qua truy vấn khoảng trên tập bản ghi \pkg{usedReveal}.
 
 \begin{table}[H]
     \centering
@@ -191,7 +191,7 @@ Hàm \pkg{RevealVoteCompact} thuộc loại \textit{invoke}, đóng vai trò tru
 
 \subsubsection{Hàm GetTally}
 
-Hàm \pkg{GetTally} thuộc loại \textit{query}, duyệt toàn bộ bản ghi thuộc không gian tên \pkg{usedReveal} của một cuộc bầu cử, giải mã danh sách ứng viên từng lá phiếu và cộng dồn để trả về đối tượng \pkg{TallyView} dưới dạng ánh xạ từ định danh ứng viên sang số lượt chọn. Đây là nguồn dữ liệu cốt lõi để công khai kết quả bầu cử. Khi mỗi lá phiếu có thể chọn nhiều ứng viên, tổng số lượt chọn (tổng các giá trị trong \pkg{tally}) có thể lớn hơn số lá phiếu đã giải mù -- số lá phiếu đã giải mù được lấy từ \pkg{GetAuditCounts.revealCount}.
+Hàm \pkg{GetTally} thuộc loại \textit{query}, duyệt toàn bộ danh sách bản ghi thuộc namespace \pkg{usedReveal} của một cuộc bầu cử, giải mã danh sách ứng viên từng lá phiếu và cộng dồn để trả về đối tượng \pkg{TallyView} dưới dạng ánh xạ từ định danh ứng viên sang số lượt chọn. Đây là nguồn dữ liệu cốt lõi để công khai kết quả bầu cử. Khi mỗi lá phiếu có thể chọn nhiều ứng viên, tổng số lượt chọn (tổng các giá trị trong \pkg{tally}) có thể lớn hơn số lá phiếu đã giải mù -- số lá phiếu đã giải mù được lấy từ \pkg{GetAuditCounts.revealCount}.
 
 \begin{table}[H]
     \centering

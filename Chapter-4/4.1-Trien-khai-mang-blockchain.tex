@@ -12,12 +12,19 @@ Hệ thống bầu cử điện tử yêu cầu mức độ sẵn sàng cao và 
     \item \textbf{Thành phần lưu trữ và xác thực (Peer Nodes):} Gồm 2 node (\pkg{peer0-org1msp} trên cổng 7000 và \pkg{peer1-org1msp} trên cổng 7100) đóng vai trò lưu trữ bản sao sổ cái (Ledger) và thực thi hợp đồng thông minh.
 \end{itemize}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth, keepaspectratio]{Figures/Chainlaunch-dashboard.png}
+    \caption{Giao diện dashboard quản lý mạng blockchain trên nền tảng Chainlaunch}
+    \label{fig:chainlaunch-dashboard}
+\end{figure}
+
 Bộ công cụ giao diện dòng lệnh Chainlaunch CLI được cài đặt qua trình quản lý gói \pkg{npm}. Hình~\ref{fig:chainlaunch-deploy-all} trình bày toàn bộ trình tự lệnh triển khai theo sáu bước.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth, keepaspectratio]{Figures/code/chainlaunch-deploy-all.png}
-    \caption{Trình tự lệnh Chainlaunch và fabric-ca-client triển khai mạng blockchain e-voting (6 bước)}
+    \caption{Trình tự lệnh triển khai mạng blockchain e-voting (6 bước)}
     \label{fig:chainlaunch-deploy-all}
 \end{figure}
 

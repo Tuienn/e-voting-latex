@@ -46,7 +46,7 @@ Sau khi \pkg{commitMerkleRoot} được ghi lên sổ cái Fabric, ba bất bi�
 
     \item \textbf{Bằng chứng thành viên (\textit{membership proof}):} bất kỳ phiếu nào trong cuộc bầu cử cũng có thể tự chứng minh thuộc về tập phiếu chính thức mà không cần tiết lộ các phiếu khác -- một dạng \textit{zero-knowledge-like} thực tế nhờ Merkle proof.
 
-    \item \textbf{Đối chiếu chéo cơ sở dữ liệu và blockchain:} giá trị \pkg{election.merkleRoot} lưu trong MongoDB được đối chiếu với \pkg{MerkleRootView.merkleRoot} đọc từ blockchain. Bất kỳ chênh lệch nào cũng đồng nghĩa backend đã tự ý thay đổi root sau khi commit -- sự việc có thể bị bất kỳ bên kiểm toán nào phát hiện.
+    \item \textbf{Đối chiếu chéo cơ sở dữ liệu và blockchain:} giá trị \pkg{election.merkleRoot} lưu trong MongoDB được đối chiếu với \pkg{MerkleRootView.merkleRoot} được đọc từ blockchain. Bất kỳ chênh lệch nào cũng đồng nghĩa backend đã tự ý thay đổi root sau khi commit -- sự việc có thể bị bất kỳ bên kiểm toán nào phát hiện.
 \end{itemize}
 
 \subsubsection{Độ phức tạp của bằng chứng Merkle}
