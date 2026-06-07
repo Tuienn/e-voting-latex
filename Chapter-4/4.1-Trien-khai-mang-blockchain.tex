@@ -1,13 +1,13 @@
-\subsection{Triển khai mạng blockchain}
+\subsection{Triển khai mạng blockchain qua Chainlaunch}
 
 Phần này trình bày quy trình triển khai hạ tầng mạng Hyperledger Fabric phục vụ hệ thống bỏ phiếu điện tử, sử dụng nền tảng Chainlaunch để tự động hóa và quản trị toàn bộ vòng đời các node mạng.
 
 \subsubsection{Thiết kế kiến trúc mạng}
 
-Hệ thống bầu cử điện tử yêu cầu mức độ sẵn sàng cao và khả năng chống lỗi tốt. Mạng blockchain được xây dựng trên nền tảng Hyperledger Fabric với định danh tổ chức \pkg{org1msp} và kênh truyền thông \pkg{votechannel}. hạ tầng được phân tách thành 5 node cốt lõi:
+Hệ thống bầu cử điện tử yêu cầu mức độ sẵn sàng cao và khả năng chống lỗi tốt. Mạng blockchain được xây dựng trên nền tảng Hyperledger Fabric với định danh tổ chức \pkg{org1msp} và kênh truyền thông \pkg{votechannel}, hạ tầng được phân tách thành 5 node cốt lõi:
 
 \begin{itemize}
-    \item \textbf{Thành phần đồng thuận (Ordering Service):} Gồm 3 node Orderer cấu hình theo thuật toán Raft (\pkg{orderer0-org1msp}, \pkg{orderer1-org1msp}, \pkg{orderer2-org1msp}) lần lượt trên cổng 9000, 9100 và 9200, đảm bảo tính toàn vẹn dữ liệu và bảo đảm thứ tự giao dịch, tạo khối và duy trì khả năng chịu lỗi của cụm đồng thuận theo mô hình chịu lỗi (fault-tolerant).
+    \item \textbf{Thành phần đồng thuận (Ordering Service):} Gồm 3 node Orderer cấu hình theo thuật toán Raft (\pkg{orderer0-org1msp}, \pkg{orderer1-org1msp}, \pkg{orderer2-org1msp}) lần lượt trên cổng 9000, 9100 và 9200, đảm bảo tính toàn vẹn dữ liệu và bảo đảm thứ tự giao dịch, tạo khối và duy trì khả năng chịu lỗi của cụm đồng thuận theo mô hình chịu lỗi (\textit{fault-tolerant}).
 
     \item \textbf{Thành phần lưu trữ và xác thực (Peer Nodes):} Gồm 2 node (\pkg{peer0-org1msp} trên cổng 7000 và \pkg{peer1-org1msp} trên cổng 7100) đóng vai trò lưu trữ bản sao sổ cái (Ledger) và thực thi hợp đồng thông minh.
 \end{itemize}
@@ -33,7 +33,7 @@ Kênh \pkg{votechannel} đóng vai trò là không gian mạng riêng tư, cô l
 
 \subsubsection{Triển khai hợp đồng thông minh}
 
-Mã nguồn xử lý logic bầu chọn được phát triển bằng ngôn ngữ \textbf{Go} và đóng gói thành Docker Image lưu trữ tại \pkg{tuienn/votecc:latest}. Quy trình triển khai gồm 3 bước: Bước 1 khai báo siêu dữ liệu để tạo sự đồng thuận về phiên bản giữa các node; Bước 2 kéo Docker Image từ Docker Hub về các node xác thực; Bước 3 thực hiện giao dịch khởi tạo để thiết lập trạng thái gốc của sổ cái.
+Mã nguồn xử lý logic bầu chọn được phát triển bằng ngôn ngữ Go và đóng gói thành Docker Image. Quy trình triển khai gồm 3 bước: (1) Khai báo siêu dữ liệu để tạo sự đồng thuận về phiên bản giữa các node; (2) Kéo Docker Image từ Docker Hub về các node xác thực; (3) Thực hiện giao dịch khởi tạo để thiết lập trạng thái gốc của sổ cái.
 
 \subsubsection{Cấp phát định danh cho ứng dụng client}
 

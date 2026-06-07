@@ -6,7 +6,7 @@ Trên cơ sở kiến trúc và các tầng bảo mật đã trình bày ở Ch�
 
 Trang quản trị cung cấp các chức năng vận hành cốt lõi của một cuộc bầu cử: quản lý người dùng, khởi tạo và cấu hình cuộc bầu cử, theo dõi diễn biến bỏ phiếu thời gian thực và thực thi quy trình kiểm phiếu sau khi đóng phiếu. Giao diện được thiết kế đồng nhất theo nguyên tắc thiết kế \textit{Material Design} với bố cục dạng bảng điều khiển (dashboard) nhằm tối ưu cho thao tác nhập liệu và truy vấn dữ liệu khối lượng lớn.
 
-Màn hình \textbf{Đăng nhập} là điểm vào duy nhất của hệ thống quản trị, yêu cầu xác thực bằng tài khoản nội bộ có gắn vai trò \textit{admin} hoặc \textit{auditor}. Phiên đăng nhập được bảo vệ bằng cơ chế JWT hai cặp khóa và lưu trữ tập trung trên Redis như đã trình bày trong Chương~3.
+Màn hình \textbf{Đăng nhập} là điểm vào duy nhất của hệ thống quản trị, yêu cầu xác thực bằng tài khoản nội bộ có gắn vai trò \textit{admin}. Phiên đăng nhập được bảo vệ bằng cơ chế JWT hai cặp khóa và lưu trữ tập trung trên Redis như đã trình bày trong Chương~3.
 
 \begin{figure}[H]
     \centering
@@ -22,7 +22,7 @@ Sau khi xác thực thành công, quản trị viên có thể truy cập \textb
     \caption{Quản lý danh sách người dùng E-voting admin}
 \end{figure}
 
-\textbf{Trang quản lý danh sách bầu cử} liệt kê toàn bộ cuộc bầu cử đã, đang và sẽ diễn ra theo từng trạng thái: \textit{nháp}, \textit{chuẩn bị}, \textit{đang diễn ra}, \textit{đã đóng phiếu}, \textit{đã công bố kết quả}. Mỗi mục cho phép truy cập nhanh tới chi tiết tương ứng để cấu hình hoặc theo dõi.
+\textbf{Trang quản lý danh sách bầu cử} liệt kê toàn bộ cuộc bầu cử đã, đang và sẽ diễn ra theo từng trạng thái: \pkg{PENDING}, \pkg{ACTIVE}, \textit{CLOSED}, \textit{COMPLETED}. Mỗi mục cho phép truy cập nhanh tới chi tiết tương ứng để cấu hình hoặc theo dõi.
 
 \begin{figure}[H]
     \centering
@@ -106,12 +106,12 @@ Khi cuộc bầu cử kết thúc và ban tổ chức công bố kết quả, c�
     \caption{Xác minh biên lai E-voting mobile}
 \end{figure}
 
-Song song với cơ chế xác minh từng phiếu, màn hình \textbf{Công bố phiếu} hiển thị danh sách phiếu công khai đã được ghi nhận trong cuộc bầu cử kèm các tham số mật mã cho phép bên thứ ba tự kiểm chứng tính toàn vẹn của toàn bộ tập phiếu.
+Song song với cơ chế xác minh từng phiếu, màn hình \textbf{Tiết lộ phiếu} hiển thị danh sách phiếu công khai đã được ghi nhận trong cuộc bầu cử kèm các tham số mật mã cho phép bên thứ ba tự kiểm chứng tính toàn vẹn của toàn bộ tập phiếu.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.45\textwidth, keepaspectratio]{Figures/Ket-qua-thuc-nghiem/Cong-bo-phieu-E-voting-mobile.png}
-    \caption{Công bố phiếu E-voting mobile}
+    \caption{Tiết lộ phiếu E-voting mobile}
 \end{figure}
 
 Cuối cùng, màn hình \textbf{Kết quả cuộc bầu cử} trình bày tổng kết kết quả kiểm phiếu dưới dạng biểu đồ và bảng số liệu, kèm các thông tin chứng cứ (số phiếu hợp lệ, số phiếu trùng bị loại, mã cam kết của cây Merkle cuối cùng) để cử tri đối chiếu với dữ liệu công khai trên sổ cái.
