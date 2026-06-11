@@ -1,12 +1,15 @@
 @startuml TaoCuocBauCu_UC
 left to right direction
+
 actor "Admin" as admin
 
 rectangle "Tạo cuộc bầu cử" {
-  usecase "Khởi tạo cuộc bầu cử" as UC_Create
-  usecase "Chọn danh sách ứng viên ban đầu" as UC_PickCandidates
+    usecase "Khởi tạo cuộc bầu cử" as UC_Create
+    usecase "Chọn danh sách ứng viên ban đầu" as UC_PickCandidates
+
+    UC_Create ..> UC_PickCandidates : <<include>>
 }
 
 admin --> UC_Create
-UC_PickCandidates ..> UC_Create : <<include>>
+
 @enduml

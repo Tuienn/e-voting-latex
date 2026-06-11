@@ -1,7 +1,7 @@
-\subsection{Công nghệ Blockchain}
+\subsection{Công nghệ blockchain}
 \label{sec:cong-nghe-blockchain}
 
-\subsubsection{Khái niệm Blockchain}
+\subsubsection{Khái niệm blockchain}
 
 Blockchain (chuỗi khối) là một công nghệ lưu trữ và truyền tải thông tin dưới dạng các khối (block) được liên kết với nhau theo trình tự thời gian thông qua các giá trị băm (hash) mật mã, tạo thành một chuỗi dữ liệu liên tục và khó có thể bị chỉnh sửa. Về bản chất, blockchain là một dạng sổ cái phân tán (distributed ledger) được nhân bản và đồng bộ trên nhiều node trong mạng ngang hàng (peer-to-peer), trong đó mọi thay đổi của dữ liệu đều phải được xác thực thông qua một cơ chế đồng thuận chung trước khi được ghi nhận chính thức vào hệ thống.
 
@@ -11,7 +11,7 @@ Cơ chế hoạt động cốt lõi của blockchain dựa trên ba thành phầ
 
 Nhờ các đặc tính phân tán, khó sửa đổi và có thể kiểm chứng công khai, blockchain phù hợp với các hệ thống cần duy trì niềm tin giữa nhiều bên tham gia mà không phụ thuộc hoàn toàn vào một nền tảng quản lý tập trung. Công nghệ này mở ra hướng tiếp cận mới cho việc thiết kế các hệ thống đòi hỏi mức độ tin cậy cao mà không cần đến cơ chế quản lý tập trung truyền thống.
 
-\subsubsection{Đặc điểm cơ bản của Blockchain}
+\subsubsection{Đặc điểm cơ bản của blockchain}
 
 Blockchain sở hữu một số đặc điểm nền tảng giúp nó trở nên khác biệt rõ rệt so với các mô hình cơ sở dữ liệu tập trung truyền thống. Những đặc điểm này không chỉ là ưu thế về mặt kỹ thuật mà còn là cơ sở để xây dựng các ứng dụng yêu cầu mức độ tin cậy và an toàn cao như bỏ phiếu điện tử.
 
@@ -29,7 +29,7 @@ Blockchain sở hữu một số đặc điểm nền tảng giúp nó trở nê
     \item \textbf{Tính đồng thuận (Consensus):} Các node trong mạng blockchain phải đạt được sự thống nhất về trạng thái chung của sổ cái thông qua một giao thức đồng thuận xác định. Điều này đảm bảo rằng dữ liệu được ghi nhận là nhất quán giữa các node và không xảy ra hiện tượng chia tách hay xung đột dữ liệu.
 \end{itemize}
 
-\subsubsection{Cấu trúc dữ liệu Blockchain}
+\subsubsection{Cấu trúc dữ liệu blockchain}
 
 Dữ liệu trong blockchain được tổ chức dưới dạng một chuỗi tuần tự các khối được liên kết bằng giá trị băm. Cấu trúc này được thiết kế nhằm đảm bảo các thuộc tính toàn vẹn, bất biến và có khả năng kiểm chứng. Các thành phần cốt lõi của cấu trúc dữ liệu blockchain bao gồm khối (block), giao dịch (transaction), hàm băm (hash) và cây Merkle (Merkle Tree).
 
@@ -43,16 +43,16 @@ Dữ liệu trong blockchain được tổ chức dưới dạng một chuỗi t
     \item \textbf{Merkle Tree (Cây Merkle):} Cây Merkle là một cấu trúc dữ liệu dạng cây nhị phân, trong đó mỗi node lá lưu trữ giá trị băm của một giao dịch, và mỗi node cha lưu giá trị băm được tính từ hai node con. Giá trị băm tại gốc cây là một bản tóm lược của toàn bộ giao dịch trong khối. Nhờ cấu trúc này, việc kiểm chứng xem một giao dịch có thuộc khối hay không có thể được thực hiện hiệu quả thông qua đường dẫn Merkle (Merkle proof), với độ phức tạp chỉ là $O(\log n)$ thay vì $O(n)$. Đây là một trong những yếu tố giúp blockchain có khả năng mở rộng tốt và cho phép các node xác thực giao dịch mà không cần tải toàn bộ khối.
 \end{itemize}
 
-\subsubsection{Phân loại Blockchain}
+\subsubsection{Phân loại blockchain}
 
 Dựa trên mức độ phân quyền và phạm vi tham gia của các thực thể trong mạng, blockchain được chia thành ba loại chính: blockchain công khai (Public), blockchain riêng tư (Private) và blockchain liên hợp (Consortium).
 
 \begin{itemize}
-    \item \textbf{Blockchain công khai (Public Blockchain):} Đây là loại blockchain hoàn toàn mở, cho phép bất kỳ ai trên Internet đều có thể tham gia với vai trò người dùng hoặc node xác thực mà không cần xin phép. Mọi người đều có quyền đọc dữ liệu, gửi giao dịch và tham gia vào quá trình đồng thuận. Public blockchain có mức độ phi tập trung cao nhất và minh bạch nhất, song hiệu năng thường bị hạn chế do phải xử lý số lượng node lớn và áp dụng các cơ chế đồng thuận tốn nhiều tài nguyên. Các ví dụ tiêu biểu của loại này bao gồm Bitcoin, Ethereum và Litecoin.
+    \item \textbf{Blockchain công khai (Public blockchain):} Đây là loại blockchain hoàn toàn mở, cho phép bất kỳ ai trên Internet đều có thể tham gia với vai trò người dùng hoặc node xác thực mà không cần xin phép. Mọi người đều có quyền đọc dữ liệu, gửi giao dịch và tham gia vào quá trình đồng thuận. Public blockchain có mức độ phi tập trung cao nhất và minh bạch nhất, song hiệu năng thường bị hạn chế do phải xử lý số lượng node lớn và áp dụng các cơ chế đồng thuận tốn nhiều tài nguyên. Các ví dụ tiêu biểu của loại này bao gồm Bitcoin, Ethereum và Litecoin.
 
-    \item \textbf{Blockchain riêng tư (Private Blockchain):} Trái ngược với loại công khai, loại riêng tư chỉ cho phép các thành viên đã được xác thực và cấp phép trước mới có thể tham gia. Quyền đọc, ghi và xác thực giao dịch thường do một tổ chức duy nhất kiểm soát, tương tự như mô hình cơ sở dữ liệu nội bộ nhưng được tăng cường bằng cơ chế blockchain. Loại này có ưu điểm về hiệu năng cao, độ trễ thấp và bảo mật thông tin nội bộ, nhưng đánh đổi bằng mức độ phi tập trung thấp hơn. Private blockchain thường được dùng trong nội bộ doanh nghiệp để quản lý các loại dữ liệu nhạy cảm.
+    \item \textbf{Blockchain riêng tư (Private blockchain):} Trái ngược với loại công khai, loại riêng tư chỉ cho phép các thành viên đã được xác thực và cấp phép trước mới có thể tham gia. Quyền đọc, ghi và xác thực giao dịch thường do một tổ chức duy nhất kiểm soát, tương tự như mô hình cơ sở dữ liệu nội bộ nhưng được tăng cường bằng cơ chế blockchain. Loại này có ưu điểm về hiệu năng cao, độ trễ thấp và bảo mật thông tin nội bộ, nhưng đánh đổi bằng mức độ phi tập trung thấp hơn. Private blockchain thường được dùng trong nội bộ doanh nghiệp để quản lý các loại dữ liệu nhạy cảm.
 
-    \item \textbf{Blockchain liên hợp (Consortium Blockchain):} Đây là dạng kết hợp giữa hai loại trên, trong đó quyền tham gia mạng được giới hạn trong một nhóm các tổ chức hoặc thực thể đã được phép. Quá trình đồng thuận và xác thực giao dịch được thực hiện bởi một số node được chỉ định, thay vì toàn bộ thành viên mạng. Mô hình này cân bằng giữa tính bảo mật, hiệu năng và mức độ tin cậy, phù hợp với các ứng dụng đòi hỏi nhiều bên tham gia mà không hoàn toàn tin cậy lẫn nhau, ví dụ như các nền tảng tài chính liên ngân hàng, quản lý chuỗi cung ứng, hay các hệ thống bỏ phiếu điện tử. Hyperledger Fabric, Corda và Quorum là các nền tảng tiêu biểu thuộc nhóm consortium blockchain.
+    \item \textbf{Blockchain liên hợp (Consortium blockchain):} Đây là dạng kết hợp giữa hai loại trên, trong đó quyền tham gia mạng được giới hạn trong một nhóm các tổ chức hoặc thực thể đã được phép. Quá trình đồng thuận và xác thực giao dịch được thực hiện bởi một số node được chỉ định, thay vì toàn bộ thành viên mạng. Mô hình này cân bằng giữa tính bảo mật, hiệu năng và mức độ tin cậy, phù hợp với các ứng dụng đòi hỏi nhiều bên tham gia mà không hoàn toàn tin cậy lẫn nhau, ví dụ như các nền tảng tài chính liên ngân hàng, quản lý chuỗi cung ứng, hay các hệ thống bỏ phiếu điện tử. Hyperledger Fabric, Corda và Quorum là các nền tảng tiêu biểu thuộc nhóm consortium blockchain.
 \end{itemize}
 
 \subsubsection{Cơ chế đồng thuận}
@@ -77,9 +77,9 @@ Một hợp đồng thông minh bao gồm các đoạn mã chứa các quy tắc
 
 Trong các nền tảng blockchain hiện đại, hợp đồng thông minh được sử dụng để xây dựng các ứng dụng phi tập trung (Decentralized Applications -- dApp) trong nhiều lĩnh vực như tài chính phi tập trung (DeFi), bảo hiểm tự động, đấu giá, định danh số, quản lý tài sản số và các hệ thống bỏ phiếu điện tử. Đối với hệ thống bỏ phiếu, hợp đồng thông minh có thể được sử dụng để định nghĩa các luật bầu cử, tự động kiểm phiếu và đảm bảo rằng quá trình diễn ra theo đúng quy trình đã được công khai từ trước.
 
-Trong nền tảng Hyperledger Fabric, hợp đồng thông minh được hiện thực dưới dạng \textit{chaincode} -- một mô-đun phần mềm được viết bằng các ngôn ngữ phổ thông như Go, Java hoặc Node.js. Chaincode được thực thi trong môi trường biệt lập trên các node xác thực, đảm bảo tính nhất quán giữa các bên tham gia mạng.
+Trong nền tảng Hyperledger Fabric, hợp đồng thông minh được hiện thực dưới dạng chaincode -- một mô-đun phần mềm được viết bằng các ngôn ngữ phổ thông như Go, Java hoặc Node.js. Chaincode được thực thi trong môi trường biệt lập trên các node xác thực, đảm bảo tính nhất quán giữa các bên tham gia mạng.
 
-\subsubsection{Ưu điểm và hạn chế của Blockchain}
+\subsubsection{Ưu điểm và hạn chế của blockchain}
 
 \textbf{Ưu điểm:} Blockchain mang lại nhiều lợi ích nổi bật so với các mô hình cơ sở dữ liệu tập trung truyền thống:
 \begin{itemize}

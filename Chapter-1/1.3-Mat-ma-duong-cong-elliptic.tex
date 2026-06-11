@@ -22,14 +22,14 @@ nhận đầu vào là chuỗi bit có độ dài bất kỳ và sinh ra giá tr
 
 Trong các lược đồ chữ ký số, hàm băm được sử dụng để rút gọn thông điệp về kích thước cố định trước khi ký, vừa nâng cao hiệu năng vừa loại trừ các tấn công khai thác cấu trúc thông điệp.
 
-\textbf{Chữ ký số:} Một lược đồ chữ ký số (Digital Signature) được xác định bởi bộ ba thuật toán $(Gen, Sig, Ver)$ trên nền hệ mật khóa công khai:
+\textbf{Chữ ký số:} Một lược đồ chữ ký số (Digital Signature) được xác định bởi bộ ba thuật toán $(\textsf{Gen}, \textsf{Sig}, \textsf{Ver})$ trên nền hệ mật khóa công khai:
 
 \begin{itemize}
-    \item \textbf{Sinh khóa (Gen):} nhận tham số an toàn $1^k$, sinh ra cặp khóa công khai -- bí mật $(pk, sk)$.
+    \item \textbf{Sinh khóa (\textsf{Gen}):} nhận tham số an toàn $1^k$, sinh ra cặp khóa công khai -- bí mật $(pk, sk)$.
 
-    \item \textbf{Ký (Sig):} sử dụng khóa bí mật $sk$ để tạo chữ ký $s \leftarrow Sig(sk, M)$ tương ứng với thông điệp $M$. Trên thực tế, người ký không ký trực tiếp lên $M$ mà ký lên giá trị băm $H(M)$.
+    \item \textbf{Ký (\textsf{Sig}):} sử dụng khóa bí mật $sk$ để tạo chữ ký $s \leftarrow \textsf{Sig}(sk, M)$ tương ứng với thông điệp $M$. Trên thực tế, người ký không ký trực tiếp lên $M$ mà ký lên giá trị băm $H(M)$.
 
-    \item \textbf{Xác thực (Ver):} sử dụng khóa công khai $pk$ để kiểm tra tính hợp lệ của cặp $(M, s)$, trả về kết quả thuộc $\{0, 1\}$.
+    \item \textbf{Xác thực (\textsf{Ver}):} sử dụng khóa công khai $pk$ để kiểm tra tính hợp lệ của cặp $(M, s)$, trả về kết quả thuộc $\{0, 1\}$.
 \end{itemize}
 
 Nhờ cơ chế này, chữ ký số đảm nhiệm đồng thời ba chức năng cốt lõi: \textit{xác thực nguồn gốc} thông điệp, \textit{đảm bảo tính toàn vẹn} của dữ liệu được ký, và \textit{chống chối bỏ} đối với người ký.

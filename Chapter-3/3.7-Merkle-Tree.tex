@@ -42,7 +42,7 @@ Tùy chọn \pkg{sortPairs} phải được phản chiếu nguyên vẹn ở ph�
 Sau khi \pkg{commitMerkleRoot} được ghi lên sổ cái Fabric, ba bất biến quan trọng được thiết lập:
 
 \begin{itemize}
-    \item \textbf{Snapshot bất biến:} tập hợp phiếu tại thời điểm đóng bầu cử được \textit{đóng băng} trong một giá trị 32 byte. Bất kỳ thay đổi nào trong tập phiếu (thêm, xóa, sửa) đều sinh ra root khác.
+    \item \textbf{Snapshot bất biến:} tập hợp phiếu tại thời điểm đóng bầu cử được \emph{đóng băng} trong một giá trị 32 byte. Bất kỳ thay đổi nào trong tập phiếu (thêm, xóa, sửa) đều sinh ra root khác.
 
     \item \textbf{Bằng chứng thành viên (\textit{membership proof}):} bất kỳ phiếu nào trong cuộc bầu cử cũng có thể tự chứng minh thuộc về tập phiếu chính thức mà không cần tiết lộ các phiếu khác -- một dạng \textit{zero-knowledge-like} thực tế nhờ Merkle proof.
 

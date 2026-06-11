@@ -4,7 +4,9 @@ actor "Cử tri" as voter
 
 rectangle "Sao lưu khóa bí mật phiếu" {
   usecase "Sao lưu khóa bí mật phiếu" as UC_Backup
+  usecase "Nhập mã PIN" as UC_EnterPIN
 }
 
 voter --> UC_Backup
+UC_Backup ..> UC_EnterPIN : <<include>>
 @enduml

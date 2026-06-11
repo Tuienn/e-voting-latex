@@ -38,7 +38,7 @@ Với hệ thống bầu cử, \pkg{BatchTimeout = 2s} là điểm cân bằng p
 
 \subsubsection{Phân biệt rõ giữa invoke và query}
 
-Một tối ưu quan trọng ở tầng backend là \textbf{phân biệt nghiêm ngặt} giữa hai loại lời gọi chaincode: \textit{invoke} tạo ra giao dịch ghi và phải qua orderer để đóng khối; \textit{query} chỉ đọc dữ liệu trực tiếp từ World State của peer, không tạo giao dịch và không tốn quota khối. Bảng~\ref{tab:invoke-vs-query} liệt kê cách phân loại các hàm chaincode chính của hệ thống.
+Một tối ưu quan trọng ở tầng backend là phân biệt nghiêm ngặt giữa hai loại lời gọi chaincode: \pkg{invoke} tạo ra giao dịch ghi và phải qua orderer để đóng khối; \pkg{query} chỉ đọc dữ liệu trực tiếp từ World State của peer, không tạo giao dịch và không tốn quota khối. Bảng~\ref{tab:invoke-vs-query} liệt kê cách phân loại các hàm chaincode chính của hệ thống.
 
 \begin{table}[H]
 \centering
@@ -48,9 +48,9 @@ Một tối ưu quan trọng ở tầng backend là \textbf{phân biệt nghiêm
 \hline
 \textbf{Hàm chaincode} & \textbf{Loại} & \textbf{Tạo tx?} & \textbf{Độ trễ} \\
 \hline
-\pkg{SubmitVote}, \pkg{CommitMerkleRoot}, \pkg{RevealVoteCompact} & invoke & Có & 2--3 s \\
+\pkg{SubmitVote}, \pkg{CommitMerkleRoot}, \pkg{RevealVoteCompact} & \pkg{invoke} & Có & 2--3 s \\
 \hline
-\pkg{GetVote}, \pkg{GetMerkleRoot}, \pkg{GetTally}, \pkg{GetAuditCounts}, \pkg{VerifyVoteReceipt} & query & Không & dưới 100 ms \\
+\pkg{GetVote}, \pkg{GetMerkleRoot}, \pkg{GetTally}, \pkg{GetAuditCounts}, \pkg{VerifyVoteReceipt} & \pkg{query} & Không & dưới 100 ms \\
 \hline
 \end{tabularx}
 \end{table}

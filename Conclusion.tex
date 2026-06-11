@@ -1,0 +1,37 @@
+\section*{KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN}
+\phantomsection
+\addcontentsline{toc}{section}{\numberline{}KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN}
+
+Đề tài đã xây dựng thành công một hệ thống bỏ phiếu điện tử hoàn chỉnh dựa trên sự kết hợp giữa chữ ký mù tập thể EC-Schnorr, blockchain Hyperledger Fabric và cây Merkle. Hệ thống hỗ trợ các nghiệp vụ chính gồm quản lý cuộc bầu cử, xác thực cử tri, bỏ phiếu, kiểm phiếu, công bố kết quả và xác minh phiếu trên cả nền tảng Web và Mobile. Kiến trúc theo mô đun tạo điều kiện mở rộng thành các dịch vụ độc lập, trong khi blockchain đóng vai trò lưu giữ bằng chứng kiểm toán bất biến, qua đó tăng tính minh bạch và hạn chế nguy cơ sửa đổi dữ liệu.
+
+Kết quả thiết kế và thực nghiệm cho thấy hệ thống đáp ứng sáu yêu cầu cơ bản của một hệ thống bỏ phiếu điện tử:
+
+\begin{itemize}
+    \item \textbf{Tính bí mật:} Kể cả quản trị viên hay bên vận hành hệ thống, không ai có thể biết một cử tri cụ thể đã bầu cho ứng viên nào. Bí mật của lá phiếu là nền tảng để loại trừ mọi tác động bên ngoài lên quyết định bỏ phiếu.
+
+    \item \textbf{Tính duy nhất:} Mỗi cử tri hợp lệ chỉ được phép bỏ đúng một phiếu trong suốt một cuộc bầu cử. Hệ thống phải ngăn chặn mọi hình thức bỏ phiếu lặp lại, dù là cố tình hay do sự cố kỹ thuật.
+
+    \item \textbf{Tính xác thực:} Chỉ những cử tri đã được tổ chức xác nhận trước mới có thể tham gia bỏ phiếu. Không một người ngoài hay tài khoản giả mạo nào có thể chen vào quá trình.
+
+    \item \textbf{Tính không thể chối bỏ:} Một khi phiếu bầu đã được nộp và ghi nhận, không bên nào có thể phủ nhận sự kiện đó. Cả cử tri lẫn hệ thống đều không thể xóa bỏ hay làm giả dấu vết của một lá phiếu đã tồn tại.
+
+    \item \textbf{Tính kiểm chứng:} Mỗi cử tri và các bên quan tâm có thể kiểm tra độc lập rằng một phiếu hợp lệ đã được hệ thống ghi nhận và đưa vào kết quả công bố. Việc kiểm chứng không đòi hỏi phải tin tưởng tuyệt đối vào bên vận hành mà được thực hiện thông qua biên lai phiếu bầu, bằng chứng Merkle và đối chiếu dữ liệu với bản ghi bất biến trên blockchain.
+
+    \item \textbf{Tính ẩn danh:} Ngay cả khi thu thập toàn bộ dữ liệu công khai của hệ thống, không thể truy ngược từ một lá phiếu về danh tính của người đã bỏ phiếu đó. Tính ẩn danh đi xa hơn tính bí mật: không chỉ giữ bí mật nội dung, mà còn hạn chế mọi mối liên hệ có thể phát hiện được giữa cử tri và lựa chọn của họ.
+\end{itemize}
+
+Nhìn chung, các mục tiêu nghiên cứu ban đầu của đề tài đã được đáp ứng. Giải pháp có thể áp dụng cho các cuộc bầu cử quy mô nhỏ và trung bình như bầu cử trong trường đại học, đoàn thể, doanh nghiệp hoặc các cuộc khảo sát yêu cầu tính minh bạch và khả năng kiểm chứng cao. Kiến trúc hiện tại đồng thời tạo nền tảng để tiếp tục phát triển hệ thống ở quy mô lớn hơn.
+
+Do giới hạn về thời gian thực hiện và phạm vi của một đồ án tốt nghiệp, đề tài tập trung giải quyết các vấn đề cốt lõi của một hệ thống bỏ phiếu điện tử, vì vậy, một số nội dung nâng cao chưa được xem xét hoặc triển khai đầy đủ. Đây đồng thời cũng là những hướng nghiên cứu và phát triển tiềm năng trong tương lai nhằm tiếp tục hoàn thiện hệ thống và nâng cao khả năng ứng dụng trong thực tế:
+
+\begin{itemize}
+    \item \textbf{Mở rộng mạng Hyperledger Fabric đa tổ chức:} cấu hình thử nghiệm hiện tại mới tập trung các peer trong một tổ chức. Hệ thống có thể được triển khai với nhiều tổ chức độc lập, mỗi đơn vị vận hành peer và chính sách chứng thực riêng, nhằm tăng mức độ phân tán, khả năng chịu lỗi và độ tin cậy của mạng.
+
+    \item \textbf{Tích hợp định danh điện tử và eKYC:} kết nối với VNeID hoặc các nền tảng eKYC sẽ hỗ trợ tự động xác minh danh tính cử tri, giảm nguy cơ giả mạo và nâng cao khả năng triển khai trong thực tế.
+
+    \item \textbf{Đánh giá và mở rộng quy mô:} cần thử nghiệm với hàng chục nghìn hoặc hàng trăm nghìn cử tri để đo thông lượng, độ trễ bỏ phiếu và kiểm phiếu, khả năng mở rộng của các dịch vụ và blockchain, cũng như mức độ chịu lỗi. Kết quả là cơ sở để tối ưu cấu hình hạ tầng và cơ chế đồng bộ.
+
+    \item \textbf{Hoàn thiện cơ chế chữ ký ngưỡng:} từ mô hình tổng hợp các chữ ký phần hiện tại, có thể nghiên cứu giao thức chữ ký ngưỡng tạo ra một chữ ký duy nhất mà không cần tập hợp toàn bộ node ký. Hướng này giúp giảm dữ liệu chữ ký, tăng hiệu quả xử lý, hạn chế điểm lỗi đơn lẻ và nâng cao tính phân tán.
+
+    \item \textbf{Nghiên cứu mật mã hậu lượng tử:} các thuật toán dựa trên bài toán logarit rời rạc có thể bị ảnh hưởng bởi máy tính lượng tử. Vì vậy, cần nghiên cứu khả năng thay thế hoặc kết hợp với các lược đồ hậu lượng tử như CRYSTALS-Dilithium, Falcon và SPHINCS+ để duy trì mức độ an toàn lâu dài.
+\end{itemize}

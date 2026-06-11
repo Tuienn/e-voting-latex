@@ -104,14 +104,14 @@ Một lược đồ chữ ký mù được mô tả thông qua bốn pha chính:
 
 Đã có nhiều lược đồ chữ ký mù được công bố trên các cơ sở toán học khác nhau. Dưới đây là một số lược đồ tiêu biểu liên quan đến nội dung nghiên cứu của đồ án.
 
-\textit{Lược đồ chữ ký mù dựa trên RSA} được xây dựng trực tiếp từ chữ ký số RSA. Với cặp khóa RSA $(n, e)$ công khai và $d$ bí mật, người yêu cầu làm mù $M' = M \cdot r^e \bmod n$ ($r$ ngẫu nhiên, $\gcd(r, n) = 1$); người ký tính $\sigma' = (M')^d \bmod n$; giải mù: $\sigma = \sigma' \cdot r^{-1} \bmod n = M^d \bmod n$. Tính an toàn dựa trên độ khó của bài toán phân tích thừa số nguyên tố (IFP).
+\textbf{Lược đồ chữ ký mù dựa trên RSA:} được xây dựng trực tiếp từ chữ ký số RSA. Với cặp khóa RSA $(n, e)$ công khai và $d$ bí mật, người yêu cầu làm mù $M' = M \cdot r^e \bmod n$ ($r$ ngẫu nhiên, $\gcd(r, n) = 1$); người ký tính $\sigma' = (M')^d \bmod n$; giải mù: $\sigma = \sigma' \cdot r^{-1} \bmod n = M^d \bmod n$. Tính an toàn dựa trên độ khó của bài toán phân tích thừa số nguyên tố (IFP).
 
-\textit{Lược đồ chữ ký mù dựa trên Schnorr} áp dụng cơ chế làm mù lên giá trị cam kết $c = g^k$ và thành phần thử thách $r$ trong lược đồ Schnorr cổ điển. Tính an toàn dựa trên độ khó của bài toán logarit rời rạc DLP và được chứng minh trong mô hình ROM thông qua kỹ thuật Forking Lemma.
+\textbf{Lược đồ chữ ký mù dựa trên Schnorr:} áp dụng cơ chế làm mù lên giá trị cam kết $c = g^k$ và thành phần thử thách $r$ trong lược đồ Schnorr cổ điển. Tính an toàn dựa trên độ khó của bài toán logarit rời rạc DLP và được chứng minh trong mô hình ROM thông qua kỹ thuật \textit{Forking Lemma}.
 
-\textit{Lược đồ chữ ký mù dựa trên EC-Schnorr} là biến thể của lược đồ chữ ký mù Schnorr trên nhóm điểm đường cong elliptic. Lược đồ kế thừa ưu điểm của EC-Schnorr (kích thước khóa và chữ ký ngắn, tính toán nhanh) đồng thời bổ sung tính riêng tư cho người yêu cầu, là cơ sở trực tiếp để xây dựng lược đồ chữ ký mù tập thể dựa trên EC-Schnorr trong các chương tiếp theo.
+\textbf{Lược đồ chữ ký mù dựa trên EC-Schnorr:} là biến thể của lược đồ chữ ký mù Schnorr trên nhóm điểm đường cong elliptic. Lược đồ kế thừa ưu điểm của EC-Schnorr (kích thước khóa và chữ ký ngắn, tính toán nhanh) đồng thời bổ sung tính riêng tư cho người yêu cầu, là cơ sở trực tiếp để xây dựng lược đồ chữ ký mù tập thể dựa trên EC-Schnorr trong các chương tiếp theo.
 
-\textit{Lược đồ chữ ký mù dựa trên chuẩn GOST R34.10-2012} là biến thể chữ ký mù trên nhóm điểm đường cong elliptic theo chuẩn quốc gia Nga, được dùng làm cơ sở so sánh hiệu năng với lược đồ EC-Schnorr trong các phần thực nghiệm.
+\textbf{Lược đồ chữ ký mù dựa trên chuẩn GOST R34.10-2012:} là biến thể chữ ký mù trên nhóm điểm đường cong elliptic theo chuẩn quốc gia Nga, được dùng làm cơ sở so sánh hiệu năng với lược đồ EC-Schnorr trong các phần thực nghiệm.
 
-\textit{Lược đồ chữ ký mù dựa trên hai bài toán khó} (ví dụ kết hợp IFP và DLP) tăng cường tính an toàn: kẻ tấn công phải giải đồng thời cả hai bài toán khó, do đó độ phức tạp cao hơn đáng kể so với các lược đồ chỉ dựa trên một bài toán khó duy nhất.
+\textbf{Lược đồ chữ ký mù dựa trên hai bài toán khó:} ví dụ kết hợp IFP và DLP, tăng cường tính an toàn: kẻ tấn công phải giải đồng thời cả hai bài toán khó, do đó độ phức tạp cao hơn đáng kể so với các lược đồ chỉ dựa trên một bài toán khó duy nhất.
 
 Trong khuôn khổ đồ án, lược đồ chữ ký mù dựa trên EC-Schnorr được lựa chọn nhờ cân bằng tốt giữa độ an toàn, hiệu năng tính toán và kích thước chữ ký -- đặc biệt phù hợp với môi trường blockchain Hyperledger Fabric. Việc mở rộng sang trường hợp nhiều người ký cùng tham gia -- chữ ký mù tập thể -- được trình bày chi tiết trong mục tiếp theo.

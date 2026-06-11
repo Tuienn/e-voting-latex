@@ -1,5 +1,5 @@
-# Bước 1 -- Cài Chainlaunch CLI
-npm install -g @chainlaunch/cli
+# Bước 1 -- Cài Chainlaunch
+curl -fsSL https://chainlaunch.dev/deploy.sh | bash
 
 # Bước 2 -- Khởi tạo cụm Orderer (Raft 3-node, chịu lỗi đơn điểm)
 chainlaunch node create --name "orderer0-org1msp" --type "FABRIC_ORDERER" --mspid "org1msp" --port 9000

@@ -1,14 +1,17 @@
 @startuml XemChiTietCuocBauCu_UC
 left to right direction
+
 actor "Admin" as admin
 
 rectangle "Xem chi tiết cuộc bầu cử" {
-  usecase "Xem thông tin cuộc bầu cử" as UC_ViewInfo
-  usecase "Xem danh sách ứng viên" as UC_ViewCandidates
-  usecase "Xem danh sách cử tri" as UC_ViewVoters
+    usecase "Xem thông tin cuộc bầu cử" as UC_ViewInfo
+    usecase "Xem danh sách ứng viên" as UC_ViewCandidates
+    usecase "Xem danh sách cử tri" as UC_ViewVoters
+
+    UC_ViewInfo ..> UC_ViewCandidates : <<include>>
+    UC_ViewInfo ..> UC_ViewVoters : <<include>>
 }
 
 admin --> UC_ViewInfo
-UC_ViewCandidates ..> UC_ViewInfo : <<include>>
-UC_ViewVoters ..> UC_ViewInfo : <<include>>
+
 @enduml

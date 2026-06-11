@@ -3,12 +3,10 @@ left to right direction
 actor "Admin" as admin
 
 rectangle "Xem danh sách phiếu trong cuộc bầu cử" {
-  usecase "Quản lý cuộc bầu cử" as UC_Manage
   usecase "Xem danh sách phiếu trong cuộc bầu cử" as UC_ViewVotes
   usecase "Lọc và phân trang danh sách phiếu" as UC_Filter
 }
 
 admin --> UC_ViewVotes
-UC_ViewVotes ..> UC_Manage : <<include>>
-UC_Filter .> UC_ViewVotes : <<extend>>
+UC_ViewVotes <.. UC_Filter : <<extend>>
 @enduml

@@ -12,17 +12,15 @@ actor "Khách (ẩn danh)" as guest
 admin --|> user
 voter --|> user
 
-together {
-  rectangle "Xác thực" {
-    usecase "Đăng nhập hệ thống" as UC_SignIn
-    usecase "Làm mới phiên đăng nhập" as UC_Refresh
-    usecase "Đăng xuất hệ thống" as UC_SignOut
-  }
+rectangle "Xác thực" {
+  usecase "Đăng nhập hệ thống" as UC_SignIn
+  usecase "Làm mới phiên đăng nhập" as UC_Refresh
+  usecase "Đăng xuất hệ thống" as UC_SignOut
+}
 
-  rectangle "Quản lý người dùng (Admin)" {
-    usecase "Tạo tài khoản người dùng" as UC_CreateUser
-    usecase "Quản lý trạng thái tài khoản" as UC_StatusUser
-  }
+rectangle "Quản lý người dùng (Admin)" {
+  usecase "Tạo tài khoản người dùng" as UC_CreateUser
+  usecase "Quản lý trạng thái tài khoản" as UC_StatusUser
 }
 
 rectangle "Quản lý cuộc bầu cử (Admin)" {
@@ -52,8 +50,8 @@ user --> UC_SignIn
 user --> UC_Refresh
 user --> UC_SignOut
 
-admin --> UC_CreateUser
-admin --> UC_StatusUser
+UC_CreateUser <---- admin
+UC_StatusUser <---- admin
 
 admin --> UC_CreateElec
 admin --> UC_ViewElec

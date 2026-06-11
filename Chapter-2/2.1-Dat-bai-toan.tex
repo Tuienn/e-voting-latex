@@ -39,7 +39,7 @@ Tóm lại, sự gắn kết chặt chẽ giữa các mục tiêu cốt lõi và
 
 \subsubsection{Yêu cầu hệ thống}
 
-Một hệ thống bầu cử điện tử đáng tin cậy phải đồng thời thỏa mãn năm tính chất sau đây. Các tính chất này không độc lập mà bổ trợ cho nhau, nếu thiếu một trong các tính chất này, mức độ tin cậy của kết quả bầu cử sẽ bị suy giảm đáng kể.
+Một hệ thống bầu cử điện tử đáng tin cậy phải đồng thời thỏa mãn sáu tính chất sau đây. Các tính chất này không độc lập mà bổ trợ cho nhau, nếu thiếu một trong các tính chất này, mức độ tin cậy của kết quả bầu cử sẽ bị suy giảm đáng kể.
 
 \begin{itemize}
     \item \textbf{Tính bí mật:} Kể cả quản trị viên hay bên vận hành hệ thống, không ai có thể biết một cử tri cụ thể đã bầu cho ứng viên nào. Bí mật của lá phiếu là nền tảng để loại trừ mọi tác động bên ngoài lên quyết định bỏ phiếu.
@@ -49,6 +49,8 @@ Một hệ thống bầu cử điện tử đáng tin cậy phải đồng thờ
     \item \textbf{Tính xác thực:} Chỉ những cử tri đã được tổ chức xác nhận trước mới có thể tham gia bỏ phiếu. Không một người ngoài hay tài khoản giả mạo nào có thể chen vào quá trình.
 
     \item \textbf{Tính không thể chối bỏ:} Một khi phiếu bầu đã được nộp và ghi nhận, không bên nào có thể phủ nhận sự kiện đó. Cả cử tri lẫn hệ thống đều không thể xóa bỏ hay làm giả dấu vết của một lá phiếu đã tồn tại.
+
+    \item \textbf{Tính kiểm chứng:} Mỗi cử tri và các bên quan tâm có thể kiểm tra độc lập rằng một phiếu hợp lệ đã được hệ thống ghi nhận và đưa vào kết quả công bố. Việc kiểm chứng không đòi hỏi phải tin tưởng tuyệt đối vào bên vận hành mà được thực hiện thông qua biên lai phiếu bầu, bằng chứng Merkle và đối chiếu dữ liệu với bản ghi bất biến trên blockchain.
 
     \item \textbf{Tính ẩn danh:} Ngay cả khi thu thập toàn bộ dữ liệu công khai của hệ thống, không thể truy ngược từ một lá phiếu về danh tính của người đã bỏ phiếu đó. Tính ẩn danh đi xa hơn tính bí mật: không chỉ giữ bí mật nội dung, mà còn hạn chế mọi mối liên hệ có thể phát hiện được giữa cử tri và lựa chọn của họ.
 \end{itemize}

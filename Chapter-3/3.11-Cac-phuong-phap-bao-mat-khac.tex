@@ -32,13 +32,13 @@
 
 \textbf{Kiểm soát truy cập theo vai trò:} Phân quyền được thực hiện qua \pkg{@Roles(ADMIN)} đặt trên controller hoặc route handler. Lớp \pkg{RolesGuard} đọc metadata này thông qua \pkg{Reflector} của NestJS, so sánh với \pkg{payload.role} và từ chối yêu cầu nếu không trùng. Decorator \pkg{@Public()} đánh dấu các route không yêu cầu xác thực -- chủ yếu là các endpoint công khai phục vụ kiểm chứng phiếu bầu hoặc xem kết quả sau khi cuộc bầu cử kết thúc.
 
-Bên cạnh kiểm soát theo vai trò, BFF còn kiểm tra tiêu đề \pkg{Origin} của yêu cầu đăng nhập: nếu một tài khoản có vai trò \textit{VOTER} hoặc \textit{CANDIDATE} đăng nhập vào trang quản trị, hệ thống trả về lỗi \pkg{401 Unauthorized}. Cơ chế này ngăn cử tri vô tình hoặc cố ý xâm nhập giao diện quản trị -- tách bạch hoàn toàn hai miền sử dụng dù chia sẻ cùng một dịch vụ Identity.
+Bên cạnh kiểm soát theo vai trò, BFF còn kiểm tra tiêu đề \pkg{Origin} của yêu cầu đăng nhập: nếu một tài khoản có vai trò \pkg{VOTER} hoặc \pkg{CANDIDATE} đăng nhập vào trang quản trị, hệ thống trả về lỗi \pkg{401 Unauthorized}. Cơ chế này ngăn cử tri vô tình hoặc cố ý xâm nhập giao diện quản trị -- tách bạch hoàn toàn hai miền sử dụng dù chia sẻ cùng một dịch vụ Identity.
 
 \subsubsection{Bảo mật tầng HTTP -- Helmet, CORS, Rate Limit và HTTPS}
 
-Tầng HTTP là điểm tiếp xúc đầu tiên giữa cử tri và hệ thống, do đó các biện pháp phòng thủ tại tầng này được áp dụng đồng thời theo nhiều khía cạnh: \textit{tăng cường bảo mật tiêu đề HTTP} qua Helmet, giới hạn nguồn gốc qua CORS, giới hạn tần suất yêu cầu qua Rate Limiting, ngắt các yêu cầu vượt quá thời gian xử lý qua Timeout, và mã hóa truyền tải qua HTTPS.
+Tầng HTTP là điểm tiếp xúc đầu tiên giữa cử tri và hệ thống, do đó các biện pháp phòng thủ tại tầng này được áp dụng đồng thời theo nhiều khía cạnh: \emph{tăng cường bảo mật tiêu đề HTTP} qua Helmet, giới hạn nguồn gốc qua CORS, giới hạn tần suất yêu cầu qua Rate Limiting, ngắt các yêu cầu vượt quá thời gian xử lý qua Timeout, và mã hóa truyền tải qua HTTPS.
 
-\textbf{Helmet:} BFF và Reveal-Vote đều dùng thư viện \pkg{helmet} với cấu hình phân biệt theo môi trường (Hình~\ref{fig:helmet-config}). \textit{Content-Security-Policy} ở chế độ nghiêm ngặt với \pkg{default-src 'none'}, chỉ cho phép \pkg{connect-src 'self'} và buộc nâng cấp HTTP sang HTTPS. Các tiêu đề khác như \pkg{X-Frame-Options}, \pkg{X-Content-Type-Options}, \pkg{Referrer-Policy}, \pkg{Strict-Transport-Security} và \pkg{Cross-Origin-Opener-Policy} đều được bật mặc định.
+\textbf{Helmet:} BFF và Reveal-Vote đều dùng thư viện \pkg{helmet} với cấu hình phân biệt theo môi trường (Hình~\ref{fig:helmet-config}). \pkg{Content-Security-Policy} ở chế độ nghiêm ngặt với \pkg{default-src 'none'}, chỉ cho phép \pkg{connect-src 'self'} và buộc nâng cấp HTTP sang HTTPS. Các tiêu đề khác như \pkg{X-Frame-Options}, \pkg{X-Content-Type-Options}, \pkg{Referrer-Policy}, \pkg{Strict-Transport-Security}, \pkg{Cross-Origin-Opener-Policy} đều được bật mặc định.
 
 \begin{figure}[H]
     \centering

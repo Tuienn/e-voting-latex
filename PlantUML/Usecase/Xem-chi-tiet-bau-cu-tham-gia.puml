@@ -1,14 +1,17 @@
 @startuml XemChiTietBauCuThamGia_UC
 left to right direction
+
 actor "Voter" as voter
 
 rectangle "Xem chi tiết cuộc bầu cử đang tham gia" {
-  usecase "Xem thông tin cuộc bầu cử" as UC_ViewInfo
-  usecase "Xem danh sách ứng viên" as UC_ViewCandidates
-  usecase "Xem trạng thái bỏ phiếu của bản thân" as UC_ViewMyStatus
+    usecase "Xem thông tin cuộc bầu cử" as UC_ViewInfo
+    usecase "Xem danh sách ứng viên" as UC_ViewCandidates
+    usecase "Xem trạng thái bỏ phiếu của bản thân" as UC_ViewMyStatus
+
+    UC_ViewInfo ..> UC_ViewCandidates : <<include>>
+    UC_ViewInfo ..> UC_ViewMyStatus : <<include>>
 }
 
 voter --> UC_ViewInfo
-UC_ViewCandidates ..> UC_ViewInfo : <<include>>
-UC_ViewMyStatus ..> UC_ViewInfo : <<include>>
+
 @enduml

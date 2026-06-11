@@ -72,7 +72,7 @@ Chức năng \textit{tạo tài khoản người dùng} cho phép quản trị v
 
 \begin{figure}[H]
     \centering
-    \makebox[\textwidth][c]{\includegraphics[width=0.7\textwidth, keepaspectratio]{Diagrams/Usecase/TaoDanhSachNguoiDung.pdf}}
+    \makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth, keepaspectratio]{Diagrams/Usecase/TaoDanhSachNguoiDung.pdf}}
     \caption{Biểu đồ Use Case ``Tạo tài khoản người dùng''}
     \label{fig:uc-tao-danh-sach-nguoi-dung}
 \end{figure}
@@ -129,7 +129,7 @@ Chức năng \textit{quản lý trạng thái tài khoản} cho phép quản tr�
 
 \begin{figure}[H]
     \centering
-    \makebox[\textwidth][c]{\includegraphics[width=0.7\textwidth, keepaspectratio]{Diagrams/Usecase/QuanLyTrangThaiTaiKhoan.pdf}}
+    \makebox[\textwidth][c]{\includegraphics[width=0.6\textwidth, keepaspectratio]{Diagrams/Usecase/QuanLyTrangThaiTaiKhoan.pdf}}
     \caption{Biểu đồ Use Case ``Quản lý trạng thái tài khoản''}
     \label{fig:uc-quan-ly-trang-thai-tai-khoan}
 \end{figure}
@@ -640,9 +640,9 @@ Chức năng \textit{bỏ phiếu} là quy trình cốt lõi của hệ thống,
     \tabitem Cử tri thuộc danh sách cử tri của cuộc bầu cử và chưa từng bỏ phiếu trong cuộc bầu cử này. \\
     \hline
     Điều kiện sau &
-    \tabitem Cam kết phiếu mù của cử tri được ghi lên blockchain (trạng thái CONFIRMED) và lưu vào cơ sở dữ liệu kèm tham chiếu giao dịch; cử tri được đánh dấu đã bỏ phiếu và nhận về biên lai để xác minh sau này. \\
+    \tabitem Cam kết phiếu mù của cử tri được ghi lên blockchain (trạng thái \pkg{CONFIRMED}) và lưu vào cơ sở dữ liệu kèm tham chiếu giao dịch; cử tri được đánh dấu đã bỏ phiếu và nhận về biên lai để xác minh sau này. \\
     &
-    \tabitem Trong trường hợp lỗi tạm thời, tự động phục hồi bản ghi ở trạng thái {PENDING\_CHAIN} hoặc xóa bản ghi nếu phiếu chưa được ghi lên blockchain. \\
+    \tabitem Trong trường hợp lỗi tạm thời, tự động phục hồi bản ghi ở trạng thái \pkg{PENDING\_CHAIN} hoặc xóa bản ghi nếu phiếu chưa được ghi lên blockchain. \\
     \hline
     Luồng sự kiện chính &
     1.~Cử tri gửi yêu cầu khởi tạo phiên bỏ phiếu tới BFF Gateway kèm định danh cuộc bầu cử. \\
@@ -661,9 +661,9 @@ Chức năng \textit{bỏ phiếu} là quy trình cốt lõi của hệ thống,
     &
     8.~Cử tri gửi cam kết phiếu mù cùng chữ ký tổng và định danh phiên tới BFF Gateway, và được chuyển tiếp yêu cầu tới Coordinator Service. \\
     &
-    9.~Coordinator Service xác minh phiên và sinh định danh phiếu duy nhất, ghi trước bản ghi phiếu với trạng thái {PENDING\_CHAIN} vào cơ sở dữ liệu với ràng buộc duy nhất \pkg{(electionId, voterId)}, ngăn hai yêu cầu bỏ phiếu song song từ cùng một cử tri; sau đó gọi blockchain qua Chainlaunch để ghi cam kết phiếu. \\
+    9.~Coordinator Service xác minh phiên và sinh định danh phiếu duy nhất, ghi trước bản ghi phiếu với trạng thái \pkg{PENDING\_CHAIN} vào cơ sở dữ liệu với ràng buộc duy nhất \pkg{(electionId, voterId)}, ngăn hai yêu cầu bỏ phiếu song song từ cùng một cử tri; sau đó gọi blockchain qua Chainlaunch để ghi cam kết phiếu. \\
     &
-    10.~Chainlaunch ghi nhận phiếu vào sổ cái và trả về tham chiếu giao dịch; Coordinator Service cập nhật trạng thái phiếu từ {PENDING\_CHAIN} sang CONFIRMED kèm tham chiếu giao dịch và đánh dấu phiên đã hoàn tất. \\
+    10.~Chainlaunch ghi nhận phiếu vào sổ cái và trả về tham chiếu giao dịch; Coordinator Service cập nhật trạng thái phiếu từ \pkg{PENDING\_CHAIN} sang \pkg{CONFIRMED} kèm tham chiếu giao dịch và đánh dấu phiên đã hoàn tất. \\
     &
     11.~Cử tri nhận biên lai gồm định danh phiếu, cam kết phiếu mù và tham chiếu giao dịch blockchain. \\
     \hline
@@ -674,9 +674,9 @@ Chức năng \textit{bỏ phiếu} là quy trình cốt lõi của hệ thống,
     &
     \tabitem 5a. Một Signing Node phát hiện vi phạm ràng buộc duy nhất khi ghi bản ghi đã ký: yêu cầu ký toàn bộ bị từ chối. \\
     &
-    \tabitem 8a. Bản ghi {PENDING\_CHAIN} cho cặp \pkg{(electionId, voterId)} đã tồn tại (yêu cầu bỏ phiếu song song hoặc cử tri đã bỏ phiếu): Coordinator Service từ chối với lỗi xung đột, không gọi blockchain. \\
+    \tabitem 8a. Bản ghi \pkg{PENDING\_CHAIN} cho cặp \pkg{(electionId, voterId)} đã tồn tại (yêu cầu bỏ phiếu song song hoặc cử tri đã bỏ phiếu): Coordinator Service từ chối với lỗi xung đột, không gọi blockchain. \\
     &
-    \tabitem 8b. Chainlaunch phản hồi lỗi khi ghi phiếu: Coordinator Service truy vấn \pkg{GetVote} trên blockchain để phân định. Nếu phiếu đã được ghi, phục hồi trạng thái CONFIRMED kèm tham chiếu giao dịch từ blockchain. Nếu chưa ghi, xóa bản ghi {PENDING\_CHAIN} và trả về lỗi cho cử tri. \\
+    \tabitem 8b. Chainlaunch phản hồi lỗi khi ghi phiếu: Coordinator Service truy vấn \pkg{GetVote} trên blockchain để phân định. Nếu phiếu đã được ghi, phục hồi trạng thái \pkg{CONFIRMED} kèm tham chiếu giao dịch từ blockchain. Nếu chưa ghi, xóa bản ghi \pkg{PENDING\_CHAIN} và trả về lỗi cho cử tri. \\
     \hline
 \end{longtable}
 

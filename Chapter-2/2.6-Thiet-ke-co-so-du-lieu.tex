@@ -1,8 +1,8 @@
 \subsection{Thiết kế cơ sở dữ liệu}
 
-Hệ thống được tổ chức theo kiến trúc microservice, trong đó mỗi service nghiệp vụ sở hữu một cơ sở dữ liệu logic riêng biệt (\textit{database per service}) nhằm bảo đảm tính cô lập, tránh phụ thuộc chéo và hỗ trợ khả năng triển khai độc lập.
+Hệ thống được tổ chức theo kiến trúc microservice, trong đó mỗi service nghiệp vụ sở hữu một cơ sở dữ liệu logic riêng biệt (database per service) nhằm bảo đảm tính cô lập, tránh phụ thuộc chéo và hỗ trợ khả năng triển khai độc lập.
 
-Hệ thống bao gồm bốn cơ sở dữ liệu tương ứng với bốn nhóm dịch vụ: \textit{Identity}, \textit{Coordinator}, \textit{Signing Node} và \textit{Reveal-Vote}. Liên kết giữa các cơ sở dữ liệu này không sử dụng khóa ngoại vật lý mà được duy trì ở tầng ứng dụng thông qua định danh \pkg{ObjectId} dùng chung và các thông điệp TCP nội bộ.
+Hệ thống bao gồm bốn cơ sở dữ liệu tương ứng với bốn nhóm dịch vụ: Identity, Coordinator, Signing Node và Reveal-Vote. Liên kết giữa các cơ sở dữ liệu này không sử dụng khóa ngoại vật lý mà được duy trì ở tầng ứng dụng thông qua định danh \pkg{ObjectId} dùng chung và các thông điệp TCP nội bộ.
 
 \subsubsection{Bảng users (Identity Service)}
 
@@ -18,14 +18,14 @@ Bảng \pkg{users} lưu trữ toàn bộ tài khoản trong hệ thống, bao g�
     \hline
     \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
     \hline
-    id        & ObjectId  & Khóa chính của bản ghi, sinh tự động. \\ \hline
-    email     & String    & Địa chỉ thư điện tử dùng để đăng nhập, có ràng buộc duy nhất. \\ \hline
-    password  & String    & Chuỗi băm mật khẩu theo thuật toán bcrypt. \\ \hline
-    name      & String    & Họ và tên hiển thị của người dùng. \\ \hline
-    role      & Enum (\textit{Role}) & Vai trò của tài khoản, nhận một trong các giá trị \pkg{ADMIN}, \pkg{VOTER}, \pkg{CANDIDATE}; mặc định là \pkg{VOTER}. \\ \hline
-    isActive  & Boolean   & Trạng thái kích hoạt của tài khoản; mặc định là \pkg{true}. \\ \hline
-    createdAt & DateTime  & Thời điểm tạo bản ghi, sinh tự động. \\ \hline
-    updatedAt & DateTime  & Thời điểm cập nhật gần nhất, sinh tự động. \\ \hline
+    \pkg{id}        & \pkg{ObjectId}  & Khóa chính của bản ghi, sinh tự động. \\ \hline
+    \pkg{email}     & \pkg{String}    & Địa chỉ thư điện tử dùng để đăng nhập, có ràng buộc duy nhất. \\ \hline
+    \pkg{password}  & \pkg{String}    & Chuỗi băm mật khẩu theo thuật toán bcrypt. \\ \hline
+    \pkg{name}      & \pkg{String}    & Họ và tên hiển thị của người dùng. \\ \hline
+    \pkg{role}      & \pkg{Enum(Role)} & Vai trò của tài khoản, nhận một trong các giá trị \pkg{ADMIN}, \pkg{VOTER}, \pkg{CANDIDATE}; mặc định là \pkg{VOTER}. \\ \hline
+    \pkg{isActive}  & \pkg{Boolean}   & Trạng thái kích hoạt của tài khoản; mặc định là \pkg{true}. \\ \hline
+    \pkg{createdAt} & \pkg{DateTime}  & Thời điểm tạo bản ghi, sinh tự động. \\ \hline
+    \pkg{updatedAt} & \pkg{DateTime}  & Thời điểm cập nhật gần nhất, sinh tự động. \\ \hline
     \end{tabularx}
 \end{table}
 
@@ -33,7 +33,7 @@ Bảng \pkg{users} lưu trữ toàn bộ tài khoản trong hệ thống, bao g�
 
 \subsubsection{Bảng {vote\_secret\_backups} (Identity Service)}
 
-Bảng \pkg{vote\_secret\_backups} lưu bản sao lưu khóa bí mật phiếu của cử tri theo mô hình \textit{zero-knowledge}. Dữ liệu được mã hóa hai lớp: lớp ngoài do máy khách (ứng dụng di động) dẫn xuất khóa từ mã PIN rồi mã hóa, lớp trong do Identity Service áp dụng thêm trước khi lưu trữ (\textit{at-rest encryption}). Máy chủ không bao giờ nhận mã PIN nên không thể giải lớp do máy khách tạo (xem mục Sao lưu và khôi phục khóa bí mật phiếu ở Chương 3).
+Bảng \pkg{vote\_secret\_backups} lưu bản sao lưu khóa bí mật phiếu của cử tri theo mô hình zero-knowledge. Dữ liệu được mã hóa hai lớp: lớp ngoài do máy khách (ứng dụng di động) dẫn xuất khóa từ mã PIN rồi mã hóa, lớp trong do Identity Service áp dụng thêm trước khi lưu trữ (at-rest encryption). Máy chủ không bao giờ nhận mã PIN nên không thể giải lớp do máy khách tạo (xem mục Sao lưu và khôi phục khóa bí mật phiếu ở Chương 3).
 
 \begin{table}[H]
     \centering
@@ -45,15 +45,15 @@ Bảng \pkg{vote\_secret\_backups} lưu bản sao lưu khóa bí mật phiếu c
     \hline
     \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
     \hline
-    id         & ObjectId & Khóa chính của bản ghi, sinh tự động. \\ \hline
-    userId     & ObjectId & Định danh cử tri sở hữu bản sao lưu, tham chiếu sang \pkg{users.id}; có ràng buộc duy nhất. \\ \hline
-    cipher     & String   & Bản mã \textit{at-rest} của envelope do máy khách tạo (đã mã hóa bằng PIN), biểu diễn base64. \\ \hline
-    iv         & String   & Vector khởi tạo AES-256-GCM của lớp \textit{at-rest} phía máy chủ, biểu diễn base64. \\ \hline
-    authTag    & String   & Thẻ xác thực AES-256-GCM của lớp \textit{at-rest} phía máy chủ, biểu diễn base64. \\ \hline
-    serverSalt & String   & Salt ngẫu nhiên theo từng bản ghi dùng để dẫn xuất khóa \textit{at-rest} bằng argon2id, biểu diễn base64. \\ \hline
-    version    & Int      & Phiên bản định dạng envelope; mặc định là $1$. \\ \hline
-    createdAt  & DateTime & Thời điểm tạo bản ghi, sinh tự động. \\ \hline
-    updatedAt  & DateTime & Thời điểm cập nhật gần nhất, sinh tự động. \\ \hline
+    \pkg{id}         & \pkg{ObjectId} & Khóa chính của bản ghi, sinh tự động. \\ \hline
+    \pkg{userId}     & \pkg{ObjectId} & Định danh cử tri sở hữu bản sao lưu, tham chiếu sang \pkg{users.id}; có ràng buộc duy nhất. \\ \hline
+    \pkg{cipher}     & \pkg{String}   & Bản mã at-rest của envelope do máy khách tạo (đã mã hóa bằng PIN), biểu diễn base64. \\ \hline
+    \pkg{iv}         & \pkg{String}   & Vector khởi tạo AES-256-GCM của lớp at-rest phía máy chủ, biểu diễn base64. \\ \hline
+    \pkg{authTag}    & \pkg{String}   & Thẻ xác thực AES-256-GCM của lớp at-rest phía máy chủ, biểu diễn base64. \\ \hline
+    \pkg{serverSalt} & \pkg{String}   & Salt ngẫu nhiên theo từng bản ghi dùng để dẫn xuất khóa at-rest bằng argon2id, biểu diễn base64. \\ \hline
+    \pkg{version}    & \pkg{Int}      & Phiên bản định dạng envelope; mặc định là $1$. \\ \hline
+    \pkg{createdAt}  & \pkg{DateTime} & Thời điểm tạo bản ghi, sinh tự động. \\ \hline
+    \pkg{updatedAt}  & \pkg{DateTime} & Thời điểm cập nhật gần nhất, sinh tự động. \\ \hline
     \end{tabularx}
 \end{table}
 
@@ -73,18 +73,18 @@ Bảng \pkg{elections} là bảng trung tâm của nghiệp vụ bầu cử, lư
     \hline
     \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
     \hline
-    id                  & ObjectId  & Khóa chính của cuộc bầu cử, sinh tự động. \\ \hline
-    name                & String    & Tên cuộc bầu cử, có ràng buộc duy nhất. \\ \hline
-    status              & Enum (\textit{ElectionStatus}) & Trạng thái vòng đời, nhận một trong các giá trị \pkg{PENDING}, \pkg{ACTIVE}, \pkg{CLOSING}, \pkg{CLOSED}, \pkg{COMPLETED}; mặc định là \pkg{PENDING}. Trạng thái \pkg{CLOSING} là trạng thái trung gian khi đóng cuộc bầu cử (xem mục Nhất quán dữ liệu blockchain--MongoDB). \\ \hline
-    candidateIds        & String[]  & Danh sách định danh của các ứng viên thuộc cuộc bầu cử, tham chiếu sang \pkg{users.id}. \\ \hline
-    max\allowbreak Selectable\allowbreak Candidates & Int & Số ứng viên tối đa mỗi cử tri được chọn trên một lá phiếu; mặc định là $1$, hợp lệ khi $1 \le \textit{max} \l |\textit{candidateIds}|$. \\ \hline
-    collective\allowbreak Public\allowbreak Key & String?   & Khóa công khai tập thể EC-Schnorr (điểm trên đường cong secp256k1, biểu diễn dưới dạng hex 66 ký tự), được sinh khi bắt đầu cuộc bầu cử. \\ \hline
-    merkleRoot          & String?   & Gốc Merkle của tập phiếu mù, biểu diễn dưới dạng chuỗi băm SHA-256 hex 64 ký tự, được tính khi đóng cuộc bầu cử. \\ \hline
-    blockchainRef       & String?   & Mã giao dịch blockchain của lệnh ghi nhận \pkg{CommitMerkleRoot}; được cập nhật sau khi chain xác nhận. \\ \hline
-    startDate           & DateTime? & Thời điểm cuộc bầu cử chuyển sang trạng thái \pkg{ACTIVE}. \\ \hline
-    endDate             & DateTime? & Thời điểm cuộc bầu cử chuyển sang trạng thái \pkg{COMPLETED}. \\ \hline
-    createdAt           & DateTime  & Thời điểm tạo bản ghi, sinh tự động. \\ \hline
-    updatedAt           & DateTime  & Thời điểm cập nhật gần nhất, sinh tự động. \\ \hline
+    \pkg{id}                  & \pkg{ObjectId}  & Khóa chính của cuộc bầu cử, sinh tự động. \\ \hline
+    \pkg{name}                & \pkg{String}    & Tên cuộc bầu cử, có ràng buộc duy nhất. \\ \hline
+    \pkg{status}              & \pkg{Enum}\allowbreak\pkg{(ElectionStatus)} & Trạng thái vòng đời, nhận một trong các giá trị \pkg{PENDING}, \pkg{ACTIVE}, \pkg{CLOSING}, \pkg{CLOSED}, \pkg{COMPLETED}; mặc định là \pkg{PENDING}. Trạng thái \pkg{CLOSING} là trạng thái trung gian khi đóng cuộc bầu cử (xem mục Nhất quán dữ liệu blockchain--MongoDB). \\ \hline
+    \pkg{candidateIds}        & \pkg{String[]}  & Danh sách định danh của các ứng viên thuộc cuộc bầu cử, tham chiếu sang \pkg{users.id}. \\ \hline
+    \pkg{maxSelectable}\allowbreak\pkg{Candidates} & \pkg{Int} & Số ứng viên tối đa mỗi cử tri được chọn trên một lá phiếu; mặc định là $1$, hợp lệ khi giá trị này nằm trong khoảng từ $1$ đến số phần tử của \pkg{candidateIds}. \\ \hline
+    \pkg{collective}\allowbreak\pkg{PublicKey} & \pkg{String?}   & Khóa công khai tập thể EC-Schnorr (điểm trên đường cong secp256k1, biểu diễn dưới dạng hex 66 ký tự), được sinh khi bắt đầu cuộc bầu cử. \\ \hline
+    \pkg{merkleRoot}          & \pkg{String?}   & Gốc Merkle của tập phiếu mù, biểu diễn dưới dạng chuỗi băm SHA-256 hex 64 ký tự, được tính khi đóng cuộc bầu cử. \\ \hline
+    \pkg{blockchainRef}       & \pkg{String?}   & Mã giao dịch blockchain của lệnh ghi nhận \pkg{CommitMerkleRoot}; được cập nhật sau khi chain xác nhận. \\ \hline
+    \pkg{startDate}           & \pkg{DateTime?} & Thời điểm cuộc bầu cử chuyển sang trạng thái \pkg{ACTIVE}. \\ \hline
+    \pkg{endDate}             & \pkg{DateTime?} & Thời điểm cuộc bầu cử chuyển sang trạng thái \pkg{COMPLETED}. \\ \hline
+    \pkg{createdAt}           & \pkg{DateTime}  & Thời điểm tạo bản ghi, sinh tự động. \\ \hline
+    \pkg{updatedAt}           & \pkg{DateTime}  & Thời điểm cập nhật gần nhất, sinh tự động. \\ \hline
     \end{tabularx}
 \end{table}
 
@@ -104,10 +104,10 @@ Bảng \pkg{election\_voters} mô hình hóa quan hệ nhiều-nhiều giữa cu
     \hline
     \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
     \hline
-    id         & ObjectId  & Khóa chính của bản ghi, sinh tự động. \\ \hline
-    electionId & ObjectId  & Định danh cuộc bầu cử, tham chiếu sang \pkg{elections.id}. \\ \hline
-    voterId    & ObjectId  & Định danh cử tri, tham chiếu sang \pkg{users.id} của Identity Service. \\ \hline
-    createdAt  & DateTime  & Thời điểm cử tri được thêm vào cuộc bầu cử, sinh tự động. \\ \hline
+    \pkg{id}         & \pkg{ObjectId}  & Khóa chính của bản ghi, sinh tự động. \\ \hline
+    \pkg{electionId} & \pkg{ObjectId}  & Định danh cuộc bầu cử, tham chiếu sang \pkg{elections.id}. \\ \hline
+    \pkg{voterId}    & \pkg{ObjectId}  & Định danh cử tri, tham chiếu sang \pkg{users.id} của Identity Service. \\ \hline
+    \pkg{createdAt}  & \pkg{DateTime}  & Thời điểm cử tri được thêm vào cuộc bầu cử, sinh tự động. \\ \hline
     \end{tabularx}
 \end{table}
 
@@ -115,7 +115,7 @@ Bảng \pkg{election\_voters} mô hình hóa quan hệ nhiều-nhiều giữa cu
 
 \subsubsection{Bảng votes (Coordinator Service)}
 
-Bảng \pkg{votes} lưu các phiếu mù đã được ký tập thể và nộp lên hệ thống. Bản ghi chỉ chứa cam kết mù (\textit{blinded commitment}) chứ không chứa thông tin về ứng viên được chọn, bảo đảm tính ẩn danh ngay từ tầng lưu trữ.
+Bảng \pkg{votes} lưu các phiếu mù đã được ký tập thể và nộp lên hệ thống. Bản ghi chỉ chứa cam kết mù (blinded commitment) chứ không chứa thông tin về ứng viên được chọn, bảo đảm tính ẩn danh ngay từ tầng lưu trữ.
 
 \begin{table}[H]
     \centering
@@ -127,14 +127,14 @@ Bảng \pkg{votes} lưu các phiếu mù đã được ký tập thể và nộp
     \hline
     \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
     \hline
-    id                & ObjectId & Khóa chính của bản ghi phiếu, sinh tự động. \\ \hline
-    electionId        & ObjectId & Định danh cuộc bầu cử, tham chiếu sang \pkg{elections.id}. \\ \hline
-    voterId           & ObjectId & Định danh cử tri, tham chiếu sang \pkg{users.id} của Identity Service; cùng với \pkg{electionId} tạo thành tham chiếu hợp lệ tới bản ghi \pkg{election\_voters} và được sử dụng để chặn bỏ phiếu trùng. \\ \hline
-    blinded\allowbreak Commitment & String   & Cam kết mù của phiếu, là chuỗi băm SHA-256 hex 64 ký tự của điểm cam kết $C'$. \\ \hline
-    status            & Enum (\textit{VoteStatus}) & Trạng thái ghi nhận của phiếu, nhận một trong hai giá trị \pkg{PENDING\_CHAIN} (đã ghi cơ sở dữ liệu nhưng chưa xác nhận trên blockchain) và \pkg{CONFIRMED} (đã có trên blockchain). \\ \hline
-    blockchain\allowbreak Ref     & String?  & Mã giao dịch blockchain của lệnh ghi nhận \pkg{SubmitVote}; để trống khi phiếu còn ở trạng thái \pkg{PENDING\_CHAIN}. \\ \hline
-    createdAt         & DateTime & Thời điểm phiếu được nộp, sinh tự động. \\ \hline
-    updatedAt         & DateTime & Thời điểm cập nhật gần nhất (khi xác nhận hoặc đồng bộ lại), sinh tự động. \\ \hline
+    \pkg{id}                & \pkg{ObjectId} & Khóa chính của bản ghi phiếu, sinh tự động. \\ \hline
+    \pkg{electionId}        & \pkg{ObjectId} & Định danh cuộc bầu cử, tham chiếu sang \pkg{elections.id}. \\ \hline
+    \pkg{voterId}           & \pkg{ObjectId} & Định danh cử tri, tham chiếu sang \pkg{users.id} của Identity Service; cùng với \pkg{electionId} tạo thành tham chiếu hợp lệ tới bản ghi \pkg{election\_voters} và được sử dụng để chặn bỏ phiếu trùng. \\ \hline
+    \pkg{blindedCommitment} & \pkg{String}   & Cam kết mù của phiếu, là chuỗi băm SHA-256 hex 64 ký tự của điểm cam kết $C'$. \\ \hline
+    \pkg{status}            & \pkg{Enum(VoteStatus)} & Trạng thái ghi nhận của phiếu, nhận một trong hai giá trị \pkg{PENDING\_CHAIN} (đã ghi cơ sở dữ liệu nhưng chưa xác nhận trên blockchain) và \pkg{CONFIRMED} (đã có trên blockchain). \\ \hline
+    \pkg{blockchainRef}     & \pkg{String?}  & Mã giao dịch blockchain của lệnh ghi nhận \pkg{SubmitVote}; để trống khi phiếu còn ở trạng thái \pkg{PENDING\_CHAIN}. \\ \hline
+    \pkg{createdAt}         & \pkg{DateTime} & Thời điểm phiếu được nộp, sinh tự động. \\ \hline
+    \pkg{updatedAt}         & \pkg{DateTime} & Thời điểm cập nhật gần nhất (khi xác nhận hoặc đồng bộ lại), sinh tự động. \\ \hline
     \end{tabularx}
 \end{table}
 
@@ -142,7 +142,7 @@ Bảng \pkg{votes} lưu các phiếu mù đã được ký tập thể và nộp
 
 \subsubsection{Bảng {key\_pairs} (Signing Node Service)}
 
-Bảng \pkg{key\_pairs} thuộc cơ sở dữ liệu của mỗi node ký (\textit{signing node}), lưu cặp khóa EC-Schnorr riêng của node đó cho từng cuộc bầu cử. Tổng ba khóa công khai của ba node sẽ được Coordinator tổng hợp thành khóa công khai tập thể.
+Bảng \pkg{key\_pairs} thuộc cơ sở dữ liệu của mỗi node ký (signing node), lưu cặp khóa EC-Schnorr riêng của node đó cho từng cuộc bầu cử. Tổng ba khóa công khai của ba node sẽ được Coordinator tổng hợp thành khóa công khai tập thể.
 
 \begin{table}[H]
     \centering
@@ -154,11 +154,11 @@ Bảng \pkg{key\_pairs} thuộc cơ sở dữ liệu của mỗi node ký (\text
     \hline
     \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
     \hline
-    id         & ObjectId & Khóa chính của bản ghi, sinh tự động. \\ \hline
-    electionId & ObjectId & Định danh cuộc bầu cử mà cặp khóa thuộc về, tham chiếu sang \pkg{elections.id}; có ràng buộc duy nhất. \\ \hline
-    publicKey  & String   & Khóa công khai $P_i = d_i \cdot G$ của node, biểu diễn dưới dạng điểm nén hex 66 ký tự trên đường cong secp256k1. \\ \hline
-    privateKey & String   & Khóa bí mật $d_i$ đã được mã hóa AES-256-GCM, biểu diễn dưới dạng chuỗi hex. \\ \hline
-    createdAt  & DateTime & Thời điểm sinh cặp khóa, sinh tự động. \\ \hline
+    \pkg{id}         & \pkg{ObjectId} & Khóa chính của bản ghi, sinh tự động. \\ \hline
+    \pkg{electionId} & \pkg{ObjectId} & Định danh cuộc bầu cử mà cặp khóa thuộc về, tham chiếu sang \pkg{elections.id}; có ràng buộc duy nhất. \\ \hline
+    \pkg{publicKey}  & \pkg{String}   & Khóa công khai $P_i = d_i \cdot G$ của node, biểu diễn dưới dạng điểm nén hex 66 ký tự trên đường cong secp256k1. \\ \hline
+    \pkg{privateKey} & \pkg{String}   & Khóa bí mật $d_i$ đã được mã hóa AES-256-GCM, biểu diễn dưới dạng chuỗi hex. \\ \hline
+    \pkg{createdAt}  & \pkg{DateTime} & Thời điểm sinh cặp khóa, sinh tự động. \\ \hline
     \end{tabularx}
 \end{table}
 
@@ -178,11 +178,11 @@ Bảng \pkg{signed\_voters} ghi nhận vĩnh viễn việc một node ký đã p
     \hline
     \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
     \hline
-    id         & ObjectId & Khóa chính của bản ghi, sinh tự động. \\ \hline
-    electionId & ObjectId & Định danh cuộc bầu cử, tham chiếu sang \pkg{elections.id}. \\ \hline
-    voterId    & ObjectId & Định danh cử tri, tham chiếu sang \pkg{users.id} của Identity Service. \\ \hline
-    sessionId  & String   & Định danh phiên ký (chuỗi UUID v4) mà node đã tiêu thụ \textit{nonce} để phát hành chữ ký từng phần. \\ \hline
-    signedAt   & DateTime & Thời điểm node phát hành chữ ký từng phần, sinh tự động. \\ \hline
+    \pkg{id}         & \pkg{ObjectId} & Khóa chính của bản ghi, sinh tự động. \\ \hline
+    \pkg{electionId} & \pkg{ObjectId} & Định danh cuộc bầu cử, tham chiếu sang \pkg{elections.id}. \\ \hline
+    \pkg{voterId}    & \pkg{ObjectId} & Định danh cử tri, tham chiếu sang \pkg{users.id} của Identity Service. \\ \hline
+    \pkg{sessionId}  & \pkg{String}   & Định danh phiên ký (chuỗi UUID v4) mà node đã tiêu thụ nonce để phát hành chữ ký từng phần. \\ \hline
+    \pkg{signedAt}   & \pkg{DateTime} & Thời điểm node phát hành chữ ký từng phần, sinh tự động. \\ \hline
     \end{tabularx}
 \end{table}
 
@@ -190,7 +190,7 @@ Bảng \pkg{signed\_voters} ghi nhận vĩnh viễn việc một node ký đã p
 
 \subsubsection{Bảng {revealed\_votes} (Reveal-Vote Service)}
 
-Bảng \pkg{revealed\_votes} lưu các phiếu đã được giải mù sau khi cuộc bầu cử đóng. Mỗi bản ghi tương ứng với đúng một lá phiếu, chỉ chứa danh sách định danh ứng viên được chọn cùng với chữ ký Schnorr đã giải mù, không tham chiếu tới định danh cử tri để giữ tính không thể liên kết (\textit{unlinkability}).
+Bảng \pkg{revealed\_votes} lưu các phiếu đã được giải mù sau khi cuộc bầu cử đóng. Mỗi bản ghi tương ứng với đúng một lá phiếu, chỉ chứa danh sách định danh ứng viên được chọn cùng với chữ ký Schnorr đã giải mù, không tham chiếu tới định danh cử tri để giữ tính không thể liên kết (unlinkability).
 
 \begin{table}[H]
     \centering
@@ -202,15 +202,15 @@ Bảng \pkg{revealed\_votes} lưu các phiếu đã được giải mù sau khi 
     \hline
     \textbf{Tên thuộc tính} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\
     \hline
-    id            & ObjectId & Khóa chính của bản ghi, sinh tự động. \\ \hline
-    electionId    & ObjectId & Định danh cuộc bầu cử, tham chiếu sang \pkg{elections.id}. \\ \hline
-    candidateIds  & ObjectId[] & Danh sách định danh ứng viên được chọn trên lá phiếu (dạng nguyên bản, đã chuẩn hóa (canonicalize): loại bỏ phần tử trùng lặp và sắp xếp), tham chiếu sang \pkg{users.id}. \\ \hline
-    revealKey     & String   & Vân tay chữ ký, được tính bằng $\mathrm{SHA256}(h \mathbin{\|} s')$ dưới dạng hex 64 ký tự, sử dụng làm khóa chống phát lại. \\ \hline
-    signature     & Embedded (\textit{Signature\allowbreak Revealed\allowbreak Vote}) & Đối tượng nhúng chứa chữ ký Schnorr đã giải mù gồm hai thành phần con. \\ \hline
-    signature.h   & String   & Thành phần $h$ của chữ ký, là vô hướng hex 64 ký tự. \\ \hline
-    signature.\allowbreak sPrime & String & Thành phần $s'$ của chữ ký (đã giải mù), là vô hướng hex 64 ký tự. \\ \hline
-    blockchain\allowbreak Ref & String?  & Mã giao dịch blockchain của lệnh ghi nhận \pkg{RevealVoteCompact}; có thể null khi bản ghi được phục hồi qua cơ chế retry mà \pkg{GetUsedReveal} không trả \pkg{transactionId}. \\ \hline
-    revealedAt    & DateTime & Thời điểm phiếu được giải mù, sinh tự động. \\ \hline
+    \pkg{id}            & \pkg{ObjectId} & Khóa chính của bản ghi, sinh tự động. \\ \hline
+    \pkg{electionId}    & \pkg{ObjectId} & Định danh cuộc bầu cử, tham chiếu sang \pkg{elections.id}. \\ \hline
+    \pkg{candidateIds}  & \pkg{ObjectId[]} & Danh sách định danh ứng viên được chọn trên lá phiếu (dạng nguyên bản, đã chuẩn hóa (canonicalize): loại bỏ phần tử trùng lặp và sắp xếp), tham chiếu sang \pkg{users.id}. \\ \hline
+    \pkg{revealKey}     & \pkg{String}   & Định danh chữ ký, được tính bằng $\mathrm{SHA256}(h \mathbin{\|} s')$ dưới dạng hex 64 ký tự, sử dụng làm khóa chống phát lại. \\ \hline
+    \pkg{signature}     & \pkg{Embedded}\allowbreak\pkg{(Signature}\allowbreak\pkg{RevealedVote)} & Đối tượng nhúng chứa chữ ký Schnorr đã giải mù gồm hai thành phần con. \\ \hline
+    \pkg{signature.h}   & \pkg{String}   & Thành phần $h$ của chữ ký, là vô hướng hex 64 ký tự. \\ \hline
+    \pkg{signature.sPrime} & \pkg{String} & Thành phần $s'$ của chữ ký (đã giải mù), là vô hướng hex 64 ký tự. \\ \hline
+    \pkg{blockchainRef} & \pkg{String?}  & Mã giao dịch blockchain của lệnh ghi nhận \pkg{RevealVoteCompact}; có thể null khi bản ghi được phục hồi qua cơ chế retry mà \pkg{GetUsedReveal} không trả \pkg{transactionId}. \\ \hline
+    \pkg{revealedAt}    & \pkg{DateTime} & Thời điểm phiếu được giải mù, sinh tự động. \\ \hline
     \end{tabularx}
 \end{table}
 

@@ -71,7 +71,7 @@
 
 \usepackage[unicode]{hyperref}
 \usepackage{url}
-\newcommand{\pkg}[1]{\texttt{#1}}
+\DeclareRobustCommand{\pkg}[1]{\texttt{#1}}
 \newcommand{\tabitem}{~~\llap{\textbullet}~~}
 \usepackage{colortbl}
 \definecolor{LightCyan}{rgb}{0.88,1,1}
@@ -123,6 +123,9 @@
 \input{Chapter-3}
 \newpage
 \input{Chapter-4}
+\newpage
+
+\input{Conclusion}
 \newpage
 
 \phantomsection\addcontentsline{toc}{section}{\numberline {}TÀI LIỆU THAM KHẢO}

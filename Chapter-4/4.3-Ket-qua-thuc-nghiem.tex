@@ -4,9 +4,9 @@ Trên cơ sở kiến trúc và các tầng bảo mật đã trình bày ở Ch�
 
 \subsubsection{Giao diện phía quản trị viên (E-voting Admin)}
 
-Trang quản trị cung cấp các chức năng vận hành cốt lõi của một cuộc bầu cử: quản lý người dùng, khởi tạo và cấu hình cuộc bầu cử, theo dõi diễn biến bỏ phiếu thời gian thực và thực thi quy trình kiểm phiếu sau khi đóng phiếu. Giao diện được thiết kế đồng nhất theo nguyên tắc thiết kế \textit{Material Design} với bố cục dạng bảng điều khiển (dashboard) nhằm tối ưu cho thao tác nhập liệu và truy vấn dữ liệu khối lượng lớn.
+Trang quản trị cung cấp các chức năng vận hành cốt lõi của một cuộc bầu cử: quản lý người dùng, khởi tạo và cấu hình cuộc bầu cử, theo dõi diễn biến bỏ phiếu thời gian thực và thực thi quy trình kiểm phiếu sau khi đóng phiếu. Giao diện được thiết kế đồng nhất theo nguyên tắc thiết kế Material Design với bố cục dạng bảng điều khiển (dashboard) nhằm tối ưu cho thao tác nhập liệu và truy vấn dữ liệu khối lượng lớn.
 
-Màn hình \textbf{Đăng nhập} là điểm vào duy nhất của hệ thống quản trị, yêu cầu xác thực bằng tài khoản nội bộ có gắn vai trò \textit{admin}. Phiên đăng nhập được bảo vệ bằng cơ chế JWT hai cặp khóa và lưu trữ tập trung trên Redis như đã trình bày trong Chương~3.
+Màn hình \textbf{Đăng nhập} là điểm vào duy nhất của hệ thống quản trị, yêu cầu xác thực bằng tài khoản nội bộ có gắn vai trò \pkg{admin}. Phiên đăng nhập được bảo vệ bằng cơ chế JWT hai cặp khóa và lưu trữ tập trung trên Redis như đã trình bày trong Chương~3.
 
 \begin{figure}[H]
     \centering
@@ -22,7 +22,7 @@ Sau khi xác thực thành công, quản trị viên có thể truy cập \textb
     \caption{Quản lý danh sách người dùng E-voting admin}
 \end{figure}
 
-\textbf{Trang quản lý danh sách bầu cử} liệt kê toàn bộ cuộc bầu cử đã, đang và sẽ diễn ra theo từng trạng thái: \pkg{PENDING}, \pkg{ACTIVE}, \textit{CLOSED}, \textit{COMPLETED}. Mỗi mục cho phép truy cập nhanh tới chi tiết tương ứng để cấu hình hoặc theo dõi.
+\textbf{Trang quản lý danh sách bầu cử} liệt kê toàn bộ cuộc bầu cử đã, đang và sẽ diễn ra theo từng trạng thái: \pkg{PENDING}, \pkg{ACTIVE}, \pkg{CLOSED}, \pkg{COMPLETED}. Mỗi mục cho phép truy cập nhanh tới chi tiết tương ứng để cấu hình hoặc theo dõi.
 
 \begin{figure}[H]
     \centering
@@ -58,7 +58,7 @@ Sau khi cuộc bầu cử kết thúc, quản trị viên chuyển sang tab \tex
 
 Ứng dụng di động được phát triển trên nền tảng Expo cho phép cử tri thực hiện toàn bộ quy trình bỏ phiếu trên thiết bị cá nhân: từ đăng nhập, lựa chọn cuộc bầu cử, thực hiện bỏ phiếu cho đến lưu giữ biên lai và tự xác minh phiếu bầu sau khi kết quả được công bố. Giao diện được thiết kế theo nguyên tắc tối giản với màn hình tập trung vào một thao tác duy nhất tại mỗi thời điểm nhằm giảm rủi ro nhầm lẫn của cử tri.
 
-Màn hình \textbf{Đăng nhập} xác thực cử tri bằng tài khoản đã được quản trị viên cấp quyền ở phía trang quản trị. Mỗi phiên đăng nhập thành công khởi tạo một cặp khóa cục bộ lưu trong vùng \textit{Secure Storage} của thiết bị, phục vụ ký mù phiếu bầu ở các bước sau.
+Màn hình \textbf{Đăng nhập} xác thực cử tri bằng tài khoản đã được quản trị viên cấp quyền ở phía trang quản trị. Mỗi phiên đăng nhập thành công khởi tạo một cặp khóa cục bộ lưu trong vùng Secure Storage của thiết bị, phục vụ ký mù phiếu bầu ở các bước sau.
 
 \begin{figure}[H]
     \centering
