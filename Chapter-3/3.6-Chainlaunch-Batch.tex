@@ -11,7 +11,7 @@ Hyperledger Fabric không đóng khối cho từng giao dịch riêng lẻ mà \
     \label{fig:configtx-batch}
 \end{figure}
 
-Một khối được đóng khi \textbf{thỏa một trong bốn điều kiện}: (1) số giao dịch đạt \pkg{MaxMessageCount}; (2) tổng kích thước vượt quá \pkg{AbsoluteMaxBytes}; (3) kích thước vượt quá ngưỡng \pkg{PreferredMaxBytes} (dù ngay cả khi chưa đủ \pkg{MaxMessageCount}); hoặc (4) \pkg{BatchTimeout} hết hạn dù lô chỉ có một giao dịch. Trong các điều kiện trên, \pkg{BatchTimeout} là yếu tố quyết định tính chất hành vi của mạng -- quyết định độ trễ chung quyết tối thiểu mà cử tri quan sát thấy. Cơ chế đóng khối được minh họa trong Hình~\ref{fig:batch-blockchain}.
+Một khối được đóng khi \textbf{thỏa một trong bốn điều kiện}: (1) số giao dịch đạt \pkg{MaxMessageCount}; (2) tổng kích thước vượt quá \pkg{AbsoluteMaxBytes}; (3) kích thước vượt quá ngưỡng \pkg{PreferredMaxBytes} (dù ngay cả khi chưa đủ \pkg{MaxMessageCount}); hoặc (4) \pkg{BatchTimeout} hết hạn dù lô chỉ có một giao dịch. Trong các điều kiện trên, \pkg{BatchTimeout} là yếu tố quyết định tính chất hành vi của mạng -- quyết định độ trễ chung quyết tối thiểu mà cử tri quan sát thấy.
 
 \subsubsection{Đánh đổi giữa thông lượng và độ trễ}
 
